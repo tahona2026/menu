@@ -17,14 +17,21 @@
     <!-- الهيدر -->
     <header class="bg-red-900 text-white px-5 py-3.5 shadow-lg flex justify-between items-center z-10 border-b-4 border-amber-500">
         <div class="flex items-center gap-3">
-            <div class="bg-amber-500 text-red-950 w-11 h-11 rounded-2xl flex items-center justify-center text-2xl shadow-inner font-black">🐓</div>
+            <!-- تمت إضافة onclick للدجاجة لفتح CPanel -->
+            <div onclick="handleAdminTap()" class="bg-amber-500 text-red-950 w-11 h-11 rounded-2xl flex items-center justify-center text-2xl shadow-inner font-black cursor-pointer select-none transition active:scale-95">🐓</div>
             <div>
                 <h1 class="text-lg md:text-xl font-black tracking-wide">دواجن الطاحونة</h1>
                 <p class="text-[11px] text-amber-300 font-semibold">طازج يومياً • بيع بالوزن وتجهيز حسب الطلب</p>
             </div>
         </div>
-        <div class="bg-red-950/80 px-3 py-1.5 rounded-xl border border-red-700 text-[11px] text-amber-400 font-bold">
-            ⚖️ أسعار اليوم محدثة
+        <div class="flex flex-col items-end gap-1.5">
+            <div class="bg-red-950/80 px-3 py-1.5 rounded-xl border border-red-700 text-[11px] text-amber-400 font-bold shadow-sm">
+                ⚖️ أسعار اليوم
+            </div>
+            <!-- زر تحديث الأسعار يدوياً -->
+            <button onclick="refreshPrices()" id="refresh-btn" class="text-amber-300 text-[10px] font-bold flex items-center gap-1 active:scale-90 transition">
+                <span id="refresh-icon">🔄</span> تحديث
+            </button>
         </div>
     </header>
 
@@ -71,58 +78,28 @@
     <!-- نافذة إتمام الطلب والدفع واللوكيشن -->
     <div id="cart-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-40 flex justify-end">
         <div class="bg-white w-full max-w-lg h-full flex flex-col shadow-2xl overflow-hidden">
-            
-            <!-- رأس النافذة -->
             <div class="p-4 bg-red-900 text-white flex justify-between items-center">
                 <h3 class="font-bold text-base">🛒 مراجعة الطلب وبيانات التوصيل</h3>
                 <button onclick="toggleCartModal()" class="text-amber-300 text-2xl font-bold leading-none">&times;</button>
             </div>
-
-            <!-- محتوى السلة والفورم قابل للتمرير -->
             <div class="flex-1 overflow-y-auto p-4 space-y-4">
-                
-                <!-- تنبيه الميزان -->
                 <div class="bg-amber-50 border border-amber-300 rounded-xl p-2.5 text-[11px] text-amber-900 font-semibold">
                     ⚖️ <b>تنويه الميزان:</b> الإجمالي محسوب تقريبياً بناءً على الأوزان المختارة، وسيتم تحديد الحساب الفعلي بدقة على الميزان الديجيتال وقت التحضير.
                 </div>
-
-                <!-- قائمة الأصناف المختارة -->
                 <div id="cart-items-container" class="divide-y border rounded-xl p-3 bg-slate-50"></div>
-
-                <!-- بيانات العميل واللوكيشن -->
                 <div class="bg-white border rounded-xl p-3.5 space-y-3 shadow-sm">
                     <h4 class="font-bold text-sm text-red-900 border-b pb-1.5">📍 بيانات العميل والتوصيل</h4>
-                    
+                    <div><input type="text" id="cust-name" placeholder="الاسم بالكامل *" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-red-700"></div>
+                    <div><input type="tel" id="cust-phone" placeholder="01xxxxxxxxx *" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-red-700"></div>
                     <div>
-                        <label class="text-xs font-bold text-slate-700 block mb-1">اسم العميل *</label>
-                        <input type="text" id="cust-name" placeholder="الاسم بالكامل" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-red-700">
-                    </div>
-
-                    <div>
-                        <label class="text-xs font-bold text-slate-700 block mb-1">رقم الموبايل / واتساب *</label>
-                        <input type="tel" id="cust-phone" placeholder="01xxxxxxxxx" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-red-700">
-                    </div>
-
-                    <!-- زر اللوكيشن التلقائي -->
-                    <div>
-                        <label class="text-xs font-bold text-slate-700 block mb-1">الموقع على الخريطة (GPS)</label>
-                        <button type="button" onclick="getAutoLocation()" id="gps-btn" class="w-full bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-300 font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-2 transition">
-                            <span>📍 اضغط لتحديد موقعك الحالي تلقائياً</span>
-                        </button>
+                        <button type="button" onclick="getAutoLocation()" id="gps-btn" class="w-full bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-300 font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-2 transition">📍 اضغط لتحديد موقعك الحالي تلقائياً</button>
                         <input type="hidden" id="cust-gps-url" value="">
                         <p id="gps-status" class="text-[11px] text-emerald-600 font-bold mt-1 hidden"></p>
                     </div>
-
-                    <div>
-                        <label class="text-xs font-bold text-slate-700 block mb-1">العنوان بالتفصيل (مكتوب) *</label>
-                        <textarea id="cust-address" rows="2" placeholder="المنطقة، اسم الشارع، رقم العقار، الدور، الشقة، وعلامة مميزة..." class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-red-700"></textarea>
-                    </div>
+                    <div><textarea id="cust-address" rows="2" placeholder="العنوان بالتفصيل (مكتوب) *" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-red-700"></textarea></div>
                 </div>
-
-                <!-- طرق الدفع ورفع الإيصال -->
                 <div class="bg-white border rounded-xl p-3.5 space-y-3 shadow-sm">
                     <h4 class="font-bold text-sm text-red-900 border-b pb-1.5">💳 طريقة الدفع</h4>
-                    
                     <div class="grid grid-cols-3 gap-2">
                         <label class="border rounded-xl p-2 text-center cursor-pointer has-[:checked]:bg-red-50 has-[:checked]:border-red-700">
                             <input type="radio" name="payment_method" value="كاش عند الاستلام" checked onchange="togglePaymentDetails()" class="hidden">
@@ -137,60 +114,58 @@
                         <label class="border rounded-xl p-2 text-center cursor-pointer has-[:checked]:bg-red-50 has-[:checked]:border-red-700">
                             <input type="radio" name="payment_method" value="فودافون كاش" onchange="togglePaymentDetails()" class="hidden">
                             <span class="text-xs font-bold block text-red-600">📱 فودافون كاش</span>
-                            <span class="text-[10px] text-slate-500">محفظة إلكترونية</span>
+                            <span class="text-[10px] text-slate-500">محفظة</span>
                         </label>
                     </div>
-
-                    <!-- صندوق بيانات التحويل ورفع الإيصال -->
                     <div id="electronic-payment-box" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2.5">
                         <div class="flex justify-between items-center bg-white p-2 rounded-lg border">
                             <div>
                                 <span class="text-[10px] text-slate-500 block">حول المبلغ على الرقم / الحساب:</span>
-                                <span id="payment-target-number" class="font-black text-sm text-slate-900 select-all">01027808157</span>
+                                <span id="payment-target-number" class="font-black text-sm text-slate-900 select-all">01097022660</span>
                             </div>
-                            <button type="button" onclick="copyPaymentNumber()" class="bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg">نسخ الرقم 📋</button>
+                            <button type="button" onclick="copyPaymentNumber()" class="bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg">نسخ 📋</button>
                         </div>
-
                         <div>
-                            <label class="text-xs font-bold text-slate-700 block mb-1">📸 إرفاق صورة إيصال التحويل (اختياري أو بعد الوزن):</label>
-                            <input type="file" id="receipt-file" accept="image/*" class="w-full text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-500 file:text-red-950 hover:file:bg-amber-400">
-                            <p class="text-[10px] text-slate-500 mt-1">سيتم رفع الإيصال تلقائياً وإرفاق رابطه مع الفاتورة.</p>
+                            <label class="text-xs font-bold text-slate-700 block mb-1">📸 إرفاق صورة إيصال التحويل (اختياري):</label>
+                            <input type="file" id="receipt-file" accept="image/*" class="w-full text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-500 file:text-red-950">
                         </div>
                     </div>
                 </div>
-
             </div>
-
-            <!-- زر الإرسال النهائي -->
             <div class="p-3.5 bg-slate-100 border-t">
-                <button id="submit-order-btn" onclick="submitAndSendWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-sm shadow-lg transition flex items-center justify-center gap-2">
-                    <span>💬 تأكيد الطلب وإرسال عبر واتساب</span>
-                </button>
+                <button id="submit-order-btn" onclick="submitAndSendWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-sm shadow-lg transition flex items-center justify-center gap-2">💬 تأكيد الطلب وإرسال عبر واتساب</button>
             </div>
         </div>
     </div>
 
+    <!-- ========================================================= -->
+    <!-- لوحة الإدارة المخفية (CPanel) التي تفتح بالضغط على الدجاجة -->
+    <!-- ========================================================= -->
+    <div id="cpanel-view" class="hidden fixed inset-0 bg-slate-100 z-50 overflow-hidden flex flex-col">
+        <div class="bg-red-950 text-amber-400 p-4 flex justify-between items-center shadow-lg border-b-4 border-amber-500">
+            <h2 class="font-black text-lg flex items-center gap-2">⚙️ بورصة الأسعار (الإدارة)</h2>
+            <button onclick="hideCPanel()" class="bg-red-800 hover:bg-red-700 text-white px-4 py-1.5 rounded-xl text-sm font-bold shadow-md transition">إغلاق ✖</button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4">
+            <p class="text-[11px] text-slate-500 font-bold mb-4 text-center">أي تعديل للسعر هنا سيتم حفظه مباشرة في جوجل شيت ليراه جميع الزبائن.</p>
+            <div id="cpanel-items-container" class="space-y-3 max-w-xl mx-auto pb-10"></div>
+        </div>
+    </div>
+
     <script>
-        // ضع هنا رابط الـ Web App URL الخاص بـ Google Apps Script 👇
         const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbybijlHYuVk2ZnDTLu4z_Gk96vt7t0QZN94JQUC5v9J5ggqXi0LVb4CvHshIETvN0oJ/exec";
-        const STORE_WHATSAPP = "201027808157";
+        const STORE_WHATSAPP = "201097022660";
+        const ADMIN_PIN = "2026"; // الرقم السري للإدارة
 
         let menuItems = [];
         let cart = {};
         let currentCategory = 'all';
 
-        // بيانات افتراضية تعمل فوراً حتى تضع رابط الشيت الخاص بك
         const fallbackMenu = [
-            { id: "PL-101", name: "فراخ بيضاء طازجة", cat: "CAT-RAW", price: 95, unit: "كيلو", step: 0.5, prep_options: "تقطيع 4 قطع,تقطيع 8 قطع للشوي,فرخة سليمة بدون تقطيع,خلي كامل", img: "https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=500", desc: "فراخ بيضاء مزارع طازجة ذبح اليوم، السعر للكيلو والوزن الفعلي عند التجهيز" },
-            { id: "PL-102", name: "فراخ بلدي حر", cat: "CAT-RAW", price: 135, unit: "كيلو", step: 0.5, prep_options: "فرخة سليمة للحشو,تقطيع 4 قطع", img: "https://images.unsplash.com/photo-1518492104633-130d0cc84637?w=500", desc: "فراخ بلدي فلاحي طازجة ممتازة للشوربة والحشو" },
-            { id: "PL-103", name: "فيليه بانيه صافي", cat: "CAT-CUTS", price: 210, unit: "كيلو", step: 0.25, prep_options: "شرائح بانيه عادي,شرائح سميكة (ستيك),تقطيع شاورما,تقطيع فاهيتا/استربس", img: "https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=500", desc: "صدور دجاج مخلية صافي بدون دهون أو عظم، تقطيع حسب رغبتك" },
-            { id: "PL-104", name: "شيش طاووق (أوراك مخلية)", cat: "CAT-CUTS", price: 195, unit: "كيلو", step: 0.25, prep_options: "مكعبات شيش طاووق,أوراك مخلية سليمة للحشو (حمام كداب)", img: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=500", desc: "أوراك دجاج مخلية طازجة جاهزة للتتبيل والشوي" },
-            { id: "PL-105", name: "أوراك دجاج بالعظم", cat: "CAT-CUTS", price: 105, unit: "كيلو", step: 0.5, prep_options: "سليمة للفرن,مقطعة نصفين (دبوس وعريض)", img: "https://images.unsplash.com/photo-1588767768106-1b20e51d9d68?w=500", desc: "أوراك دجاج طازجة مقطعة ومنظفة بعناية" },
-            { id: "PL-106", name: "كبد وقوانص طازجة", cat: "CAT-CUTS", price: 110, unit: "كيلو", step: 0.25, prep_options: "كبد وقوانص معاً,تقطيع عصافيري", img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=500", desc: "كبد وقوانص فراخ طازجة منظفة تماماً" },
-            { id: "PL-108", name: "جوز حمام بلدي جامبو", cat: "CAT-DUCK", price: 180, unit: "جوز", step: 1, prep_options: "تنظيف للحشو,فتح سنجاري", img: "https://images.unsplash.com/photo-1514944298352-f4d732142f74?w=500", desc: "حمام بلدي زغاليل حجم جامبو، السعر للجوز" },
-            { id: "PL-109", name: "بط مسكوفي طازج", cat: "CAT-DUCK", price: 145, unit: "كيلو", step: 0.5, prep_options: "بطة سليمة للفرن,تقطيع 4 قطع,تقطيع 8 قطع", img: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500", desc: "بط مسكوفي لحم أحمر قليل الدهون، السعر للكيلو" }
+            { id: "PL-101", name: "فراخ بيضاء طازجة", cat: "CAT-RAW", price: 95, unit: "كيلو", step: 0.5, prep_options: "تقطيع 4 قطع,تقطيع 8 قطع للشوي,فرخة سليمة بدون تقطيع,خلي كامل", img: "https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=500", desc: "فراخ بيضاء مزارع طازجة ذبح اليوم" }
         ];
 
+        // 1. إضافة "?t=" لرابط الـ API تمنع الكاش وتجبر المتصفح على جلب السعر الجديد فوراً
         async function fetchMenu() {
             if (!GOOGLE_SHEET_API_URL.startsWith("http")) {
                 menuItems = fallbackMenu;
@@ -199,9 +174,12 @@
                 return;
             }
             try {
-                const response = await fetch(GOOGLE_SHEET_API_URL);
+                // استخدام Timestamp يمنع الكاش نهائياً
+                const response = await fetch(GOOGLE_SHEET_API_URL + "?t=" + new Date().getTime());
                 const textData = await response.text();
-                menuItems = JSON.parse(textData);
+                const parsed = JSON.parse(textData);
+                menuItems = Array.isArray(parsed) ? parsed : (parsed.menu || fallbackMenu);
+                
                 document.getElementById('loading-spinner').style.display = 'none';
                 applyFilters();
             } catch (error) {
@@ -210,6 +188,16 @@
                 document.getElementById('loading-spinner').style.display = 'none';
                 applyFilters();
             }
+        }
+
+        async function refreshPrices() {
+            const icon = document.getElementById('refresh-icon');
+            const spinner = document.getElementById('loading-spinner');
+            icon.classList.add('animate-spin');
+            spinner.style.display = 'block';
+            spinner.innerHTML = 'جاري تحديث الأسعار اللحظية... 🔄';
+            await fetchMenu();
+            icon.classList.remove('animate-spin');
         }
 
         function filterCategory(cat, btn) {
@@ -244,17 +232,13 @@
         function renderMenu(items) {
             const grid = document.getElementById('menu-grid');
             grid.innerHTML = '';
-
             items.forEach(item => {
                 const step = parseFloat(item.step) || 0.5;
                 const unit = item.unit || 'كيلو';
                 const prepList = item.prep_options ? item.prep_options.split(',') : ['تجهيز عادي'];
                 const currentQty = cart[item.id] ? cart[item.id].qty : 0;
                 const selectedPrep = cart[item.id] ? cart[item.id].prep : prepList[0];
-
-                const optionsHtml = prepList.map(opt => 
-                    `<option value="${opt.trim()}" ${opt.trim() === selectedPrep ? 'selected' : ''}>${opt.trim()}</option>`
-                ).join('');
+                const optionsHtml = prepList.map(opt => `<option value="${opt.trim()}" ${opt.trim() === selectedPrep ? 'selected' : ''}>${opt.trim()}</option>`).join('');
 
                 const card = document.createElement('div');
                 card.className = "bg-white rounded-2xl p-3.5 border border-slate-200 shadow-sm flex flex-col justify-between";
@@ -262,57 +246,41 @@
                     <div>
                         <div class="relative mb-3">
                             <img src="${item.img}" class="w-full h-36 object-cover rounded-xl" onerror="this.src='https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=400'">
-                            <span class="absolute top-2 left-2 bg-red-900/90 text-amber-300 font-black px-2.5 py-1 rounded-lg text-xs shadow">
-                                ${item.price} ج.م / ${unit}
-                            </span>
+                            <span class="absolute top-2 left-2 bg-red-900/90 text-amber-300 font-black px-2.5 py-1 rounded-lg text-xs shadow">${item.price} ج.م / ${unit}</span>
                         </div>
                         <h3 class="font-bold text-slate-900 text-sm mb-1">${item.name}</h3>
                         <p class="text-[11px] text-slate-500 mb-2.5 line-clamp-2">${item.desc || ''}</p>
-                        
                         <div class="mb-3">
                             <label class="text-[10px] font-bold text-slate-600 block mb-1">🔪 طريقة التقطيع / التجهيز:</label>
-                            <select id="prep-${item.id}" onchange="updatePrep('${item.id}', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-semibold focus:outline-none focus:border-red-700">
-                                ${optionsHtml}
-                            </select>
+                            <select id="prep-${item.id}" onchange="updatePrep('${item.id}', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-semibold focus:outline-none focus:border-red-700">${optionsHtml}</select>
                         </div>
                     </div>
                     <div>
-                        ${currentQty === 0 ? `
-                            <button onclick="updateWeight('${item.id}', ${step})" class="w-full bg-red-800 hover:bg-red-900 text-white font-bold py-2 rounded-xl text-xs transition shadow-sm">
-                                ⚖️ أضف بالوزن (+${step} ${unit})
-                            </button>
-                        ` : `
-                            <div class="flex items-center justify-between bg-amber-50 rounded-xl p-1 border border-amber-300">
+                        ${currentQty === 0 ? 
+                            `<button onclick="updateWeight('${item.id}', ${step})" class="w-full bg-red-800 hover:bg-red-900 text-white font-bold py-2 rounded-xl text-xs transition shadow-sm">⚖️ أضف بالوزن (+${step} ${unit})</button>` 
+                            : 
+                            `<div class="flex items-center justify-between bg-amber-50 rounded-xl p-1 border border-amber-300">
                                 <button onclick="updateWeight('${item.id}', -${step})" class="bg-white border w-8 h-8 rounded-lg font-black text-red-800 shadow-sm">-</button>
                                 <div class="text-center">
                                     <span class="font-black text-xs text-red-950 block">${formatWeight(currentQty, unit)}</span>
                                     <span class="text-[10px] text-slate-600 font-bold">${(currentQty * item.price).toFixed(0)} ج.م</span>
                                 </div>
                                 <button onclick="updateWeight('${item.id}', ${step})" class="bg-amber-500 w-8 h-8 rounded-lg font-black text-red-950 shadow-sm">+</button>
-                            </div>
-                        `}
-                    </div>
-                `;
+                            </div>`
+                        }
+                    </div>`;
                 grid.appendChild(card);
             });
         }
 
-        function updatePrep(id, newPrep) {
-            if (cart[id]) {
-                cart[id].prep = newPrep;
-                updateCartBar();
-            }
-        }
+        function updatePrep(id, newPrep) { if (cart[id]) { cart[id].prep = newPrep; updateCartBar(); } }
 
         function updateWeight(id, delta) {
             const item = menuItems.find(i => i.id === id);
             const prepSelect = document.getElementById(`prep-${id}`);
             const chosenPrep = prepSelect ? prepSelect.value : 'عادي';
-
             if (!cart[id]) {
-                if (delta > 0) {
-                    cart[id] = { ...item, qty: delta, prep: chosenPrep };
-                }
+                if (delta > 0) cart[id] = { ...item, qty: delta, prep: chosenPrep };
             } else {
                 cart[id].qty = Math.round((cart[id].qty + delta) * 100) / 100;
                 if (cart[id].qty <= 0) delete cart[id];
@@ -325,18 +293,14 @@
             const cartBar = document.getElementById('floating-cart');
             const cartContainer = document.getElementById('cart-items-container');
             const keys = Object.keys(cart);
-
             if (keys.length === 0) {
                 cartBar.classList.add('translate-y-full');
                 cartContainer.innerHTML = '<p class="text-center text-xs text-slate-400 py-4">السلة فارغة</p>';
                 return;
             }
             cartBar.classList.remove('translate-y-full');
-
-            let totalItems = keys.length;
             let subtotal = 0;
             cartContainer.innerHTML = '';
-
             keys.forEach(id => {
                 const item = cart[id];
                 const itemTotal = item.qty * item.price;
@@ -348,33 +312,32 @@
                             <span class="text-[11px] text-red-700 font-semibold">🔪 التجهيز: ${item.prep}</span>
                         </div>
                         <span class="font-black text-slate-900">${itemTotal.toFixed(0)} ج.م</span>
-                    </div>
-                `;
+                    </div>`;
             });
-
-            document.getElementById('cart-count').innerText = totalItems;
+            document.getElementById('cart-count').innerText = keys.length;
             document.getElementById('cart-total-price').innerText = subtotal.toFixed(0) + " ج.م";
         }
 
-        function toggleCartModal() {
-            document.getElementById('cart-modal').classList.toggle('hidden');
+        function toggleCartModal() { document.getElementById('cart-modal').classList.toggle('hidden'); }
+        function togglePaymentDetails() {
+            const method = document.querySelector('input[name="payment_method"]:checked').value;
+            const box = document.getElementById('electronic-payment-box');
+            if (method === "كاش عند الاستلام") box.classList.add('hidden');
+            else box.classList.remove('hidden');
         }
-
-        // تحديد اللوكيشن التلقائي عبر المتصفح
+        function copyPaymentNumber() {
+            const num = document.getElementById('payment-target-number').innerText;
+            navigator.clipboard.writeText(num);
+            alert("تم نسخ الرقم: " + num);
+        }
         function getAutoLocation() {
             const btn = document.getElementById('gps-btn');
             const status = document.getElementById('gps-status');
-            if (!navigator.geolocation) {
-                alert("متصفحك لا يدعم تحديد الموقع التلقائي.");
-                return;
-            }
+            if (!navigator.geolocation) return alert("متصفحك لا يدعم تحديد الموقع التلقائي.");
             btn.innerHTML = "⏳ جاري التقاط إشارة الـ GPS...";
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
-                    const lat = pos.coords.latitude;
-                    const lng = pos.coords.longitude;
-                    const mapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
-                    document.getElementById('cust-gps-url').value = mapsUrl;
+                    document.getElementById('cust-gps-url').value = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
                     btn.className = "w-full bg-emerald-50 text-emerald-800 border border-emerald-400 font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-2";
                     btn.innerHTML = "✅ تم تحديد موقعك على الخريطة بنجاح";
                     status.innerText = "سيتم إرفاق رابط الخريطة مع الطلب تلقائياً.";
@@ -382,28 +345,97 @@
                 },
                 (err) => {
                     btn.innerHTML = "⚠️ تعذر تحديد الموقع تلقائياً (يرجى تفعيل الـ GPS)";
-                    alert("يرجى السماح للمتصفح بالوصول للموقع (Location) وتفعيل الـ GPS في الهاتف.");
+                    alert("يرجى السماح للمتصفح بالوصول للموقع.");
                 },
                 { enableHighAccuracy: true, timeout: 10000 }
             );
         }
 
-        function togglePaymentDetails() {
-            const method = document.querySelector('input[name="payment_method"]:checked').value;
-            const box = document.getElementById('electronic-payment-box');
-            if (method === "كاش عند الاستلام") {
-                box.classList.add('hidden');
+        // ===========================================================
+        // دوال الإدارة المخفية CPanel (تمت إضافتها)
+        // ===========================================================
+        let tapCount = 0;
+        let tapTimeout;
+
+        function handleAdminTap() {
+            tapCount++;
+            clearTimeout(tapTimeout);
+            if (tapCount >= 5) {
+                tapCount = 0;
+                let pin = prompt("🔒 يرجى إدخال الرقم السري لفتح لوحة التحكم (CPanel):");
+                if (pin === ADMIN_PIN) {
+                    showCPanel();
+                } else if (pin !== null) {
+                    alert("❌ الرقم السري غير صحيح!");
+                }
             } else {
-                box.classList.remove('hidden');
+                tapTimeout = setTimeout(() => { tapCount = 0; }, 1500);
             }
         }
 
-        function copyPaymentNumber() {
-            const num = document.getElementById('payment-target-number').innerText;
-            navigator.clipboard.writeText(num);
-            alert("تم نسخ الرقم: " + num);
+        function showCPanel() {
+            document.getElementById('cpanel-view').classList.remove('hidden');
+            renderCPanelItems();
         }
 
+        function hideCPanel() {
+            document.getElementById('cpanel-view').classList.add('hidden');
+            fetchMenu(); // جلب الأسعار المحدثة بعد الخروج
+        }
+
+        function renderCPanelItems() {
+            const container = document.getElementById('cpanel-items-container');
+            container.innerHTML = '';
+            menuItems.forEach(item => {
+                container.innerHTML += `
+                    <div class="bg-white p-3.5 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center gap-3">
+                        <div class="flex-1">
+                            <div class="text-sm font-bold text-slate-900">${item.name}</div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="cpanel-price-${item.id}" value="${item.price}" class="w-16 border-2 border-slate-300 focus:border-red-700 rounded-lg px-2 py-1 text-center font-black text-sm bg-slate-50">
+                            <button onclick="saveNewPrice('${item.id}')" id="save-btn-${item.id}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-sm w-14">حفظ</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function saveNewPrice(id) {
+            const newPrice = document.getElementById(`cpanel-price-${id}`).value;
+            const btn = document.getElementById(`save-btn-${id}`);
+            const originalText = btn.innerText;
+            btn.innerText = "⏳...";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(GOOGLE_SHEET_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: "update_price", itemId: id, newPrice: newPrice })
+                });
+                const res = await response.json();
+                if (res.status === 'success') {
+                    btn.innerText = "✅ تم";
+                    btn.classList.replace('bg-emerald-600', 'bg-sky-600');
+                    const item = menuItems.find(i => i.id === id);
+                    if (item) item.price = Number(newPrice);
+                } else {
+                    btn.innerText = "❌ خطأ";
+                }
+            } catch (e) {
+                btn.innerText = "❌";
+            }
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.replace('bg-sky-600', 'bg-emerald-600');
+                btn.disabled = false;
+            }, 2000);
+        }
+
+        // ===========================================================
+        // دالة الإرسال للواتساب
+        // ===========================================================
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -422,10 +454,7 @@
             const fileInput = document.getElementById('receipt-file');
             const submitBtn = document.getElementById('submit-order-btn');
 
-            if (!name || !phone || !address) {
-                alert("يرجى إدخال اسم العميل، رقم الموبايل، والعنوان بالتفصيل!");
-                return;
-            }
+            if (!name || !phone || !address) { return alert("يرجى إدخال اسم العميل، رقم الموبايل، والعنوان بالتفصيل!"); }
 
             const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
             let sub = 0;
@@ -439,76 +468,49 @@
 
             let uploadedReceiptUrl = "";
 
-            // رفع صورة الإيصال وتسجيل الطلب في Google Sheet إن وجد رابط API مفعل
             if (GOOGLE_SHEET_API_URL.startsWith("http")) {
                 try {
                     submitBtn.disabled = true;
-                    submitBtn.innerHTML = "⏳ جاري تسجيل الطلب ورفع الإيصال...";
-
-                    let receiptBase64 = null;
-                    let receiptName = null;
-                    let receiptMimeType = null;
-
+                    submitBtn.innerHTML = "⏳ جاري التسجيل...";
+                    let receiptBase64 = null, receiptName = null, receiptMimeType = null;
                     if (fileInput.files.length > 0) {
                         const file = fileInput.files[0];
                         receiptBase64 = await fileToBase64(file);
                         receiptName = file.name;
                         receiptMimeType = file.type;
                     }
-
                     const response = await fetch(GOOGLE_SHEET_API_URL, {
                         method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify({
-                            orderId: orderId,
-                            customerName: name,
-                            customerPhone: phone,
-                            customerAddress: address,
-                            locationUrl: gpsUrl,
-                            itemsSummary: itemsSummaryList.join(" | "),
-                            totalPrice: sub.toFixed(0),
-                            paymentMethod: paymentMethod,
-                            receiptBase64: receiptBase64,
-                            receiptName: receiptName,
-                            receiptMimeType: receiptMimeType
+                            orderId, customerName: name, customerPhone: phone, customerAddress: address,
+                            locationUrl: gpsUrl, itemsSummary: itemsSummaryList.join(" | "),
+                            totalPrice: sub.toFixed(0), paymentMethod: paymentMethod,
+                            receiptBase64: receiptBase64, receiptName: receiptName, receiptMimeType: receiptMimeType
                         })
                     });
-
                     const resJson = await response.json();
                     if (resJson.receiptUrl && resJson.receiptUrl.startsWith("http")) {
                         uploadedReceiptUrl = resJson.receiptUrl;
                     }
                 } catch (e) {
-                    console.warn("Could not upload to Apps Script, proceeding to WhatsApp:", e);
+                    console.warn("API Error:", e);
                 } finally {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = "💬 تأكيد الطلب وإرسال عبر واتساب";
                 }
             }
 
-            // تجهيز رسالة الواتساب النهائية
-            let msg = `🐓 *طلب جديد - دواجن الطاحونة*\n`;
-            msg += `🔖 رقم الطلب: *${orderId}*\n`;
-            msg += `━━━━━━━━━━━━━━\n`;
-            msg += `👤 *العميل:* ${name}\n`;
-            msg += `📞 *الموبايل:* ${phone}\n`;
-            msg += `🏠 *العنوان:* ${address}\n`;
-            if (gpsUrl) {
-                msg += `📍 *لوكيشن GPS:* ${gpsUrl}\n`;
-            }
-            msg += `━━━━━━━━━━━━━━\n`;
-            msg += `⚖️ *الأصناف المطلوبة:*\n`;
+            let msg = `🐓 *طلب جديد - دواجن الطاحونة*\n🔖 رقم الطلب: *${orderId}*\n━━━━━━━━━━━━━━\n👤 *العميل:* ${name}\n📞 *الموبايل:* ${phone}\n🏠 *العنوان:* ${address}\n`;
+            if (gpsUrl) msg += `📍 *لوكيشن GPS:* ${gpsUrl}\n`;
+            msg += `━━━━━━━━━━━━━━\n⚖️ *الأصناف المطلوبة:*\n`;
             Object.values(cart).forEach(i => {
                 msg += `▫️ *${i.name}*\n   الوزن: ${formatWeight(i.qty, i.unit || 'كيلو')} | التجهيز: ${i.prep} | ${(i.qty * i.price).toFixed(0)} ج.م\n`;
             });
-            msg += `━━━━━━━━━━━━━━\n`;
-            msg += `💰 *الإجمالي التقريبي:* ${sub.toFixed(0)} ج.م _(لحين الوزن الفعلي)_\n`;
-            msg += `💳 *طريقة الدفع:* ${paymentMethod}\n`;
-
-            if (uploadedReceiptUrl) {
-                msg += `🧾 *رابط إيصال الدفع:* ${uploadedReceiptUrl}\n`;
-            } else if (fileInput.files.length > 0) {
-                msg += `📎 *ملاحظة:* قمت باختيار إيصال الدفع وسأرسله في الشات الآن.\n`;
-            }
+            msg += `━━━━━━━━━━━━━━\n💰 *الإجمالي التقريبي:* ${sub.toFixed(0)} ج.م _(لحين الوزن الفعلي)_\n💳 *طريقة الدفع:* ${paymentMethod}\n`;
+            
+            if (uploadedReceiptUrl) msg += `🧾 *رابط إيصال الدفع:* ${uploadedReceiptUrl}\n`;
+            else if (fileInput.files.length > 0) msg += `📎 *ملاحظة:* تم إرفاق صورة الإيصال.\n`;
 
             window.open(`https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank');
         }
