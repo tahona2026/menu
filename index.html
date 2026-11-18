@@ -1,376 +1,812 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl" class="transition-all duration-300">
+<!doctype html>
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دواجن الطاحونة - المنيو الإلكتروني</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config = { darkMode: 'class' }</script>
-    <style>
-        body { font-family: 'Cairo', sans-serif; }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        #cart-drawer { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .cart-open { transform: translateX(0) !important; }
-        .cart-closed { transform: translateX(-100%) !important; }
-        .overlay-open { opacity: 1; visibility: visible; }
-        .overlay-closed { opacity: 0; visibility: hidden; transition: all 0.4s; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#7f1d1d">
+<title>دواجن الطاحونة - المنيو</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand:#7f1d1d; --brand-dark:#450a0a; --gold:#f59e0b; --gold-soft:#fde68a;
+  --bg:#f8fafc; --surface:#ffffff; --surface-2:#f1f5f9; --text:#0f172a; --muted:#64748b; --border:#e2e8f0;
+  --ok:#059669; --danger:#dc2626; --radius:16px;
+  --shadow:0 1px 2px rgba(15,23,42,.06),0 4px 14px rgba(15,23,42,.06);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+[data-theme="dark"]{
+  --bg:#0b1120; --surface:#111a2e; --surface-2:#1a2540; --text:#f1f5f9; --muted:#94a3b8; --border:#263451; --shadow:none;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:100%;-webkit-text-size-adjust:100%}
+body{font-family:'Cairo',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:.95rem;line-height:1.5;
+  min-height:100vh;min-height:100dvh;padding-bottom:calc(96px + var(--safe-b));overflow-x:hidden;transition:background .25s,color .25s}
+body.lock{overflow:hidden}
+button,input,select,textarea{font-family:inherit;color:inherit;font-size:1rem}
+button{cursor:pointer;border:0;background:none;touch-action:manipulation}
+button:disabled{opacity:.5;cursor:not-allowed}
+img{display:block;max-width:100%}
+.hidden{display:none!important}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---------- الهيدر ---------- */
+.top{position:sticky;top:0;z-index:30;height:64px;background:var(--brand);color:#fff;display:flex;align-items:center;gap:10px;
+  padding:0 16px;box-shadow:0 2px 12px rgba(0,0,0,.25);border-bottom:3px solid var(--gold)}
+.logo{width:42px;height:42px;border-radius:13px;background:var(--gold);display:grid;place-items:center;font-size:23px;user-select:none;-webkit-user-select:none;flex:none}
+.brand{flex:1;min-width:0}
+.brand h1{font-size:1.1rem;font-weight:900;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand p{font-size:.72rem;color:var(--gold-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.icon-btn{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.13);display:grid;place-items:center;font-size:1.1rem;flex:none;position:relative;color:#fff}
+.icon-btn.spin span{display:inline-block;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- البحث والأقسام ---------- */
+.tools{padding:12px 16px 4px;max-width:1200px;margin:0 auto}
+.search{width:100%;height:46px;border-radius:14px;border:1px solid var(--border);background:var(--surface);padding:0 14px;box-shadow:var(--shadow)}
+.chips-wrap{position:sticky;top:64px;z-index:20;background:var(--bg)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 16px;max-width:1200px;margin:0 auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;height:40px;padding:0 16px;border-radius:999px;background:var(--surface);border:1px solid var(--border);font-weight:700;font-size:.85rem;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+
+/* ---------- الأصناف ---------- */
+main{padding:6px 16px 16px;max-width:1200px;margin:0 auto}
+.grid{display:grid;gap:12px}
+.card{display:flex;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px;box-shadow:var(--shadow)}
+.thumb{position:relative;flex:0 0 112px;height:112px;border-radius:12px;overflow:hidden;background:var(--surface-2)}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.price{position:absolute;bottom:6px;right:6px;background:rgba(69,10,10,.92);color:var(--gold-soft);font-weight:900;font-size:.75rem;padding:3px 8px;border-radius:8px}
+.price small{font-weight:600;opacity:.85}
+.info{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.info h3{font-size:.98rem;font-weight:800;line-height:1.35}
+.desc{font-size:.75rem;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sel,.note{width:100%;height:42px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);padding:0 10px}
+.sel{font-weight:600}
+.qty{margin-top:auto}
+.btn-add{width:100%;height:44px;border-radius:12px;background:var(--brand);color:#fff;font-weight:800}
+.step{display:flex;align-items:center;justify-content:space-between;background:var(--surface-2);border-radius:12px;padding:3px;height:46px}
+.step button{width:42px;height:40px;border-radius:10px;background:var(--surface);font-size:1.3rem;font-weight:900;color:var(--brand);border:1px solid var(--border)}
+.step button.plus{background:var(--gold);color:var(--brand-dark);border-color:var(--gold)}
+.qv{display:flex;align-items:center;gap:4px}
+.qv input{width:62px;text-align:center;font-weight:900;background:transparent;border:0;height:40px}
+.qv span{font-size:.75rem;color:var(--muted)}
+.empty,.state{text-align:center;color:var(--muted);padding:40px 16px;font-weight:700}
+.retry{margin-top:12px;height:44px;padding:0 20px;border-radius:12px;background:var(--brand);color:#fff;font-weight:800}
+.skel{height:136px;border-radius:var(--radius);background:linear-gradient(90deg,var(--surface-2),var(--surface),var(--surface-2));background-size:200% 100%;animation:shine 1.3s infinite;margin-bottom:12px}
+@keyframes shine{to{background-position:-200% 0}}
+@media (min-width:640px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .card{flex-direction:column}
+  .thumb{flex:none;width:100%;height:190px}
+}
+@media (min-width:1000px){.grid{grid-template-columns:repeat(3,1fr)}}
+
+/* ---------- شريط السلة ---------- */
+.cartbar{position:fixed;left:12px;right:12px;bottom:calc(12px + var(--safe-b));z-index:25;max-width:560px;margin:0 auto;
+  background:var(--brand-dark);color:#fff;border-radius:18px;padding:10px 12px;display:flex;align-items:center;gap:12px;
+  box-shadow:0 12px 30px rgba(0,0,0,.4);transform:translateY(160%);transition:transform .3s;border:1px solid rgba(255,255,255,.1)}
+.cartbar.show{transform:none}
+.cnt{width:42px;height:42px;background:var(--gold);color:var(--brand-dark);border-radius:12px;display:grid;place-items:center;font-weight:900;flex:none}
+.cartbar .meta{flex:1;min-width:0;line-height:1.25}
+.cartbar .meta small{display:block;font-size:.7rem;color:var(--gold-soft)}
+.cartbar .meta b{font-size:1rem;color:var(--gold)}
+.cartbar .go{background:var(--gold);color:var(--brand-dark);font-weight:900;border-radius:12px;height:44px;padding:0 16px;flex:none}
+
+/* ---------- نافذة الطلب ---------- */
+.overlay{position:fixed;inset:0;background:rgba(2,6,23,.55);z-index:40;opacity:0;pointer-events:none;transition:opacity .25s}
+.overlay.show{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-height:94vh;max-height:94dvh;background:var(--bg);border-radius:22px 22px 0 0;z-index:41;
+  transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;visibility:hidden}
+.sheet.show{transform:none;visibility:visible}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--surface);border-radius:22px 22px 0 0}
+.sheet-head h2{font-size:1.05rem;font-weight:900}
+.x-btn{width:44px;height:44px;border-radius:12px;background:var(--surface-2);font-size:1.2rem;font-weight:700}
+.sheet-body{overflow-y:auto;padding:14px 16px;flex:1;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.sheet-foot{padding:12px 16px calc(12px + var(--safe-b));border-top:1px solid var(--border);background:var(--surface)}
+@media (min-width:768px){
+  .sheet{left:auto;top:0;bottom:0;right:0;width:440px;max-height:none;border-radius:0;transform:translateX(105%)}
+  .sheet.show{transform:none}
+  .sheet-head{border-radius:0}
+}
+.box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:12px}
+.box h4{font-size:.9rem;font-weight:800;color:var(--brand);margin-bottom:10px}
+[data-theme="dark"] .box h4{color:#fca5a5}
+.notice{background:#fffbeb;border:1px solid #fcd34d;color:#78350f;border-radius:12px;padding:10px 12px;font-size:.78rem;font-weight:600;margin-bottom:12px}
+[data-theme="dark"] .notice{background:#3a2a07;border-color:#92651a;color:#fde68a}
+.co-line{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.co-line:last-child{border-bottom:0}
+.co-info{min-width:0;flex:1}
+.co-info b{display:block;font-size:.88rem}
+.co-info small{display:block;color:var(--muted);font-size:.72rem}
+.co-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.co-right b{font-size:.85rem;color:var(--brand)}
+[data-theme="dark"] .co-right b{color:var(--gold)}
+.step.sm{height:38px;gap:2px}
+.step.sm button{width:34px;height:32px;font-size:1.1rem}
+.step.sm span{min-width:56px;text-align:center;font-weight:800;font-size:.8rem}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.field label{font-size:.8rem;font-weight:700}
+.input{width:100%;height:46px;border-radius:12px;border:1px solid var(--border);background:var(--surface-2);padding:0 12px}
+textarea.input{height:auto;padding:10px 12px;resize:vertical;min-height:72px}
+.seg{display:grid;gap:8px}
+.seg.c2{grid-template-columns:repeat(2,1fr)}
+.seg.c3{grid-template-columns:repeat(3,1fr)}
+.seg-opt{position:relative}
+.seg-opt input{position:absolute;opacity:0;pointer-events:none}
+.seg-opt span{display:flex;align-items:center;justify-content:center;min-height:46px;border-radius:12px;border:1px solid var(--border);background:var(--surface-2);font-weight:700;font-size:.85rem;text-align:center;padding:4px 6px}
+.seg-opt input:checked + span{background:var(--brand);border-color:var(--brand);color:#fff}
+.seg-opt input:disabled + span{opacity:.45}
+.seg-opt input:focus-visible + span{outline:3px solid var(--gold)}
+.hint{font-size:.75rem;color:var(--muted);margin-top:6px}
+.btn{width:100%;min-height:46px;border-radius:12px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn.primary{background:var(--ok);color:#fff;min-height:50px;font-size:1rem}
+.btn.soft{background:#e0f2fe;color:#075985;border:1px solid #7dd3fc}
+[data-theme="dark"] .btn.soft{background:#0c2a40;color:#7dd3fc;border-color:#164e6e}
+.btn.dark{background:var(--surface-2);border:1px solid var(--border)}
+.btn.wa{background:#16a34a;color:#fff;min-height:52px;font-size:1.02rem}
+.btn.danger,.danger{color:var(--danger)}
+.pay-row{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px 10px}
+.pay-row b{font-size:1rem;letter-spacing:.5px;user-select:all}
+.pay-row button{height:40px;padding:0 14px;border-radius:10px;background:var(--text);color:var(--bg);font-weight:800;font-size:.8rem}
+.sum{display:flex;justify-content:space-between;font-size:.9rem;padding:3px 0}
+.sum.total{font-size:1.05rem;font-weight:900;color:var(--brand);border-top:1px dashed var(--border);margin-top:6px;padding-top:8px}
+[data-theme="dark"] .sum.total{color:var(--gold)}
+.done{text-align:center;padding:24px 8px}
+.done .tick{font-size:56px}
+.done h3{font-size:1.2rem;font-weight:900;margin:6px 0}
+.done p{color:var(--muted);margin-top:6px}
+
+/* ---------- لوحة الإدارة ---------- */
+.screen{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;flex-direction:column}
+.screen-head{display:flex;justify-content:space-between;align-items:center;padding:0 16px;height:60px;background:var(--brand);color:#fff;border-bottom:3px solid var(--gold);flex:none}
+.screen-head b{font-size:1.05rem}
+.screen-head button{height:40px;padding:0 14px;border-radius:10px;background:rgba(255,255,255,.15);color:#fff;font-weight:700}
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);flex:none}
+.tabs button{flex:1;height:50px;font-weight:800;color:var(--muted);border-bottom:3px solid transparent;font-size:.9rem}
+.tabs button.on{color:var(--brand);border-color:var(--brand)}
+[data-theme="dark"] .tabs button.on{color:var(--gold);border-color:var(--gold)}
+.screen-body{flex:1;overflow-y:auto;padding:14px 16px calc(24px + var(--safe-b));-webkit-overflow-scrolling:touch}
+.wrap{max-width:640px;margin:0 auto}
+.row{display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:8px}
+.row img{width:52px;height:52px;border-radius:10px;object-fit:cover;flex:none;background:var(--surface-2)}
+.row-info{flex:1;min-width:0}
+.row-info b{display:block;font-size:.88rem;line-height:1.3}
+.row-info small{color:var(--muted);font-size:.72rem}
+.row-act{display:flex;flex-direction:column;gap:6px}
+.row-act button{height:36px;padding:0 12px;border-radius:9px;background:var(--surface-2);border:1px solid var(--border);font-weight:700;font-size:.78rem}
+.zone-row{display:flex;gap:8px;margin-bottom:8px}
+.zone-row .fee{width:96px;flex:none;text-align:center}
+.zone-row button{width:46px;flex:none;border-radius:12px;background:var(--surface-2);border:1px solid var(--border);font-weight:800}
+.preview{width:100%;height:150px;object-fit:cover;border-radius:12px;background:var(--surface-2);margin-top:6px}
+.dialog{position:fixed;inset:0;z-index:70;background:rgba(2,6,23,.6);display:grid;place-items:center;padding:16px}
+.dialog-box{background:var(--surface);border-radius:18px;padding:18px;width:100%;max-width:340px}
+.dialog-box h3{margin-bottom:12px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.toast{position:fixed;top:74px;left:50%;transform:translate(-50%,-20px);background:#0f172a;color:#fff;padding:12px 18px;border-radius:12px;
+  font-weight:700;font-size:.85rem;z-index:80;opacity:0;pointer-events:none;transition:all .25s;max-width:92vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.err{background:#b91c1c}
+.toast.warn{background:#b45309}
+</style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col h-screen overflow-hidden transition-colors duration-300">
+<body>
 
-    <!-- ⚙️ شريط الإعدادات -->
-    <div class="bg-slate-900 dark:bg-black text-slate-300 px-4 py-1.5 flex justify-between items-center text-[11px] font-bold z-20 shadow-md">
-        <div class="flex items-center gap-2"><span>⚙️ إعدادات العرض:</span></div>
-        <div class="flex items-center gap-3">
-            <button onclick="toggleDarkMode()" class="hover:text-amber-400 transition flex items-center gap-1"><span id="theme-icon">🌙</span> <span id="theme-text">ليلي</span></button>
-            <div class="w-px h-3 bg-slate-600"></div>
-            <button onclick="changeFontSize(5)" class="hover:text-amber-400 transition text-sm">A+</button>
-            <button onclick="changeFontSize(-5)" class="hover:text-amber-400 transition text-[10px]">A-</button>
+<header class="top">
+  <div class="logo" id="logo" role="img" aria-label="دواجن الطاحونة">🐓</div>
+  <div class="brand">
+    <h1>دواجن الطاحونة</h1>
+    <p id="status">جاري التحديث...</p>
+  </div>
+  <button class="icon-btn" id="font-btn" aria-label="حجم الخط"><b>Aa</b></button>
+  <button class="icon-btn" id="theme-btn" aria-label="الوضع الليلي"><span id="theme-icon">🌙</span></button>
+  <button class="icon-btn" id="refresh-btn" aria-label="تحديث الأسعار"><span id="refresh-icon">🔄</span></button>
+</header>
+
+<div class="tools"><input class="search" id="search" type="search" placeholder="🔍 ابحث: بانيه، فراخ، بط..." aria-label="بحث"></div>
+<div class="chips-wrap"><nav class="chips" id="chips" aria-label="الأقسام"></nav></div>
+
+<main>
+  <div class="state" id="state"></div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<div class="cartbar" id="cartbar" role="button" tabindex="0" aria-label="فتح السلة">
+  <div class="cnt" id="cart-count">0</div>
+  <div class="meta"><small>سلة الطلبات • الإجمالي تقريبي</small><b id="bar-total">0 ج.م</b></div>
+  <button class="go" id="open-cart" type="button">إتمام الطلب</button>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="مراجعة الطلب">
+  <div class="sheet-head"><h2 id="sheet-title">🛒 مراجعة الطلب</h2><button class="x-btn" id="sheet-close" aria-label="إغلاق">✕</button></div>
+  <div class="sheet-body">
+    <div id="co-view">
+      <div class="notice">⚖️ الإجمالي تقريبي، والحساب النهائي بيتحدد بدقة على الميزان الديجيتال.</div>
+      <div class="box" id="co-items"></div>
+
+      <div class="box">
+        <h4>📍 بيانات الاستلام</h4>
+        <div class="field"><label for="c-name">الاسم بالكامل *</label><input class="input" id="c-name" autocomplete="name" placeholder="مثال: أحمد محمد"></div>
+        <div class="field"><label for="c-phone">رقم الموبايل (واتساب) *</label><input class="input" id="c-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="01XXXXXXXXX"></div>
+        <div class="seg c2" style="margin-bottom:6px">
+          <label class="seg-opt"><input type="radio" name="dtype" value="delivery" id="dt-delivery" checked><span>🛵 توصيل</span></label>
+          <label class="seg-opt"><input type="radio" name="dtype" value="pickup"><span>🏬 استلام من الفرع</span></label>
         </div>
+        <p class="hint" id="dt-hint"></p>
+        <div id="delivery-fields" style="margin-top:10px">
+          <div class="field"><label for="c-zone">المنطقة</label><select class="input" id="c-zone"></select></div>
+          <button type="button" class="btn soft" id="gps" style="margin-bottom:10px">📍 حدّد موقعي (GPS)</button>
+          <div class="field"><label for="c-address">العنوان بالتفصيل *</label><textarea class="input" id="c-address" rows="2" autocomplete="street-address" placeholder="الشارع، رقم العمارة، الدور، علامة مميزة"></textarea></div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h4>💳 طريقة الدفع</h4>
+        <div class="seg c3">
+          <label class="seg-opt"><input type="radio" name="pay" value="كاش" checked><span>💵 كاش</span></label>
+          <label class="seg-opt"><input type="radio" name="pay" value="إنستاباي"><span>⚡ إنستاباي</span></label>
+          <label class="seg-opt"><input type="radio" name="pay" value="فودافون كاش"><span>📱 فودافون</span></label>
+        </div>
+        <div id="pay-box" class="hidden" style="margin-top:12px">
+          <span class="hint" style="display:block;margin:0 0 6px">حوّل المبلغ على الرقم ده:</span>
+          <div class="pay-row"><b id="pay-number"></b><button type="button" id="copy-pay">نسخ 📋</button></div>
+          <div class="field" style="margin-top:10px"><label for="c-receipt">📸 صورة إيصال التحويل (اختياري)</label><input type="file" id="c-receipt" accept="image/*"></div>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="sum"><span>إجمالي الأصناف</span><b id="co-sub">0 ج.م</b></div>
+        <div class="sum"><span>التوصيل</span><b id="co-fee">—</b></div>
+        <div class="sum total"><span>الإجمالي التقريبي</span><b id="co-total">0 ج.م</b></div>
+      </div>
     </div>
 
-    <!-- 🐓 الهيدر -->
-    <header class="bg-red-900 dark:bg-red-950 text-white px-4 md:px-5 py-3 shadow-lg flex justify-between items-center z-10 border-b-4 border-amber-500">
-        <div class="flex items-center gap-3">
-            <div onclick="handleAdminTap()" class="bg-amber-500 text-red-950 w-11 h-11 rounded-2xl flex items-center justify-center text-2xl shadow-inner font-black cursor-pointer select-none transition active:scale-95">🐓</div>
-            <div>
-                <h1 class="text-lg md:text-xl font-black tracking-wide">دواجن الطاحونة</h1>
-                <p class="text-[10px] md:text-[11px] text-amber-300 font-semibold">بورصة أسعار اليوم • بيع بالوزن</p>
-            </div>
-        </div>
-        <div class="flex items-center gap-3">
-            <button onclick="refreshPrices()" id="refresh-btn" class="bg-red-950/80 dark:bg-black/50 hover:bg-black border border-red-700 text-amber-300 text-[10px] md:text-[11px] font-bold px-2 py-1.5 rounded-xl flex items-center gap-1 active:scale-95 transition shadow-sm"><span id="refresh-icon">🔄</span> تحديث</button>
-            <button onclick="toggleCartDrawer()" class="relative bg-white/10 hover:bg-white/20 p-2 rounded-xl transition active:scale-95">
-                <span class="text-2xl">🛒</span>
-                <span id="header-cart-count" class="absolute -top-1 -right-1 bg-amber-500 text-red-950 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-red-900">0</span>
-            </button>
-        </div>
-    </header>
+    <div id="done-view" class="hidden">
+      <div class="done"><div class="tick" id="done-tick">✅</div><h3 id="done-title"></h3><p id="done-text"></p></div>
+    </div>
+  </div>
+  <div class="sheet-foot">
+    <div id="co-foot"><button class="btn primary" id="co-submit" type="button">✅ تأكيد الطلب</button></div>
+    <div id="done-foot" class="hidden" style="display:grid;gap:8px">
+      <a class="btn wa" id="done-wa" href="#" target="_blank" rel="noopener">📲 ابعت الطلب على واتساب</a>
+      <button class="btn dark" id="done-close" type="button">رجوع للمنيو</button>
+    </div>
+  </div>
+</section>
 
-    <!-- 🔍 شريط البحث والأقسام -->
-    <div class="bg-white dark:bg-slate-800 px-4 py-2.5 border-b border-slate-200 dark:border-slate-700 z-10"><input type="text" id="search-input" oninput="applyFilters()" placeholder="ابحث عن: بانيه، فراخ، بط..." class="w-full bg-slate-100 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 border border-slate-200 dark:border-slate-600 rounded-xl py-2 px-4 text-sm focus:outline-none focus:border-red-700 transition"></div>
-    <nav id="category-nav" class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-2.5 overflow-x-auto hide-scrollbar flex gap-2 z-10 shadow-sm"><button onclick="filterCategory('all', this)" class="cat-btn bg-red-800 text-white px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shadow-sm transition">الكل</button><button onclick="filterCategory('CAT-RAW', this)" class="cat-btn bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition">🐔 طازجة</button><button onclick="filterCategory('CAT-CUTS', this)" class="cat-btn bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition">🥩 مقطعات</button><button onclick="filterCategory('CAT-DUCK', this)" class="cat-btn bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition">🦆 بط وحمام</button><button onclick="filterCategory('CAT-READY', this)" class="cat-btn bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition">🌶️ متبل</button></nav>
-
-    <!-- 📋 قائمة الأصناف -->
-    <main class="flex-1 overflow-y-auto p-4 md:p-6 pb-24"><div id="loading-spinner" class="text-center py-16 text-slate-500 dark:text-slate-400 font-bold">جاري تحميل الأسعار... 🔄</div><div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-w-7xl mx-auto"></div></main>
-
-    <!-- 🛒 الشريط السفلي العائم -->
-    <div id="floating-cart" class="fixed bottom-3 left-3 right-3 bg-red-950 text-white p-3 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] transition-transform duration-300 translate-y-[150%] z-20 border border-red-800/50 backdrop-blur-md">
-        <div class="max-w-xl mx-auto flex justify-between items-center cursor-pointer" onclick="toggleCartDrawer()">
-            <div class="flex items-center gap-3"><div class="bg-amber-500 text-red-950 font-black w-11 h-11 rounded-xl flex items-center justify-center text-lg shadow-inner" id="cart-count">0</div><div><h3 class="font-bold text-sm">سلة الطلبات</h3><p class="text-[10px] text-amber-300">متابعة الدفع والتوصيل</p></div></div>
-            <div class="flex items-center gap-3"><div class="text-left"><span class="text-[10px] text-slate-300 block">الإجمالي تقريبي</span><span class="text-base font-black text-amber-400" id="cart-total-price">0 ج.م</span></div><button class="bg-amber-500 hover:bg-amber-400 text-red-950 font-black px-4 py-2.5 rounded-xl text-xs shadow-md transition">إتمام الطلب 🛒</button></div>
-        </div>
+<!-- لوحة الإدارة -->
+<div id="admin" class="screen hidden">
+  <div class="screen-head"><b>⚙️ لوحة الإدارة</b><button id="admin-close" type="button">إغلاق ✕</button></div>
+  <nav class="tabs">
+    <button data-tab="items" class="on">📋 الأصناف</button>
+    <button data-tab="form">➕ صنف</button>
+    <button data-tab="delivery">🛵 التوصيل</button>
+  </nav>
+  <div class="screen-body"><div class="wrap">
+    <div id="tab-items">
+      <button class="btn primary" id="a-new" type="button" style="margin-bottom:10px">➕ إضافة صنف جديد</button>
+      <input class="input" id="a-search" type="search" placeholder="🔍 ابحث في الأصناف" style="margin-bottom:10px">
+      <div id="a-list"></div>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- 🛍️ السلة الجانبية (Side Drawer) -->
-    <!-- ========================================================= -->
-    <div id="drawer-overlay" onclick="toggleCartDrawer()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 overlay-closed"></div>
-    <div id="cart-drawer" class="fixed top-0 left-0 h-full w-full max-w-[360px] bg-slate-50 dark:bg-slate-900 shadow-2xl z-50 flex flex-col cart-closed border-r border-slate-200 dark:border-slate-800">
-        <div class="p-4 bg-red-900 text-white flex justify-between items-center shadow-md"><h3 class="font-bold text-base flex items-center gap-2"><span>🛒</span> مراجعة الطلب</h3><button onclick="toggleCartDrawer()" class="text-amber-300 hover:text-white text-3xl font-bold leading-none transition">&times;</button></div>
-        <div class="flex-1 overflow-y-auto p-4 space-y-4">
-            <div class="bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700/50 rounded-xl p-3 text-[11px] text-amber-900 dark:text-amber-300 font-semibold shadow-sm">⚖️ <b>تنويه:</b> الإجمالي تقريبي، سيتم تحديد الحساب النهائي بدقة على الميزان الديجيتال.</div>
-            <div id="cart-items-container" class="divide-y divide-slate-200 dark:divide-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl p-3 bg-white dark:bg-slate-800 shadow-sm"></div>
-            
-            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 space-y-3 shadow-sm">
-                <h4 class="font-bold text-sm text-red-900 dark:text-red-400 border-b dark:border-slate-700 pb-2">📍 بيانات التوصيل</h4>
-                <input type="text" id="cust-name" placeholder="الاسم بالكامل *" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-xs focus:border-red-700 outline-none">
-                <input type="tel" id="cust-phone" placeholder="الموبايل (واتساب) *" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-xs focus:border-red-700 outline-none">
-                <div id="delivery-zone-container"></div>
-                <div><button type="button" onclick="getAutoLocation()" id="gps-btn" class="w-full bg-sky-50 dark:bg-sky-900/30 text-sky-800 dark:text-sky-300 border border-sky-300 dark:border-sky-700 font-bold py-2 px-3 rounded-xl text-xs flex justify-center gap-2 transition">📍 تحديد اللوكيشن تلقائياً (GPS)</button><input type="hidden" id="cust-gps-url" value=""></div>
-                <textarea id="cust-address" rows="2" placeholder="العنوان بالتفصيل *" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-xs focus:border-red-700 outline-none"></textarea>
-            </div>
-
-            <!-- طرق الدفع المحسنة -->
-            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 space-y-3 shadow-sm">
-                <h4 class="font-bold text-sm text-red-900 dark:text-red-400 border-b dark:border-slate-700 pb-2">💳 طريقة الدفع</h4>
-                <div class="grid grid-cols-3 gap-2">
-                    <label class="border dark:border-slate-600 rounded-xl p-2 text-center cursor-pointer has-[:checked]:bg-red-50 dark:has-[:checked]:bg-red-900/30 has-[:checked]:border-red-700 transition">
-                        <input type="radio" name="payment_method" value="كاش" checked onchange="togglePaymentDetails()" class="hidden"><span class="text-xs font-bold block">💵 كاش</span>
-                    </label>
-                    <label class="border dark:border-slate-600 rounded-xl p-2 text-center cursor-pointer has-[:checked]:bg-red-50 dark:has-[:checked]:bg-red-900/30 has-[:checked]:border-red-700 transition">
-                        <input type="radio" name="payment_method" value="إنستاباي" onchange="togglePaymentDetails()" class="hidden"><span class="text-xs font-bold block text-purple-700 dark:text-purple-400">⚡ إنستاباي</span>
-                    </label>
-                    <label class="border dark:border-slate-600 rounded-xl p-2 text-center cursor-pointer has-[:checked]:bg-red-50 dark:has-[:checked]:bg-red-900/30 has-[:checked]:border-red-700 transition">
-                        <input type="radio" name="payment_method" value="فودافون كاش" onchange="togglePaymentDetails()" class="hidden"><span class="text-xs font-bold block text-red-600 dark:text-red-400">📱 فودافون</span>
-                    </label>
-                </div>
-                
-                <!-- صندوق بيانات التحويل (يظهر عند اختيار إنستاباي أو فودافون) -->
-                <div id="electronic-payment-box" class="hidden bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 space-y-2.5 transition mt-3">
-                    <div class="flex justify-between items-center bg-white dark:bg-slate-800 p-2 rounded-lg border dark:border-slate-700">
-                        <div>
-                            <span class="text-[10px] text-slate-500 dark:text-slate-400 block">حول المبلغ على الرقم / الحساب:</span>
-                            <span id="payment-target-number" class="font-black text-sm text-slate-900 dark:text-white select-all">01097022660</span>
-                        </div>
-                        <button type="button" onclick="copyPaymentNumber()" class="bg-slate-800 dark:bg-slate-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg active:scale-95 transition">نسخ 📋</button>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-700 dark:text-slate-300 block mb-1">📸 إرفاق صورة إيصال التحويل (اختياري):</label>
-                        <input type="file" id="receipt-file" accept="image/*" class="w-full text-xs file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-amber-500 file:text-red-950">
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="p-4 bg-slate-100 dark:bg-slate-900 border-t dark:border-slate-700"><button id="submit-order-btn" onclick="submitAndSendWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3.5 rounded-xl text-sm shadow-lg transition flex items-center justify-center gap-2">💬 تأكيد وإرسال واتساب</button></div>
+    <div id="tab-form" class="hidden">
+      <h3 id="f-title" style="margin-bottom:12px">صنف جديد</h3>
+      <div class="field"><label for="f-name">اسم الصنف *</label><input class="input" id="f-name" maxlength="100"></div>
+      <div class="field"><label for="f-cat">القسم *</label><select class="input" id="f-cat"></select></div>
+      <div class="field"><label for="f-price">السعر (ج.م) *</label><input class="input" id="f-price" type="number" inputmode="decimal" min="0" step="any"></div>
+      <div class="field"><label for="f-unit">الوحدة *</label><select class="input" id="f-unit"><option>كيلو</option><option>جوز</option><option>قطعة</option></select></div>
+      <div class="field"><label for="f-step">أقل كمية / خطوة الزيادة *</label><input class="input" id="f-step" type="number" inputmode="decimal" min="0.05" step="any" value="0.5"></div>
+      <div class="field"><label for="f-prep">خيارات التجهيز * (كل خيار في سطر)</label><textarea class="input" id="f-prep" rows="4" placeholder="تقطيع 4 قطع&#10;تقطيع 8 قطع&#10;سليمة"></textarea><span class="hint">ممنوع استخدام الفاصلة (, أو ،) جوه الخيار الواحد.</span></div>
+      <div class="field"><label for="f-img">رابط الصورة (https://...)</label><input class="input" id="f-img" type="url" inputmode="url" placeholder="https://"><img class="preview" id="f-preview" alt="معاينة"></div>
+      <div class="field"><label for="f-desc">وصف قصير</label><textarea class="input" id="f-desc" rows="2"></textarea></div>
+      <div class="two"><button class="btn dark" id="f-cancel" type="button">إلغاء</button><button class="btn primary" id="f-save" type="button">💾 حفظ</button></div>
     </div>
 
-    <!-- ⚙️ CPanel -->
-    <div id="cpanel-view" class="hidden fixed inset-0 bg-slate-100 dark:bg-slate-900 z-50 overflow-hidden flex flex-col transition-colors">
-        <div class="bg-red-950 text-amber-400 p-4 flex justify-between items-center shadow-lg border-b-4 border-amber-500"><h2 class="font-black text-lg flex items-center gap-2">⚙️ لوحة الإدارة (CPanel)</h2><button onclick="hideCPanel()" class="bg-red-800 hover:bg-red-700 text-white px-4 py-1.5 rounded-xl text-sm font-bold shadow-md">خروج ✖</button></div>
-        <div class="flex border-b border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800"><button onclick="switchCpanelTab('prices')" id="tab-prices" class="flex-1 py-3 text-sm font-bold text-red-800 dark:text-red-400 border-b-2 border-red-800 dark:border-red-400 bg-slate-50 dark:bg-slate-700">💰 الأسعار</button><button onclick="switchCpanelTab('delivery')" id="tab-delivery" class="flex-1 py-3 text-sm font-bold text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:bg-slate-50 dark:hover:bg-slate-700">🛵 التوصيل</button></div>
-        <div class="flex-1 overflow-y-auto p-4 pb-20">
-            <div id="cpanel-prices-section" class="space-y-3 max-w-xl mx-auto"></div>
-            <div id="cpanel-delivery-section" class="hidden space-y-4 max-w-xl mx-auto">
-                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cp-delivery-active" class="w-5 h-5 accent-red-700"><span class="font-bold text-sm">🛵 تفعيل خدمة التوصيل للزبائن</span></label></div>
-                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
-                    <h3 class="font-bold text-sm border-b dark:border-slate-700 pb-2">📍 مناطق التوصيل والأسعار</h3>
-                    <div id="cp-zones-list" class="space-y-2"></div>
-                    <div class="flex gap-2 mt-2"><input type="text" id="cp-new-zone-name" placeholder="اسم المنطقة" class="flex-1 border dark:border-slate-600 dark:bg-slate-900 rounded-lg px-2 py-1.5 text-xs outline-none"><input type="number" id="cp-new-zone-fee" placeholder="السعر" class="w-20 border dark:border-slate-600 dark:bg-slate-900 rounded-lg px-2 py-1.5 text-xs text-center outline-none"><button onclick="addDeliveryZone()" class="bg-slate-800 dark:bg-slate-600 text-white px-3 rounded-lg text-xs font-bold">+</button></div>
-                </div>
-                <button onclick="saveDeliverySettings()" id="save-del-btn" class="w-full bg-emerald-600 text-white font-black py-3 rounded-xl text-sm shadow-md">💾 حفظ التوصيل</button>
-            </div>
-        </div>
+    <div id="tab-delivery" class="hidden">
+      <div class="box"><label style="display:flex;align-items:center;gap:12px;font-weight:800;min-height:44px"><input type="checkbox" id="d-active" style="width:22px;height:22px;accent-color:#7f1d1d"> تفعيل خدمة التوصيل للزبائن</label></div>
+      <div class="box">
+        <h4>📍 مناطق التوصيل والأسعار</h4>
+        <div id="d-zones"></div>
+        <button class="btn dark" id="d-add" type="button">➕ إضافة منطقة</button>
+      </div>
+      <button class="btn primary" id="d-save" type="button">💾 حفظ التوصيل</button>
     </div>
+  </div></div>
+</div>
 
-    <!-- السكربتات -->
-    <script>
-        // ⚠️ ضع رابط الـ API الخاص بك هنا
-        const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbybijlHYuVk2ZnDTLu4z_Gk96vt7t0QZN94JQUC5v9J5ggqXi0LVb4CvHshIETvN0oJ/exec";
-        const STORE_WHATSAPP = "201097022660";
-        const ADMIN_PIN = "2026";
+<div id="pin-dialog" class="dialog hidden">
+  <div class="dialog-box">
+    <h3>🔒 الرقم السري للإدارة</h3>
+    <input class="input" id="pin-input" type="password" inputmode="numeric" autocomplete="off" maxlength="16" aria-label="الرقم السري">
+    <div class="two"><button class="btn dark" id="pin-cancel" type="button">إلغاء</button><button class="btn primary" id="pin-ok" type="button">دخول</button></div>
+  </div>
+</div>
 
-        let menuItems = [], cart = {}, currentCategory = 'all', deliveryActive = true, deliveryZones = [];
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-        // 🌗 المظهر
-        let isDarkMode = false;
-        function toggleDarkMode() {
-            isDarkMode = !isDarkMode;
-            if (isDarkMode) { document.documentElement.classList.add('dark'); document.getElementById('theme-icon').innerText = '☀️'; document.getElementById('theme-text').innerText = 'نهاري'; } 
-            else { document.documentElement.classList.remove('dark'); document.getElementById('theme-icon').innerText = '🌙'; document.getElementById('theme-text').innerText = 'ليلي'; }
-        }
-        let currentFontSize = 100;
-        function changeFontSize(delta) { currentFontSize += delta; if(currentFontSize < 85) currentFontSize = 85; if(currentFontSize > 130) currentFontSize = 130; document.documentElement.style.fontSize = currentFontSize + '%'; }
+<script>
+/* ===== الإعدادات ===== */
+const API = "https://script.google.com/macros/s/AKfycbybijlHYuVk2ZnDTLu4z_Gk96vt7t0QZN94JQUC5v9J5ggqXi0LVb4CvHshIETvN0oJ/exec";
+const WA = "201097022660";
+const PAY_NUMBER = "01097022660";
+const FALLBACK_IMG = "https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=500";
+const CAT_LABELS = {"CAT-RAW":"🐔 طازجة","CAT-CUTS":"🥩 مقطعات","CAT-DUCK":"🦆 بط وحمام","CAT-READY":"🌶️ متبل"};
 
-        // 🛒 التحكم في السلة وتفاصيل الدفع (تمت إعادتها)
-        function toggleCartDrawer() {
-            const drawer = document.getElementById('cart-drawer'), overlay = document.getElementById('drawer-overlay');
-            if (drawer.classList.contains('cart-closed')) { drawer.classList.remove('cart-closed'); drawer.classList.add('cart-open'); overlay.classList.remove('overlay-closed'); overlay.classList.add('overlay-open'); } 
-            else { drawer.classList.remove('cart-open'); drawer.classList.add('cart-closed'); overlay.classList.remove('overlay-open'); overlay.classList.add('overlay-closed'); }
-        }
+/* ===== الحالة ===== */
+const S = { menu: [], settings: {deliveryActive:false, deliveryZones:[]}, cart: {}, pref: {}, cat: "all", q: "",
+  pin: "", lastUpdate: null, gps: "", taps: 0, tapTimer: null, zonesDraft: [], editingId: "" };
 
-        // إظهار وإخفاء بيانات الدفع
-        function togglePaymentDetails() {
-            const method = document.querySelector('input[name="payment_method"]:checked').value;
-            const box = document.getElementById('electronic-payment-box');
-            if (method === "كاش") box.classList.add('hidden');
-            else box.classList.remove('hidden');
-        }
-        // نسخ رقم الدفع
-        function copyPaymentNumber() {
-            const num = document.getElementById('payment-target-number').innerText;
-            navigator.clipboard.writeText(num);
-            alert("تم نسخ الرقم: " + num);
-        }
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const safeImg = u => (/^https:\/\//.test(u || "") ? u : FALLBACK_IMG);
+const money = n => Math.round(n) + " ج.م";
+const num = n => String(Math.round(n * 100) / 100);
+const findItem = id => S.menu.find(m => m.id === id);
+const prepOpts = m => String(m.prep_options || "").split(",").map(s => s.trim()).filter(Boolean);
+const defPref = m => ({ prep: prepOpts(m)[0] || "تجهيز عادي", note: "" });
+const prefOf = (id, m) => S.cart[id] || S.pref[id] || defPref(m);
+const dtype = () => document.querySelector('input[name=dtype]:checked').value;
+const payMethod = () => document.querySelector('input[name=pay]:checked').value;
 
-        // 📡 جلب البيانات
-        async function fetchMenu() {
-            try {
-                const response = await fetch(GOOGLE_SHEET_API_URL + "?t=" + new Date().getTime());
-                const resData = await response.json();
-                if (resData.menu) {
-                    menuItems = resData.menu;
-                    let settings = resData.settings || {};
-                    deliveryActive = settings.DeliveryActive === "true" || settings.DeliveryActive === true;
-                    parseDeliveryZones(settings.DeliveryZones);
-                } else { 
-                    menuItems = resData; 
-                    // في حالة عدم تحديث كود جوجل سكريبت، نضع مناطق افتراضية لكي لا يختفي الدليفري
-                    if(deliveryZones.length === 0) {
-                        deliveryZones = [{name: "استلام من الفرع", fee: 0}, {name: "حدائق القبة", fee: 20}];
-                    }
-                }
-                document.getElementById('loading-spinner').style.display = 'none';
-                initDeliveryDropdown(); applyFilters();
-            } catch (error) { document.getElementById('loading-spinner').innerHTML = '⚠️ خطأ في الاتصال'; }
-        }
+let toastT;
+function toast(msg, type) {
+  const t = $("toast"); t.textContent = msg; t.className = "toast show " + (type || "");
+  clearTimeout(toastT); toastT = setTimeout(() => { t.className = "toast"; }, 3200);
+}
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 
-        function parseDeliveryZones(zoneString) {
-            deliveryZones = [];
-            if(!zoneString) { deliveryZones = [{name: "استلام من الفرع", fee: 0}, {name: "حدائق القبة", fee: 20}]; return; }
-            zoneString.split(',').forEach(p => { const kv = p.split(':'); if(kv.length === 2) deliveryZones.push({ name: kv[0].trim(), fee: Number(kv[1]) }); });
-        }
+/* ===== المظهر ===== */
+function applyTheme(t) {
+  document.documentElement.dataset.theme = t; $("theme-icon").textContent = t === "dark" ? "☀️" : "🌙"; lsSet("tahona_theme", t);
+}
+const FONT_SIZES = [100, 112, 125];
+function applyFont(p) { document.documentElement.style.fontSize = p + "%"; lsSet("tahona_font", String(p)); }
 
-        async function refreshPrices() {
-            const icon = document.getElementById('refresh-icon'); icon.classList.add('animate-spin');
-            await fetchMenu(); icon.classList.remove('animate-spin');
-        }
+/* ===== السلة ===== */
+function loadCart() { try { return JSON.parse(lsGet("tahona_cart") || "{}") || {}; } catch (e) { return {}; } }
+function saveCart() { lsSet("tahona_cart", JSON.stringify(S.cart)); }
+function cartLines() {
+  return Object.keys(S.cart).map(id => {
+    const m = findItem(id); if (!m) return null;
+    const c = S.cart[id];
+    return { id, m, c, total: Math.round(c.qty * m.price * 100) / 100 };
+  }).filter(Boolean);
+}
+function commit() {
+  saveCart(); renderGrid(); updateBar();
+  if ($("sheet").classList.contains("show")) renderCheckoutItems();
+}
+function setQty(id, q) {
+  const m = findItem(id); if (!m) return;
+  if (Number.isNaN(q)) return commit();
+  q = Math.round(q * 100) / 100;
+  if (q <= 0) { delete S.cart[id]; }
+  else { const p = prefOf(id, m); S.cart[id] = { qty: Math.min(q, 100), prep: p.prep, note: p.note }; }
+  commit();
+}
+function setPrep(id, v) {
+  const m = findItem(id); if (!m) return;
+  if (S.cart[id]) S.cart[id].prep = v; else S.pref[id] = { ...prefOf(id, m), prep: v };
+  commit();
+}
+function setNote(id, v) {
+  const m = findItem(id); if (!m) return;
+  v = String(v).trim().slice(0, 200);
+  if (S.cart[id]) S.cart[id].note = v; else S.pref[id] = { ...prefOf(id, m), note: v };
+  commit();
+}
+function updateBar() {
+  const lines = cartLines(), sub = lines.reduce((a, l) => a + l.total, 0);
+  $("cartbar").classList.toggle("show", lines.length > 0);
+  $("cart-count").textContent = lines.length; $("bar-total").textContent = money(sub);
+}
 
-        function filterCategory(cat, btn) {
-            currentCategory = cat; document.querySelectorAll('.cat-btn').forEach(b => { b.className = "cat-btn bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition"; });
-            btn.className = "cat-btn bg-red-800 text-white px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shadow-sm transition"; applyFilters();
-        }
+/* ===== تحميل المنيو ===== */
+function setStatus() {
+  $("status").textContent = S.lastUpdate
+    ? "بورصة الأسعار • آخر تحديث " + S.lastUpdate.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" })
+    : "جاري التحديث...";
+}
+function showSkeleton() {
+  $("state").classList.remove("hidden");
+  $("state").innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
+  $("grid").innerHTML = "";
+}
+async function loadMenu(force) {
+  if (!S.menu.length) showSkeleton();
+  $("refresh-btn").classList.add("spin");
+  try {
+    const r = await fetch(API + "?t=" + Date.now());
+    const d = await r.json();
+    if (!Array.isArray(d.menu)) throw new Error(d.error || "bad response");
+    const old = {}; S.menu.forEach(m => { old[m.id] = m.price; });
+    S.menu = d.menu;
+    S.settings = d.settings || { deliveryActive: false, deliveryZones: [] };
+    let changed = false, priceMoved = false;
+    Object.keys(S.cart).forEach(id => {
+      const m = findItem(id);
+      if (!m) { delete S.cart[id]; changed = true; }
+      else if (old[id] !== undefined && old[id] !== m.price) priceMoved = true;
+    });
+    if (changed || priceMoved) saveCart();
+    S.lastUpdate = new Date(); setStatus();
+    $("state").classList.add("hidden"); $("state").innerHTML = "";
+    renderChips(); renderGrid(); updateBar();
+    if (!$("admin").classList.contains("hidden")) renderAdminItems();
+    if (priceMoved) toast("اتغيرت أسعار بعض الأصناف اللي في سلتك", "warn");
+    else if (force) toast("تم تحديث المنيو ✅");
+  } catch (e) {
+    if (!S.menu.length) {
+      $("state").classList.remove("hidden");
+      $("state").innerHTML = '⚠️ تعذر تحميل المنيو<br><button class="retry" id="retry" type="button">إعادة المحاولة</button>';
+      $("grid").innerHTML = "";
+    } else toast("تعذر التحديث، بنعرض آخر منيو محفوظ", "warn");
+  } finally { $("refresh-btn").classList.remove("spin"); }
+}
 
-        function applyFilters() {
-            const query = document.getElementById('search-input').value.trim().toLowerCase();
-            let filtered = menuItems;
-            if (currentCategory !== 'all') filtered = filtered.filter(i => i.cat === currentCategory);
-            if (query !== '') filtered = filtered.filter(i => i.name.toLowerCase().includes(query));
-            renderMenu(filtered);
-        }
+/* ===== العرض ===== */
+function renderChips() {
+  const cats = Object.keys(CAT_LABELS).filter(c => S.menu.some(m => m.cat === c));
+  $("chips").innerHTML = ['all', ...cats].map(c =>
+    `<button class="chip" type="button" data-cat="${c}" aria-pressed="${S.cat === c}">${c === "all" ? "الكل" : CAT_LABELS[c]}</button>`).join("");
+}
+function cardHtml(m) {
+  const c = S.cart[m.id], p = prefOf(m.id, m), q = c ? c.qty : 0;
+  const opts = prepOpts(m).map(o => `<option value="${esc(o)}"${o === p.prep ? " selected" : ""}>${esc(o)}</option>`).join("");
+  const stepper = q > 0
+    ? `<div class="step"><button type="button" data-act="dec" aria-label="تقليل">−</button><div class="qv"><input data-act="set" inputmode="decimal" value="${num(q)}" aria-label="الكمية"><span>${esc(m.unit)}</span></div><button type="button" class="plus" data-act="inc" aria-label="زيادة">+</button></div>`
+    : `<button type="button" class="btn-add" data-act="add">+ أضف للسلة</button>`;
+  return `<article class="card" data-id="${esc(m.id)}">
+    <div class="thumb"><img loading="lazy" src="${esc(safeImg(m.img))}" alt="${esc(m.name)}" onerror="this.onerror=null;this.src='${FALLBACK_IMG}'"><span class="price">${money(m.price)}<small> / ${esc(m.unit)}</small></span></div>
+    <div class="info">
+      <h3>${esc(m.name)}</h3>
+      ${m.desc ? `<p class="desc">${esc(m.desc)}</p>` : ""}
+      <select class="sel" data-act="prep" aria-label="التجهيز">${opts}</select>
+      <input class="note" data-act="note" value="${esc(p.note)}" placeholder="📝 ملاحظة (اختياري)" maxlength="200" aria-label="ملاحظة">
+      <div class="qty">${stepper}</div>
+    </div></article>`;
+}
+function renderGrid() {
+  const q = S.q.trim().toLowerCase();
+  let list = S.menu;
+  if (S.cat !== "all") list = list.filter(m => m.cat === S.cat);
+  if (q) list = list.filter(m => m.name.toLowerCase().includes(q));
+  $("grid").innerHTML = list.length ? list.map(cardHtml).join("") : '<div class="empty">ما فيش أصناف مطابقة</div>';
+}
 
-        function renderMenu(items) {
-            const grid = document.getElementById('menu-grid'); grid.innerHTML = '';
-            items.forEach(item => {
-                const step = parseFloat(item.step) || 0.5, unit = item.unit || 'كيلو', prepList = item.prep_options ? item.prep_options.split(',') : ['تجهيز عادي'];
-                const cartItem = cart[item.id] || { qty: 0, prep: prepList[0], note: '' }, currentQty = cartItem.qty;
-                const optionsHtml = prepList.map(opt => `<option value="${opt.trim()}" ${opt.trim() === cartItem.prep ? 'selected' : ''}>${opt.trim()}</option>`).join('');
+/* ===== الطلب ===== */
+function renderCheckoutItems() {
+  const lines = cartLines();
+  $("co-items").innerHTML = lines.length ? lines.map(l => `
+    <div class="co-line" data-id="${esc(l.id)}">
+      <div class="co-info"><b>${esc(l.m.name)}</b><small>🔪 ${esc(l.c.prep)}${l.c.note ? " • 📝 " + esc(l.c.note) : ""}</small></div>
+      <div class="co-right">
+        <div class="step sm"><button type="button" data-act="dec" aria-label="تقليل">−</button><span>${num(l.c.qty)} ${esc(l.m.unit)}</span><button type="button" class="plus" data-act="inc" aria-label="زيادة">+</button></div>
+        <b>${money(l.total)}</b>
+      </div></div>`).join("") : '<p class="empty" style="padding:16px">السلة فاضية</p>';
+  renderTotals();
+}
+function renderTotals() {
+  const sub = cartLines().reduce((a, l) => a + l.total, 0);
+  let fee = 0, feeTxt = "—";
+  if (dtype() === "delivery") {
+    const z = (S.settings.deliveryZones || [])[Number($("c-zone").value)];
+    fee = z ? Number(z.fee) || 0 : 0; feeTxt = fee > 0 ? money(fee) : "مجاناً";
+  }
+  $("co-sub").textContent = money(sub); $("co-fee").textContent = feeTxt; $("co-total").textContent = money(sub + fee);
+  $("co-submit").disabled = cartLines().length === 0;
+}
+function fillZones() {
+  const zs = S.settings.deliveryZones || [];
+  const active = !!S.settings.deliveryActive && zs.length > 0;
+  $("dt-delivery").disabled = !active;
+  $("dt-hint").textContent = active ? "" : "التوصيل مش متاح حالياً — الاستلام من الفرع.";
+  if (!active) document.querySelector("input[name=dtype][value=pickup]").checked = true;
+  $("c-zone").innerHTML = zs.map((z, i) => `<option value="${i}">${esc(z.name)} — ${Number(z.fee) > 0 ? Number(z.fee) + " ج" : "مجاناً"}</option>`).join("");
+  applyDeliveryUI();
+}
+function applyDeliveryUI() { $("delivery-fields").classList.toggle("hidden", dtype() !== "delivery"); renderTotals(); }
+function applyPayUI() { $("pay-box").classList.toggle("hidden", payMethod() === "كاش"); }
+function showCoView() {
+  $("co-view").classList.remove("hidden"); $("done-view").classList.add("hidden");
+  $("co-foot").classList.remove("hidden"); $("done-foot").classList.add("hidden");
+  $("sheet-title").textContent = "🛒 مراجعة الطلب";
+}
+function openSheet() {
+  showCoView(); fillZones(); renderCheckoutItems();
+  $("overlay").classList.add("show"); $("sheet").classList.add("show"); document.body.classList.add("lock");
+}
+function closeSheet() { $("overlay").classList.remove("show"); $("sheet").classList.remove("show"); document.body.classList.remove("lock"); }
 
-                const card = document.createElement('div'); card.className = "bg-white dark:bg-slate-800 rounded-2xl p-3.5 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between transition-colors";
-                card.innerHTML = `
-                    <div><div class="relative mb-3"><img src="${item.img}" class="w-full h-36 object-cover rounded-xl" onerror="this.src='https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=400'"><span class="absolute top-2 left-2 bg-red-900/90 text-amber-300 font-black px-2.5 py-1 rounded-lg text-xs shadow">${item.price} ج.م / ${unit}</span></div><h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1">${item.name}</h3><div class="mb-3 space-y-1.5"><label class="text-[10px] font-bold text-slate-600 dark:text-slate-400">🔪 التجهيز:</label><select onchange="updateCartField('${item.id}', 'prep', this.value)" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-1.5 text-xs font-semibold outline-none">${optionsHtml}</select><input type="text" onchange="updateCartField('${item.id}', 'note', this.value)" value="${cartItem.note}" placeholder="📝 ملاحظات اضافية (اختياري)" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-1.5 text-[10px] outline-none"></div></div>
-                    <div>${currentQty === 0 ? `<button onclick="updateWeight('${item.id}', ${step})" class="w-full bg-red-800 hover:bg-red-700 text-white font-bold py-2 rounded-xl text-xs transition shadow-sm">⚖️ أضف للسلة (+${step} ${unit})</button>` : `<div class="flex items-center justify-between bg-amber-50 dark:bg-slate-700 rounded-xl p-1 border border-amber-300 dark:border-slate-600"><button onclick="updateWeight('${item.id}', -${step})" class="bg-white dark:bg-slate-600 border dark:border-slate-500 w-8 h-8 rounded-lg font-black text-red-800 dark:text-red-300 shadow-sm">-</button><div class="flex flex-col items-center"><div class="flex items-center"><input type="number" step="0.01" min="0" value="${currentQty}" onchange="setExactWeight('${item.id}', this.value)" class="w-12 bg-transparent text-center font-black text-red-950 dark:text-amber-400 text-sm outline-none"><span class="text-[10px] font-bold dark:text-slate-300">${unit}</span></div><span class="text-[10px] text-slate-600 dark:text-slate-400 font-bold">${(currentQty * item.price).toFixed(0)} ج</span></div><button onclick="updateWeight('${item.id}', ${step})" class="bg-amber-500 dark:bg-amber-600 w-8 h-8 rounded-lg font-black text-red-950 dark:text-white shadow-sm">+</button></div>`}</div>`;
-                grid.appendChild(card);
-            });
-        }
+function getGps() {
+  if (!navigator.geolocation) return toast("الموقع غير متاح على الجهاز ده", "err");
+  $("gps").textContent = "⏳ جاري التحديد...";
+  navigator.geolocation.getCurrentPosition(
+    p => { S.gps = `https://www.google.com/maps?q=${p.coords.latitude.toFixed(6)},${p.coords.longitude.toFixed(6)}`; $("gps").textContent = "✅ تم تحديد الموقع"; },
+    () => { $("gps").textContent = "📍 حدّد موقعي (GPS)"; toast("ما قدرناش نحدد الموقع، فعّل الـ GPS", "err"); },
+    { enableHighAccuracy: true, timeout: 10000 });
+}
+function readB64(f) {
+  return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1]); r.onerror = rej; r.readAsDataURL(f); });
+}
+function readCustomer() {
+  return { name: $("c-name").value.trim(), phone: $("c-phone").value.replace(/\s+/g, ""), address: $("c-address").value.trim(),
+    deliveryType: dtype() === "delivery" ? "delivery" : "pickup", zoneIndex: $("c-zone").value, gps: S.gps, payment: payMethod() };
+}
+function checkCustomer(c) {
+  if (!c.name) return ["c-name", "اكتب الاسم بالكامل"];
+  if (!/^01[0125]\d{8}$/.test(c.phone)) return ["c-phone", "رقم الموبايل غير صحيح (11 رقم يبدأ بـ 010 أو 011 أو 012 أو 015)"];
+  if (c.deliveryType === "delivery") {
+    if (c.zoneIndex === "") return ["c-zone", "اختار منطقة التوصيل"];
+    if (!c.address) return ["c-address", "اكتب العنوان بالتفصيل"];
+  }
+  const f = $("c-receipt").files[0];
+  if (f && f.size > 5 * 1024 * 1024) return ["c-receipt", "حجم صورة الإيصال أكبر من 5 ميجا"];
+  return null;
+}
+function buildMsg(o) {
+  const L = ["🛒 *طلب جديد - دواجن الطاحونة*"];
+  if (o.orderId) L.push("🧾 رقم الطلب: " + o.orderId);
+  if (!o.saved) L.push("⚠️ الطلب ده ما اتسجلش على النظام، برجاء التأكيد");
+  L.push("", "👤 " + o.c.name, "📞 " + o.c.phone);
+  L.push(o.c.deliveryType === "pickup" ? "🏬 استلام من الفرع" : `🛵 توصيل - ${o.zone}\n🏠 ${o.c.address}`);
+  if (o.c.gps) L.push("🗺️ " + o.c.gps);
+  L.push("", "📦 *الأصناف:*");
+  o.lines.forEach(l => L.push(`• ${l.m.name} × ${num(l.c.qty)} ${l.m.unit} - ${l.c.prep}${l.c.note ? ` (${l.c.note})` : ""} = ${Math.round(l.total)} ج`));
+  L.push("", "💰 الأصناف: " + money(o.sub), "🛵 التوصيل: " + (o.fee > 0 ? money(o.fee) : "—"), "✅ *الإجمالي التقريبي: " + money(o.total) + "*", "💳 الدفع: " + o.c.payment);
+  if (o.receiptUrl) L.push("🧾 الإيصال: " + o.receiptUrl);
+  L.push("", "⚖️ الوزن النهائي بيتحدد على الميزان.");
+  return L.join("\n");
+}
+async function post(obj) {
+  const r = await fetch(API, { method: "POST", body: JSON.stringify(obj) });
+  return r.json();
+}
+async function submitOrder() {
+  const lines = cartLines(); if (!lines.length) return toast("السلة فاضية", "warn");
+  const c = readCustomer(), bad = checkCustomer(c);
+  if (bad) { toast(bad[1], "err"); $(bad[0]).focus(); return; }
+  lsSet("tahona_cust", JSON.stringify({ name: c.name, phone: c.phone }));
+  const btn = $("co-submit"); btn.disabled = true; btn.textContent = "⏳ جاري تسجيل الطلب...";
+  try {
+    const file = $("c-receipt").files[0];
+    const customer = { ...c, receiptBase64: file ? await readB64(file) : "", receiptMimeType: file ? file.type : "" };
+    const items = lines.map(l => ({ id: l.id, qty: l.c.qty, prep: l.c.prep, note: l.c.note }));
+    let res = null;
+    try { res = await post({ action: "create_order", customer, items }); } catch (e) { res = null; }
+    if (res && !res.ok) { toast(res.error || "تعذر تسجيل الطلب", "err"); return; }
+    showDone(res, c, lines);
+  } catch (e) { toast("حصل خطأ، حاول تاني", "err"); }
+  finally { btn.disabled = false; btn.textContent = "✅ تأكيد الطلب"; }
+}
+function showDone(res, c, lines) {
+  const saved = !!(res && res.ok), zs = S.settings.deliveryZones || [];
+  const zone = c.deliveryType === "pickup" ? "استلام من الفرع" : ((zs[Number(c.zoneIndex)] || {}).name || "");
+  const sub = saved ? res.subtotal : lines.reduce((a, l) => a + l.total, 0);
+  const fee = saved ? res.fee : (c.deliveryType === "delivery" ? Number((zs[Number(c.zoneIndex)] || {}).fee) || 0 : 0);
+  const total = saved ? res.total : sub + fee;
+  const msg = buildMsg({ orderId: saved ? res.orderId : "", saved, c, lines, zone, sub, fee, total, receiptUrl: saved ? res.receiptUrl : "" });
+  $("done-wa").href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(msg);
+  $("done-tick").textContent = saved ? "✅" : "⚠️";
+  $("done-title").textContent = saved ? "تم استلام طلبك" : "الطلب جاهز للإرسال";
+  $("done-text").innerHTML = saved
+    ? `رقم الطلب <b>${esc(res.orderId)}</b><br>الإجمالي التقريبي <b>${money(total)}</b><br>اضغط الزرار تحت وابعت الطلب على واتساب عشان نأكده.`
+    : "ما قدرناش نسجل الطلب على النظام (مشكلة اتصال). ابعته على واتساب مباشرة وهنستلمه.";
+  $("sheet-title").textContent = saved ? "✅ تم الطلب" : "⚠️ ابعت على واتساب";
+  $("co-view").classList.add("hidden"); $("done-view").classList.remove("hidden");
+  $("co-foot").classList.add("hidden"); $("done-foot").classList.remove("hidden");
+  if (saved) { S.cart = {}; S.pref = {}; saveCart(); renderGrid(); updateBar(); }
+}
 
-        function initItemInCart(id) { if (!cart[id]) { const item = menuItems.find(i => i.id === id); const prepSelect = document.querySelector(`select[onchange="updateCartField('${id}', 'prep', this.value)"]`); cart[id] = { ...item, qty: 0, prep: prepSelect ? prepSelect.value : 'عادي', note: '' }; } }
-        function updateWeight(id, delta) { initItemInCart(id); cart[id].qty = Math.round((cart[id].qty + delta) * 100) / 100; if (cart[id].qty <= 0) delete cart[id]; applyFilters(); updateCartBar(); }
-        function setExactWeight(id, val) { const num = parseFloat(val); if(isNaN(num) || num <= 0) { delete cart[id]; } else { initItemInCart(id); cart[id].qty = num; } applyFilters(); updateCartBar(); }
-        function updateCartField(id, field, val) { if (cart[id]) { cart[id][field] = val; updateCartBar(); } else if (val.trim() !== '') { initItemInCart(id); cart[id][field] = val; } }
+/* ===== لوحة الإدارة ===== */
+function onLogoTap() {
+  S.taps++; clearTimeout(S.tapTimer);
+  if (S.taps >= 5) { S.taps = 0; openPin(); } else S.tapTimer = setTimeout(() => { S.taps = 0; }, 1500);
+}
+function openPin() { $("pin-dialog").classList.remove("hidden"); $("pin-input").value = ""; setTimeout(() => $("pin-input").focus(), 50); }
+async function verifyPin() {
+  const pin = $("pin-input").value.trim(); if (!pin) return;
+  $("pin-ok").disabled = true;
+  try {
+    const r = await post({ action: "verify_pin", pin });
+    if (r.ok) { S.pin = pin; $("pin-dialog").classList.add("hidden"); openAdmin(); }
+    else toast("الرقم السري غير صحيح", "err");
+  } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
+  finally { $("pin-ok").disabled = false; }
+}
+function openAdmin() {
+  $("admin").classList.remove("hidden"); document.body.classList.add("lock");
+  S.zonesDraft = JSON.parse(JSON.stringify(S.settings.deliveryZones || []));
+  $("d-active").checked = !!S.settings.deliveryActive;
+  showAdminTab("items");
+}
+function closeAdmin() { $("admin").classList.add("hidden"); document.body.classList.remove("lock"); }
+function showAdminTab(t) {
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
+  ["items", "form", "delivery"].forEach(x => $("tab-" + x).classList.toggle("hidden", x !== t));
+  if (t === "items") renderAdminItems();
+  if (t === "delivery") renderZones();
+}
+function renderAdminItems() {
+  const q = $("a-search").value.trim().toLowerCase();
+  const list = S.menu.filter(m => !q || m.name.toLowerCase().includes(q));
+  $("a-list").innerHTML = list.map(m => `
+    <div class="row" data-id="${esc(m.id)}"><img src="${esc(safeImg(m.img))}" alt="" loading="lazy">
+      <div class="row-info"><b>${esc(m.name)}</b><small>${esc(CAT_LABELS[m.cat] || m.cat)} • ${money(m.price)} / ${esc(m.unit)} • ${esc(m.id)}</small></div>
+      <div class="row-act"><button type="button" data-act="edit">تعديل</button><button type="button" data-act="del" class="danger">حذف</button></div></div>`).join("")
+    || '<div class="empty">ما فيش أصناف</div>';
+}
+function openForm(id) {
+  const m = id ? findItem(id) : null;
+  S.editingId = m ? m.id : "";
+  $("f-title").textContent = m ? "تعديل الصنف" : "صنف جديد";
+  $("f-name").value = m ? m.name : ""; $("f-cat").value = m ? m.cat : "CAT-RAW";
+  $("f-price").value = m ? m.price : ""; $("f-unit").value = m ? m.unit : "كيلو";
+  $("f-step").value = m ? m.step : 0.5; $("f-prep").value = m ? prepOpts(m).join("\n") : "";
+  $("f-img").value = m ? m.img : ""; $("f-desc").value = m ? m.desc : "";
+  $("f-preview").src = safeImg($("f-img").value);
+  showAdminTab("form"); $("f-name").focus();
+}
+function readForm() {
+  return { id: S.editingId, name: $("f-name").value.trim(), cat: $("f-cat").value, price: Number($("f-price").value),
+    unit: $("f-unit").value, step: Number($("f-step").value),
+    prep_list: $("f-prep").value.split("\n").map(s => s.trim()).filter(Boolean),
+    img: $("f-img").value.trim(), desc: $("f-desc").value.trim() };
+}
+function clientItemError(it) {
+  if (!it.name) return "اكتب اسم الصنف";
+  if (!(it.price > 0)) return "اكتب السعر (لازم يكون أكبر من صفر)";
+  if (!(it.step > 0)) return "اكتب أقل كمية / خطوة الزيادة";
+  if (!it.prep_list.length) return "اكتب خيار تجهيز واحد على الأقل (كل خيار في سطر)";
+  if (it.prep_list.some(s => /[,،]/.test(s))) return "خيار التجهيز ما ينفعش فيه فاصلة";
+  if (it.img && !/^https:\/\//.test(it.img)) return "رابط الصورة لازم يبدأ بـ https://";
+  return "";
+}
+function adminErr(r) {
+  if (r && /الرقم السري/.test(r.error || "")) { S.pin = ""; closeAdmin(); toast(r.error, "err"); return; }
+  toast((r && r.error) || "حصل خطأ", "err");
+}
+async function saveItem() {
+  const it = readForm(), err = clientItemError(it); if (err) return toast(err, "err");
+  const btn = $("f-save"); btn.disabled = true;
+  try {
+    const r = await post({ action: "upsert_item", pin: S.pin, item: it });
+    if (!r.ok) return adminErr(r);
+    toast("تم حفظ الصنف ✅"); await loadMenu(false); showAdminTab("items");
+  } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
+  finally { btn.disabled = false; }
+}
+async function deleteItem(id) {
+  const m = findItem(id); if (!m) return;
+  if (!confirm(`حذف الصنف "${m.name}"؟ مش هينفع يترجع.`)) return;
+  try {
+    const r = await post({ action: "delete_item", pin: S.pin, id });
+    if (!r.ok) return adminErr(r);
+    toast("تم الحذف"); await loadMenu(false); renderAdminItems();
+  } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
+}
+function renderZones() {
+  $("d-zones").innerHTML = S.zonesDraft.map((z, i) => `
+    <div class="zone-row" data-i="${i}"><input class="input" data-f="name" value="${esc(z.name)}" placeholder="اسم المنطقة" aria-label="اسم المنطقة">
+    <input class="input fee" data-f="fee" type="number" inputmode="decimal" min="0" value="${Number(z.fee) || 0}" aria-label="السعر">
+    <button type="button" data-act="zdel" class="danger" aria-label="حذف المنطقة">✕</button></div>`).join("")
+    || '<p class="hint" style="margin-bottom:10px">مفيش مناطق توصيل.</p>';
+}
+async function saveDelivery() {
+  const zones = S.zonesDraft.map(z => ({ name: String(z.name || "").trim(), fee: Number(z.fee) || 0 }));
+  if (zones.some(z => !z.name)) return toast("اكتب اسم كل منطقة", "err");
+  if (zones.some(z => z.fee < 0)) return toast("السعر مينفعش يكون سالب", "err");
+  try {
+    const r = await post({ action: "save_delivery", pin: S.pin, deliveryActive: $("d-active").checked, deliveryZones: zones });
+    if (!r.ok) return adminErr(r);
+    toast("تم حفظ التوصيل ✅"); await loadMenu(false);
+  } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
+}
 
-        function initDeliveryDropdown() {
-            const container = document.getElementById('delivery-zone-container');
-            if(!deliveryActive || deliveryZones.length === 0) {
-                container.innerHTML = '<div class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 text-center">🛑 استلام من الفرع فقط</div>'; return;
-            }
-            container.innerHTML = '<select id="delivery-zone" onchange="updateCartBar()" class="w-full bg-amber-50 dark:bg-slate-900 border border-amber-400 dark:border-slate-600 rounded-xl px-3 py-2 text-xs font-bold outline-none"></select>';
-            document.getElementById('delivery-zone').innerHTML = deliveryZones.map((z, idx) => `<option value="${idx}">${z.name} (${z.fee>0 ? z.fee+' ج' : 'مجاناً'})</option>`).join('');
-        }
+/* ===== الأحداث ===== */
+function qtyClick(e) {
+  const b = e.target.closest("button[data-act]"); if (!b) return;
+  const card = b.closest("[data-id]"); if (!card) return;
+  const id = card.dataset.id, m = findItem(id); if (!m) return;
+  const cur = S.cart[id] ? S.cart[id].qty : 0;
+  if (b.dataset.act === "add") setQty(id, m.step);
+  if (b.dataset.act === "inc") setQty(id, cur + m.step);
+  if (b.dataset.act === "dec") setQty(id, cur - m.step);
+}
+function init() {
+  let t = lsGet("tahona_theme");
+  if (!t) t = (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+  applyTheme(t);
+  applyFont(parseInt(lsGet("tahona_font"), 10) || 100);
+  S.cart = loadCart();
+  $("pay-number").textContent = PAY_NUMBER;
+  $("f-cat").innerHTML = Object.keys(CAT_LABELS).map(c => `<option value="${c}">${CAT_LABELS[c]}</option>`).join("");
+  try { const cu = JSON.parse(lsGet("tahona_cust") || "{}"); $("c-name").value = cu.name || ""; $("c-phone").value = cu.phone || ""; } catch (e) {}
 
-        function updateCartBar() {
-            const cartBar = document.getElementById('floating-cart'), cartContainer = document.getElementById('cart-items-container'), keys = Object.keys(cart);
-            document.getElementById('cart-count').innerText = keys.length; document.getElementById('header-cart-count').innerText = keys.length;
-            if (keys.length === 0) { cartBar.classList.add('translate-y-[150%]'); cartContainer.innerHTML = '<p class="text-center text-xs text-slate-400 py-4">السلة فارغة</p>'; return; }
-            cartBar.classList.remove('translate-y-[150%]'); let subtotal = 0; cartContainer.innerHTML = '';
-            keys.forEach(id => {
-                const item = cart[id], itemTotal = item.qty * item.price; subtotal += itemTotal;
-                cartContainer.innerHTML += `<div class="py-2 flex justify-between items-center text-xs"><div><span class="font-bold text-slate-800 dark:text-white block">${item.name} (${item.qty} ${item.unit || 'كيلو'})</span><span class="text-[10px] text-red-700 dark:text-red-400 font-semibold block">🔪 ${item.prep}</span>${item.note ? `<span class="text-[10px] text-slate-500 block">📝 ${item.note}</span>` : ''}</div><span class="font-black text-slate-900 dark:text-amber-400">${itemTotal.toFixed(0)} ج</span></div>`;
-            });
-            let total = subtotal; const zoneSelect = document.getElementById('delivery-zone');
-            if(deliveryActive && zoneSelect && deliveryZones[zoneSelect.value]) total += deliveryZones[zoneSelect.value].fee;
-            document.getElementById('cart-total-price').innerText = total.toFixed(0) + " ج.م";
-        }
+  $("logo").addEventListener("click", onLogoTap);
+  $("theme-btn").addEventListener("click", () => applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
+  $("font-btn").addEventListener("click", () => { const cur = parseInt(lsGet("tahona_font"), 10) || 100; applyFont(FONT_SIZES[(FONT_SIZES.indexOf(cur) + 1) % FONT_SIZES.length]); });
+  $("refresh-btn").addEventListener("click", () => loadMenu(true));
+  $("state").addEventListener("click", e => { if (e.target.id === "retry") loadMenu(true); });
+  $("search").addEventListener("input", e => { S.q = e.target.value; renderGrid(); });
+  $("chips").addEventListener("click", e => {
+    const b = e.target.closest("[data-cat]"); if (!b) return;
+    S.cat = b.dataset.cat; renderChips(); renderGrid();
+  });
+  $("grid").addEventListener("click", qtyClick);
+  $("grid").addEventListener("change", e => {
+    const el = e.target, card = el.closest("[data-id]"); if (!card) return;
+    const id = card.dataset.id;
+    if (el.dataset.act === "prep") setPrep(id, el.value);
+    if (el.dataset.act === "note") setNote(id, el.value);
+    if (el.dataset.act === "set") setQty(id, parseFloat(String(el.value).replace(",", ".")));
+  });
+  $("co-items").addEventListener("click", qtyClick);
+  $("cartbar").addEventListener("click", openSheet);
+  $("cartbar").addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openSheet(); } });
+  $("overlay").addEventListener("click", closeSheet);
+  $("sheet-close").addEventListener("click", closeSheet);
+  $("done-close").addEventListener("click", closeSheet);
+  $("co-view").addEventListener("change", e => {
+    if (e.target.name === "dtype" || e.target.id === "c-zone") applyDeliveryUI();
+    if (e.target.name === "pay") applyPayUI();
+  });
+  $("gps").addEventListener("click", getGps);
+  $("copy-pay").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(PAY_NUMBER); toast("تم نسخ الرقم: " + PAY_NUMBER); } catch (e) { toast("انسخ الرقم يدوياً: " + PAY_NUMBER, "warn"); }
+  });
+  $("co-submit").addEventListener("click", submitOrder);
 
-        function getAutoLocation() {
-            const btn = document.getElementById('gps-btn'); if (!navigator.geolocation) return alert("الـ GPS غير مدعوم."); btn.innerHTML = "⏳ جاري التحديد...";
-            navigator.geolocation.getCurrentPosition(
-                (pos) => { document.getElementById('cust-gps-url').value = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`; btn.className = "w-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 border border-emerald-400 font-bold py-2.5 px-3 rounded-xl text-xs flex justify-center gap-2"; btn.innerHTML = "✅ تم التقاط الموقع"; },
-                (err) => { btn.innerHTML = "⚠️ فشل (يرجى تفعيل الـ GPS)"; }, { enableHighAccuracy: true, timeout: 10000 }
-            );
-        }
+  $("pin-ok").addEventListener("click", verifyPin);
+  $("pin-cancel").addEventListener("click", () => $("pin-dialog").classList.add("hidden"));
+  $("pin-input").addEventListener("keydown", e => { if (e.key === "Enter") verifyPin(); });
+  $("admin-close").addEventListener("click", closeAdmin);
+  document.querySelector(".tabs").addEventListener("click", e => {
+    const b = e.target.closest("button[data-tab]"); if (!b) return;
+    if (b.dataset.tab === "form") openForm(""); else showAdminTab(b.dataset.tab);
+  });
+  $("a-new").addEventListener("click", () => openForm(""));
+  $("a-search").addEventListener("input", renderAdminItems);
+  $("a-list").addEventListener("click", e => {
+    const b = e.target.closest("button[data-act]"); if (!b) return;
+    const id = b.closest("[data-id]").dataset.id;
+    if (b.dataset.act === "edit") openForm(id);
+    if (b.dataset.act === "del") deleteItem(id);
+  });
+  $("f-img").addEventListener("input", () => { $("f-preview").src = safeImg($("f-img").value.trim()); });
+  $("f-cancel").addEventListener("click", () => showAdminTab("items"));
+  $("f-save").addEventListener("click", saveItem);
+  $("d-zones").addEventListener("input", e => {
+    const row = e.target.closest("[data-i]"); if (!row) return;
+    const z = S.zonesDraft[Number(row.dataset.i)]; if (!z) return;
+    if (e.target.dataset.f === "name") z.name = e.target.value; else z.fee = Number(e.target.value);
+  });
+  $("d-zones").addEventListener("click", e => {
+    const b = e.target.closest('[data-act="zdel"]'); if (!b) return;
+    S.zonesDraft.splice(Number(b.closest("[data-i]").dataset.i), 1); renderZones();
+  });
+  $("d-add").addEventListener("click", () => { S.zonesDraft.push({ name: "", fee: 0 }); renderZones(); });
+  $("d-save").addEventListener("click", saveDelivery);
+  document.addEventListener("keydown", e => {
+    if (e.key !== "Escape") return;
+    if (!$("pin-dialog").classList.contains("hidden")) $("pin-dialog").classList.add("hidden");
+    else if ($("sheet").classList.contains("show")) closeSheet();
+  });
 
-        // دالة تحويل الصورة لرفع الإيصال
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result.split(',')[1]);
-                reader.onerror = error => reject(error);
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // 💬 رسالة الواتساب 
-        async function submitAndSendWhatsApp() {
-            const name = document.getElementById('cust-name').value.trim(), phone = document.getElementById('cust-phone').value.trim(), address = document.getElementById('cust-address').value.trim(), gpsUrl = document.getElementById('cust-gps-url').value.trim(), paymentMethod = document.querySelector('input[name="payment_method"]:checked').value, btn = document.getElementById('submit-order-btn'), fileInput = document.getElementById('receipt-file');
-            if (!name || !phone || !address) return alert("أكمل الاسم والموبايل والعنوان!");
-
-            const orderId = "ORD-" + Math.floor(10000 + Math.random() * 90000);
-            let sub = 0, itemsText = ``;
-            Object.values(cart).forEach(i => { const lineTotal = (i.qty * i.price).toFixed(0); sub += i.qty * i.price; itemsText += `🔸 *${i.name}*\n   ⚖️ الوزن: ${i.qty} ${i.unit}\n   🔪 التجهيز: ${i.prep}\n${i.note ? `   📝 ملاحظة: ${i.note}\n` : ''}   💵 السعر: ${lineTotal} ج\n`; });
-
-            const zoneSelect = document.getElementById('delivery-zone');
-            let deliveryFee = 0, deliveryName = "استلام من الفرع";
-            if (deliveryActive && zoneSelect && deliveryZones[zoneSelect.value]) { deliveryFee = deliveryZones[zoneSelect.value].fee; deliveryName = deliveryZones[zoneSelect.value].name; }
-
-            let uploadedReceiptUrl = "";
-            btn.innerHTML = "⏳ جاري تجهيز الطلب...";
-            btn.disabled = true;
-
-            try {
-                let receiptBase64 = null, receiptName = null, receiptMimeType = null;
-                if (fileInput && fileInput.files.length > 0) {
-                    const file = fileInput.files[0];
-                    receiptBase64 = await fileToBase64(file);
-                    receiptName = file.name;
-                    receiptMimeType = file.type;
-                }
-                const response = await fetch(GOOGLE_SHEET_API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        orderId, customerName: name, customerPhone: phone, customerAddress: address,
-                        deliveryZone: deliveryName, locationUrl: gpsUrl, itemsSummary: "تم الإرسال واتساب",
-                        subtotalPrice: sub, deliveryFee: deliveryFee, totalPrice: sub + deliveryFee, paymentMethod,
-                        receiptBase64: receiptBase64, receiptName: receiptName, receiptMimeType: receiptMimeType
-                    })
-                });
-                const resJson = await response.json();
-                if (resJson.receiptUrl && resJson.receiptUrl.startsWith("http")) uploadedReceiptUrl = resJson.receiptUrl;
-            } catch(e) {}
-
-            let msg = `🛒 *طلب جديد من دواجن الطاحونة*\n🧾 رقم الطلب: #${orderId}\n\n👤 *العميل:* ${name}\n📞 *الموبايل:* ${phone}\n🏠 *العنوان:* ${address}\n`;
-            if(gpsUrl) msg += `🗺️ *اللوكيشن:* ${gpsUrl}\n`;
-            msg += `\n📦 *تفاصيل الطلب:*\n➖➖➖➖➖➖➖➖\n${itemsText}➖➖➖➖➖➖➖➖\n💰 *إجمالي الأصناف:* ${sub.toFixed(0)} ج\n🚚 *التوصيل (${deliveryName}):* ${deliveryFee} ج\n💳 *الدفع:* ${paymentMethod}\n`;
-            if (uploadedReceiptUrl) msg += `🧾 *رابط الإيصال:* ${uploadedReceiptUrl}\n`;
-            msg += `\n🛑 *تنويه:* الحساب يحدد بدقة وقت الوزن.`;
-
-            btn.innerHTML = "✅ جاري فتح واتساب...";
-            setTimeout(() => { window.open(`https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank'); btn.innerHTML = "💬 تأكيد وإرسال واتساب"; btn.disabled = false; }, 500);
-        }
-
-        // ⚙️ CPanel
-        let tapCount = 0, tapTimeout;
-        function handleAdminTap() {
-            tapCount++; clearTimeout(tapTimeout);
-            if (tapCount >= 5) { tapCount = 0; if (prompt("🔒 الرقم السري للوحة الإدارة:") === ADMIN_PIN) { document.getElementById('cpanel-view').classList.remove('hidden'); renderCPanelPrices(); renderCPanelDelivery(); } else { alert("❌ خطأ!"); } } 
-            else { tapTimeout = setTimeout(() => tapCount = 0, 1500); }
-        }
-        function hideCPanel() { document.getElementById('cpanel-view').classList.add('hidden'); fetchMenu(); }
-        function switchCpanelTab(tab) {
-            document.getElementById('tab-prices').className = tab === 'prices' ? "flex-1 py-3 text-sm font-bold text-red-800 dark:text-red-400 border-b-2 border-red-800 dark:border-red-400 bg-slate-50 dark:bg-slate-700" : "flex-1 py-3 text-sm font-bold text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:bg-slate-50 dark:hover:bg-slate-700";
-            document.getElementById('tab-delivery').className = tab === 'delivery' ? "flex-1 py-3 text-sm font-bold text-red-800 dark:text-red-400 border-b-2 border-red-800 dark:border-red-400 bg-slate-50 dark:bg-slate-700" : "flex-1 py-3 text-sm font-bold text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:bg-slate-50 dark:hover:bg-slate-700";
-            document.getElementById('cpanel-prices-section').style.display = tab === 'prices' ? 'block' : 'none'; document.getElementById('cpanel-delivery-section').style.display = tab === 'delivery' ? 'block' : 'none';
-        }
-        function renderCPanelPrices() {
-            const container = document.getElementById('cpanel-prices-section'); container.innerHTML = '';
-            menuItems.forEach(item => { container.innerHTML += `<div class="bg-white dark:bg-slate-800 p-3.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex justify-between items-center gap-3"><div class="flex-1 font-bold text-sm dark:text-white">${item.name}</div><div class="flex gap-2"><input type="number" id="cp-price-${item.id}" value="${item.price}" class="w-16 border-2 dark:border-slate-600 dark:bg-slate-900 rounded-lg px-2 text-center font-black text-sm outline-none"><button onclick="saveNewPrice('${item.id}')" id="cp-btn-${item.id}" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold w-14">حفظ</button></div></div>`; });
-        }
-        async function saveNewPrice(id) {
-            const btn = document.getElementById(`cp-btn-${id}`), val = document.getElementById(`cp-price-${id}`).value; btn.innerText = "⏳";
-            try { await fetch(GOOGLE_SHEET_API_URL, { method: 'POST', body: JSON.stringify({ action: "update_price", itemId: id, newPrice: val }) }); btn.innerText = "✅"; btn.classList.replace('bg-emerald-600', 'bg-sky-600'); const itm = menuItems.find(i=>i.id===id); if(itm) itm.price = Number(val); } catch(e) { btn.innerText = "❌"; }
-            setTimeout(() => { btn.innerText = "حفظ"; btn.classList.replace('bg-sky-600', 'bg-emerald-600'); }, 2000);
-        }
-        function renderCPanelDelivery() {
-            document.getElementById('cp-delivery-active').checked = deliveryActive; const list = document.getElementById('cp-zones-list'); list.innerHTML = '';
-            deliveryZones.forEach((z, idx) => { list.innerHTML += `<div class="flex justify-between items-center bg-slate-50 dark:bg-slate-900 p-2 rounded-lg border dark:border-slate-700"><span class="text-xs font-bold flex-1 dark:text-white">${z.name}</span><span class="text-xs font-bold text-red-700 dark:text-amber-400 mx-3">${z.fee} ج</span><button onclick="removeDeliveryZone(${idx})" class="text-red-500 font-bold text-lg leading-none">&times;</button></div>`; });
-        }
-        function addDeliveryZone() {
-            const name = document.getElementById('cp-new-zone-name').value.trim(), fee = Number(document.getElementById('cp-new-zone-fee').value);
-            if(name) { deliveryZones.push({name, fee}); document.getElementById('cp-new-zone-name').value = ''; document.getElementById('cp-new-zone-fee').value = ''; renderCPanelDelivery(); }
-        }
-        function removeDeliveryZone(idx) { deliveryZones.splice(idx, 1); renderCPanelDelivery(); }
-        async function saveDeliverySettings() {
-            const btn = document.getElementById('save-del-btn'), zoneStr = deliveryZones.map(z => `${z.name}:${z.fee}`).join(','); deliveryActive = document.getElementById('cp-delivery-active').checked;
-            btn.innerHTML = "⏳ جاري الحفظ...";
-            try { await fetch(GOOGLE_SHEET_API_URL, { method: 'POST', body: JSON.stringify({ action: "update_delivery", deliveryActive: deliveryActive, deliveryZones: zoneStr }) }); btn.innerHTML = "✅ تم الحفظ"; initDeliveryDropdown(); } catch(e) { btn.innerHTML = "❌ خطأ"; }
-            setTimeout(() => btn.innerHTML = "💾 حفظ التوصيل", 2000);
-        }
-
-        fetchMenu();
-    </script>
+  loadMenu(false);
+  setInterval(() => {   // تحديث تلقائي هادي كل دقيقتين
+    if (document.hidden || $("sheet").classList.contains("show") || !$("admin").classList.contains("hidden")) return;
+    const a = document.activeElement;
+    if (a && ["INPUT", "SELECT", "TEXTAREA"].includes(a.tagName)) return;
+    loadMenu(false);
+  }, 120000);
+}
+init();
+</script>
 </body>
 </html>
