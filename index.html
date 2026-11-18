@@ -1,23 +1,40 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="transition-all duration-300">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دواجن الطاحونة - المنيو الإلكتروني بالوزن</title>
+    <title>دواجن الطاحونة - المنيو الإلكتروني</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
     <style>
         body { font-family: 'Cairo', sans-serif; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* تحسين مظهر حقل الأرقام لإخفاء الأسهم الافتراضية */
+        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
-<body class="bg-amber-50/40 text-slate-800 flex flex-col h-screen overflow-hidden">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col h-screen overflow-hidden transition-colors duration-300">
+
+    <!-- شريط الإعدادات العلوية (الوضع الليلي والخط) -->
+    <div class="bg-slate-900 dark:bg-black text-slate-300 px-4 py-1.5 flex justify-between items-center text-[11px] font-bold z-20 shadow-md">
+        <div class="flex items-center gap-2">
+            <span>⚙️ إعدادات العرض:</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="toggleDarkMode()" class="hover:text-amber-400 transition flex items-center gap-1"><span id="theme-icon">🌙</span> <span id="theme-text">ليلي</span></button>
+            <div class="w-px h-3 bg-slate-600"></div>
+            <button onclick="changeFontSize(5)" class="hover:text-amber-400 transition text-sm">A+</button>
+            <button onclick="changeFontSize(-5)" class="hover:text-amber-400 transition text-[10px]">A-</button>
+        </div>
+    </div>
 
     <!-- الهيدر -->
-    <header class="bg-red-900 text-white px-5 py-3.5 shadow-lg flex justify-between items-center z-10 border-b-4 border-amber-500">
+    <header class="bg-red-900 dark:bg-red-950 text-white px-5 py-3 shadow-lg flex justify-between items-center z-10 border-b-4 border-amber-500">
         <div class="flex items-center gap-3">
-            <!-- تمت إضافة onclick للدجاجة لفتح CPanel -->
             <div onclick="handleAdminTap()" class="bg-amber-500 text-red-950 w-11 h-11 rounded-2xl flex items-center justify-center text-2xl shadow-inner font-black cursor-pointer select-none transition active:scale-95">🐓</div>
             <div>
                 <h1 class="text-lg md:text-xl font-black tracking-wide">دواجن الطاحونة</h1>
@@ -25,10 +42,7 @@
             </div>
         </div>
         <div class="flex flex-col items-end gap-1.5">
-            <div class="bg-red-950/80 px-3 py-1.5 rounded-xl border border-red-700 text-[11px] text-amber-400 font-bold shadow-sm">
-                ⚖️ أسعار اليوم
-            </div>
-            <!-- زر تحديث الأسعار يدوياً -->
+            <div class="bg-red-950/80 dark:bg-black/50 px-3 py-1.5 rounded-xl border border-red-700 text-[11px] text-amber-400 font-bold shadow-sm">⚖️ أسعار اليوم</div>
             <button onclick="refreshPrices()" id="refresh-btn" class="text-amber-300 text-[10px] font-bold flex items-center gap-1 active:scale-90 transition">
                 <span id="refresh-icon">🔄</span> تحديث
             </button>
@@ -36,174 +50,229 @@
     </header>
 
     <!-- شريط البحث -->
-    <div class="bg-white px-4 py-2.5 border-b border-slate-200 z-10">
-        <input type="text" id="search-input" oninput="applyFilters()" placeholder="ابحث عن: بانيه، فراخ بيضاء، شيش، بط..." class="w-full bg-slate-100 border border-slate-200 rounded-xl py-2 px-4 text-sm focus:outline-none focus:border-red-700">
+    <div class="bg-white dark:bg-slate-800 px-4 py-2.5 border-b border-slate-200 dark:border-slate-700 z-10 transition-colors">
+        <input type="text" id="search-input" oninput="applyFilters()" placeholder="ابحث عن: بانيه، فراخ، بط..." class="w-full bg-slate-100 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 border border-slate-200 dark:border-slate-600 rounded-xl py-2 px-4 text-sm focus:outline-none focus:border-red-700">
     </div>
 
     <!-- شريط تصفية الأقسام -->
-    <nav class="bg-white border-b border-slate-200 px-4 py-2.5 overflow-x-auto hide-scrollbar flex gap-2 z-10 shadow-sm">
+    <nav id="category-nav" class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-2.5 overflow-x-auto hide-scrollbar flex gap-2 z-10 shadow-sm transition-colors">
         <button onclick="filterCategory('all', this)" class="cat-btn bg-red-800 text-white px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shadow-sm transition">الكل</button>
-        <button onclick="filterCategory('CAT-RAW', this)" class="cat-btn bg-slate-100 text-slate-700 px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap hover:bg-slate-200 transition">🐔 فراخ طازجة</button>
-        <button onclick="filterCategory('CAT-CUTS', this)" class="cat-btn bg-slate-100 text-slate-700 px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap hover:bg-slate-200 transition">🥩 بانيه ومقطعات</button>
-        <button onclick="filterCategory('CAT-DUCK', this)" class="cat-btn bg-slate-100 text-slate-700 px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap hover:bg-slate-200 transition">🦆 بط وحمام</button>
-        <button onclick="filterCategory('CAT-READY', this)" class="cat-btn bg-slate-100 text-slate-700 px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap hover:bg-slate-200 transition">🌶️ متبل وجاهز</button>
+        <button onclick="filterCategory('CAT-RAW', this)" class="cat-btn bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition">🐔 طازجة</button>
+        <button onclick="filterCategory('CAT-CUTS', this)" class="cat-btn bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition">🥩 مقطعات</button>
+        <button onclick="filterCategory('CAT-DUCK', this)" class="cat-btn bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition">🦆 بط وحمام</button>
+        <button onclick="filterCategory('CAT-READY', this)" class="cat-btn bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition">🌶️ متبل</button>
     </nav>
 
-    <!-- قائمة الأصناف -->
-    <main class="flex-1 overflow-y-auto p-4 md:p-6 pb-28">
-        <div id="loading-spinner" class="text-center py-16 text-slate-500 font-bold">جاري تحميل بورصة أسعار اليوم من الإدارة... 🔄</div>
+    <!-- قائمة الأصناف (تمت إضافة pb-40 لحل مشكلة إخفاء السلة للأصناف) -->
+    <main class="flex-1 overflow-y-auto p-4 md:p-6 pb-40">
+        <div id="loading-spinner" class="text-center py-16 text-slate-500 dark:text-slate-400 font-bold">جاري تحميل الأسعار... 🔄</div>
         <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-w-7xl mx-auto"></div>
     </main>
 
-    <!-- الشريط السفلي للسلة -->
-    <div id="floating-cart" class="fixed bottom-0 left-0 right-0 bg-red-950 text-white p-3.5 shadow-2xl transition-transform duration-300 translate-y-full z-30 border-t-2 border-amber-500">
+    <!-- الشريط السفلي للسلة (Floating Cart) -->
+    <div id="floating-cart" class="fixed bottom-3 left-3 right-3 bg-red-950 text-white p-3 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] transition-transform duration-300 translate-y-[150%] z-30 border border-red-800/50 backdrop-blur-md">
         <div class="max-w-xl mx-auto flex justify-between items-center cursor-pointer" onclick="toggleCartModal()">
             <div class="flex items-center gap-3">
-                <div class="bg-amber-500 text-red-950 font-black w-10 h-10 rounded-xl flex items-center justify-center text-base" id="cart-count">0</div>
+                <div class="bg-amber-500 text-red-950 font-black w-11 h-11 rounded-xl flex items-center justify-center text-lg shadow-inner" id="cart-count">0</div>
                 <div>
-                    <h3 class="font-bold text-sm">سلة الطلبات (بالوزن)</h3>
-                    <p class="text-[10px] text-amber-300">اضغط لإدخال العنوان وطريقة الدفع</p>
+                    <h3 class="font-bold text-sm">سلة الطلبات</h3>
+                    <p class="text-[10px] text-amber-300">متابعة الدفع والتوصيل</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
                 <div class="text-left">
-                    <span class="text-xs text-slate-300 block">الإجمالي التقريبي</span>
-                    <span class="text-base font-black text-amber-400" id="cart-total-price">0.00 ج.م</span>
+                    <span class="text-[10px] text-slate-300 block">الإجمالي تقريبي</span>
+                    <span class="text-base font-black text-amber-400" id="cart-total-price">0 ج.م</span>
                 </div>
-                <button class="bg-amber-500 text-red-950 font-black px-4 py-2 rounded-xl text-xs">إتمام الطلب 🛒</button>
+                <button class="bg-amber-500 text-red-950 font-black px-4 py-2.5 rounded-xl text-xs shadow-md">إتمام الطلب 🛒</button>
             </div>
         </div>
     </div>
 
-    <!-- نافذة إتمام الطلب والدفع واللوكيشن -->
-    <div id="cart-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-40 flex justify-end">
-        <div class="bg-white w-full max-w-lg h-full flex flex-col shadow-2xl overflow-hidden">
-            <div class="p-4 bg-red-900 text-white flex justify-between items-center">
-                <h3 class="font-bold text-base">🛒 مراجعة الطلب وبيانات التوصيل</h3>
-                <button onclick="toggleCartModal()" class="text-amber-300 text-2xl font-bold leading-none">&times;</button>
+    <!-- نافذة إتمام الطلب (Checkout) -->
+    <div id="cart-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-40 flex justify-end">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-lg h-full flex flex-col shadow-2xl overflow-hidden transition-colors">
+            <div class="p-4 bg-red-900 text-white flex justify-between items-center shadow-md">
+                <h3 class="font-bold text-base">🛒 مراجعة الطلب</h3>
+                <button onclick="toggleCartModal()" class="text-amber-300 hover:text-white text-3xl font-bold leading-none transition">&times;</button>
             </div>
             <div class="flex-1 overflow-y-auto p-4 space-y-4">
-                <div class="bg-amber-50 border border-amber-300 rounded-xl p-2.5 text-[11px] text-amber-900 font-semibold">
-                    ⚖️ <b>تنويه الميزان:</b> الإجمالي محسوب تقريبياً بناءً على الأوزان المختارة، وسيتم تحديد الحساب الفعلي بدقة على الميزان الديجيتال وقت التحضير.
+                <div id="delivery-alert" class="bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700/50 rounded-xl p-3 text-[11px] text-amber-900 dark:text-amber-300 font-semibold shadow-sm">
+                    ⚖️ <b>تنويه:</b> الإجمالي تقريبي، سيتم تحديد الحساب النهائي بدقة على الميزان الديجيتال.
                 </div>
-                <div id="cart-items-container" class="divide-y border rounded-xl p-3 bg-slate-50"></div>
-                <div class="bg-white border rounded-xl p-3.5 space-y-3 shadow-sm">
-                    <h4 class="font-bold text-sm text-red-900 border-b pb-1.5">📍 بيانات العميل والتوصيل</h4>
-                    <div><input type="text" id="cust-name" placeholder="الاسم بالكامل *" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-red-700"></div>
-                    <div><input type="tel" id="cust-phone" placeholder="01xxxxxxxxx *" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-red-700"></div>
+                <div id="cart-items-container" class="divide-y divide-slate-200 dark:divide-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl p-3 bg-slate-50 dark:bg-slate-800/50"></div>
+                
+                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 space-y-3 shadow-sm">
+                    <h4 class="font-bold text-sm text-red-900 dark:text-red-400 border-b dark:border-slate-700 pb-2">📍 بيانات التوصيل</h4>
+                    <input type="text" id="cust-name" placeholder="الاسم بالكامل *" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-xs focus:border-red-700 outline-none">
+                    <input type="tel" id="cust-phone" placeholder="الموبايل (واتساب) *" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-xs focus:border-red-700 outline-none">
+                    <div id="delivery-zone-container">
+                        <select id="delivery-zone" onchange="updateCartBar()" class="w-full bg-amber-50 dark:bg-slate-900 border border-amber-400 dark:border-slate-600 rounded-xl px-3 py-2 text-xs font-bold focus:border-red-700 outline-none"></select>
+                    </div>
                     <div>
-                        <button type="button" onclick="getAutoLocation()" id="gps-btn" class="w-full bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-300 font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-2 transition">📍 اضغط لتحديد موقعك الحالي تلقائياً</button>
+                        <button type="button" onclick="getAutoLocation()" id="gps-btn" class="w-full bg-sky-50 dark:bg-sky-900/30 text-sky-800 dark:text-sky-300 border border-sky-300 dark:border-sky-700 font-bold py-2.5 px-3 rounded-xl text-xs flex justify-center gap-2 transition">📍 تحديد اللوكيشن تلقائياً (GPS)</button>
                         <input type="hidden" id="cust-gps-url" value="">
-                        <p id="gps-status" class="text-[11px] text-emerald-600 font-bold mt-1 hidden"></p>
                     </div>
-                    <div><textarea id="cust-address" rows="2" placeholder="العنوان بالتفصيل (مكتوب) *" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-red-700"></textarea></div>
+                    <textarea id="cust-address" rows="2" placeholder="العنوان بالتفصيل *" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-xs focus:border-red-700 outline-none"></textarea>
                 </div>
-                <div class="bg-white border rounded-xl p-3.5 space-y-3 shadow-sm">
-                    <h4 class="font-bold text-sm text-red-900 border-b pb-1.5">💳 طريقة الدفع</h4>
+
+                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 space-y-3 shadow-sm">
+                    <h4 class="font-bold text-sm text-red-900 dark:text-red-400 border-b dark:border-slate-700 pb-2">💳 الدفع</h4>
                     <div class="grid grid-cols-3 gap-2">
-                        <label class="border rounded-xl p-2 text-center cursor-pointer has-[:checked]:bg-red-50 has-[:checked]:border-red-700">
-                            <input type="radio" name="payment_method" value="كاش عند الاستلام" checked onchange="togglePaymentDetails()" class="hidden">
+                        <label class="border dark:border-slate-600 rounded-xl p-2 text-center cursor-pointer has-[:checked]:bg-red-50 dark:has-[:checked]:bg-red-900/30 has-[:checked]:border-red-700 transition">
+                            <input type="radio" name="payment_method" value="كاش" checked onchange="togglePaymentDetails()" class="hidden">
                             <span class="text-xs font-bold block">💵 كاش</span>
-                            <span class="text-[10px] text-slate-500">عند الاستلام</span>
                         </label>
-                        <label class="border rounded-xl p-2 text-center cursor-pointer has-[:checked]:bg-red-50 has-[:checked]:border-red-700">
-                            <input type="radio" name="payment_method" value="إنستاباي (InstaPay)" onchange="togglePaymentDetails()" class="hidden">
-                            <span class="text-xs font-bold block text-purple-800">⚡ إنستاباي</span>
-                            <span class="text-[10px] text-slate-500">تحويل فوري</span>
+                        <label class="border dark:border-slate-600 rounded-xl p-2 text-center cursor-pointer has-[:checked]:bg-red-50 dark:has-[:checked]:bg-red-900/30 has-[:checked]:border-red-700 transition">
+                            <input type="radio" name="payment_method" value="إنستاباي" onchange="togglePaymentDetails()" class="hidden">
+                            <span class="text-xs font-bold block text-purple-700 dark:text-purple-400">⚡ إنستاباي</span>
                         </label>
-                        <label class="border rounded-xl p-2 text-center cursor-pointer has-[:checked]:bg-red-50 has-[:checked]:border-red-700">
+                        <label class="border dark:border-slate-600 rounded-xl p-2 text-center cursor-pointer has-[:checked]:bg-red-50 dark:has-[:checked]:bg-red-900/30 has-[:checked]:border-red-700 transition">
                             <input type="radio" name="payment_method" value="فودافون كاش" onchange="togglePaymentDetails()" class="hidden">
-                            <span class="text-xs font-bold block text-red-600">📱 فودافون كاش</span>
-                            <span class="text-[10px] text-slate-500">محفظة</span>
+                            <span class="text-xs font-bold block text-red-600 dark:text-red-400">📱 فودافون</span>
                         </label>
-                    </div>
-                    <div id="electronic-payment-box" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2.5">
-                        <div class="flex justify-between items-center bg-white p-2 rounded-lg border">
-                            <div>
-                                <span class="text-[10px] text-slate-500 block">حول المبلغ على الرقم / الحساب:</span>
-                                <span id="payment-target-number" class="font-black text-sm text-slate-900 select-all">01097022660</span>
-                            </div>
-                            <button type="button" onclick="copyPaymentNumber()" class="bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg">نسخ 📋</button>
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold text-slate-700 block mb-1">📸 إرفاق صورة إيصال التحويل (اختياري):</label>
-                            <input type="file" id="receipt-file" accept="image/*" class="w-full text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-500 file:text-red-950">
-                        </div>
                     </div>
                 </div>
             </div>
-            <div class="p-3.5 bg-slate-100 border-t">
-                <button id="submit-order-btn" onclick="submitAndSendWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-sm shadow-lg transition flex items-center justify-center gap-2">💬 تأكيد الطلب وإرسال عبر واتساب</button>
+            <div class="p-4 bg-slate-100 dark:bg-slate-900 border-t dark:border-slate-700">
+                <button id="submit-order-btn" onclick="submitAndSendWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3.5 rounded-xl text-sm shadow-lg transition flex items-center justify-center gap-2">💬 تأكيد وإرسال واتساب</button>
             </div>
         </div>
     </div>
 
     <!-- ========================================================= -->
-    <!-- لوحة الإدارة المخفية (CPanel) التي تفتح بالضغط على الدجاجة -->
+    <!-- لوحة الإدارة المخفية (CPanel) -->
     <!-- ========================================================= -->
-    <div id="cpanel-view" class="hidden fixed inset-0 bg-slate-100 z-50 overflow-hidden flex flex-col">
+    <div id="cpanel-view" class="hidden fixed inset-0 bg-slate-100 dark:bg-slate-900 z-50 overflow-hidden flex flex-col transition-colors">
         <div class="bg-red-950 text-amber-400 p-4 flex justify-between items-center shadow-lg border-b-4 border-amber-500">
-            <h2 class="font-black text-lg flex items-center gap-2">⚙️ بورصة الأسعار (الإدارة)</h2>
-            <button onclick="hideCPanel()" class="bg-red-800 hover:bg-red-700 text-white px-4 py-1.5 rounded-xl text-sm font-bold shadow-md transition">إغلاق ✖</button>
+            <h2 class="font-black text-lg flex items-center gap-2">⚙️ لوحة الإدارة (CPanel)</h2>
+            <button onclick="hideCPanel()" class="bg-red-800 hover:bg-red-700 text-white px-4 py-1.5 rounded-xl text-sm font-bold shadow-md">خروج ✖</button>
         </div>
-        <div class="flex-1 overflow-y-auto p-4">
-            <p class="text-[11px] text-slate-500 font-bold mb-4 text-center">أي تعديل للسعر هنا سيتم حفظه مباشرة في جوجل شيت ليراه جميع الزبائن.</p>
-            <div id="cpanel-items-container" class="space-y-3 max-w-xl mx-auto pb-10"></div>
+        
+        <!-- تبويبات CPanel -->
+        <div class="flex border-b border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800">
+            <button onclick="switchCpanelTab('prices')" id="tab-prices" class="flex-1 py-3 text-sm font-bold text-red-800 dark:text-red-400 border-b-2 border-red-800 dark:border-red-400 bg-slate-50 dark:bg-slate-700">💰 الأسعار</button>
+            <button onclick="switchCpanelTab('delivery')" id="tab-delivery" class="flex-1 py-3 text-sm font-bold text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:bg-slate-50 dark:hover:bg-slate-700">🛵 التوصيل</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 pb-20">
+            <!-- قسم الأسعار -->
+            <div id="cpanel-prices-section" class="space-y-3 max-w-xl mx-auto"></div>
+            
+            <!-- قسم التوصيل -->
+            <div id="cpanel-delivery-section" class="hidden space-y-4 max-w-xl mx-auto">
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" id="cp-delivery-active" class="w-5 h-5 accent-red-700">
+                        <span class="font-bold text-sm">🛵 تفعيل خدمة التوصيل للزبائن</span>
+                    </label>
+                    <p class="text-[10px] text-slate-500 mt-1">إذا قمت بإلغاء التحديد، سيظهر للزبائن "استلام من الفرع فقط".</p>
+                </div>
+                
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
+                    <h3 class="font-bold text-sm border-b dark:border-slate-700 pb-2">📍 مناطق التوصيل والأسعار</h3>
+                    <div id="cp-zones-list" class="space-y-2"></div>
+                    <div class="flex gap-2 mt-2">
+                        <input type="text" id="cp-new-zone-name" placeholder="اسم المنطقة" class="flex-1 border dark:border-slate-600 dark:bg-slate-900 rounded-lg px-2 py-1.5 text-xs">
+                        <input type="number" id="cp-new-zone-fee" placeholder="السعر" class="w-20 border dark:border-slate-600 dark:bg-slate-900 rounded-lg px-2 py-1.5 text-xs text-center">
+                        <button onclick="addDeliveryZone()" class="bg-slate-800 dark:bg-slate-600 text-white px-3 rounded-lg text-xs font-bold">+</button>
+                    </div>
+                </div>
+                <button onclick="saveDeliverySettings()" id="save-del-btn" class="w-full bg-emerald-600 text-white font-black py-3 rounded-xl text-sm shadow-md">💾 حفظ إعدادات التوصيل</button>
+            </div>
         </div>
     </div>
 
     <script>
+        // ==========================================
+        // ⚙️ الإعدادات الأساسية
+        // ==========================================
+        // ضع الرابط الخاص بك هنا 👇
         const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbybijlHYuVk2ZnDTLu4z_Gk96vt7t0QZN94JQUC5v9J5ggqXi0LVb4CvHshIETvN0oJ/exec";
         const STORE_WHATSAPP = "201097022660";
-        const ADMIN_PIN = "2026"; // الرقم السري للإدارة
+        const ADMIN_PIN = "2026";
 
         let menuItems = [];
         let cart = {};
         let currentCategory = 'all';
+        let deliveryActive = true;
+        let deliveryZones = [];
 
-        const fallbackMenu = [
-            { id: "PL-101", name: "فراخ بيضاء طازجة", cat: "CAT-RAW", price: 95, unit: "كيلو", step: 0.5, prep_options: "تقطيع 4 قطع,تقطيع 8 قطع للشوي,فرخة سليمة بدون تقطيع,خلي كامل", img: "https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=500", desc: "فراخ بيضاء مزارع طازجة ذبح اليوم" }
-        ];
-
-        // 1. إضافة "?t=" لرابط الـ API تمنع الكاش وتجبر المتصفح على جلب السعر الجديد فوراً
-        async function fetchMenu() {
-            if (!GOOGLE_SHEET_API_URL.startsWith("http")) {
-                menuItems = fallbackMenu;
-                document.getElementById('loading-spinner').style.display = 'none';
-                applyFilters();
-                return;
+        // ==========================================
+        // 🌓 إعدادات المظهر (الوضع الليلي والخط)
+        // ==========================================
+        let isDarkMode = false;
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            if (isDarkMode) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-icon').innerText = '☀️';
+                document.getElementById('theme-text').innerText = 'نهاري';
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('theme-icon').innerText = '🌙';
+                document.getElementById('theme-text').innerText = 'ليلي';
             }
+        }
+        
+        let currentFontSize = 100;
+        function changeFontSize(delta) {
+            currentFontSize += delta;
+            if(currentFontSize < 85) currentFontSize = 85;
+            if(currentFontSize > 130) currentFontSize = 130;
+            document.documentElement.style.fontSize = currentFontSize + '%';
+        }
+
+        // ==========================================
+        // 📡 جلب البيانات من جوجل
+        // ==========================================
+        async function fetchMenu() {
             try {
-                // استخدام Timestamp يمنع الكاش نهائياً
                 const response = await fetch(GOOGLE_SHEET_API_URL + "?t=" + new Date().getTime());
-                const textData = await response.text();
-                const parsed = JSON.parse(textData);
-                menuItems = Array.isArray(parsed) ? parsed : (parsed.menu || fallbackMenu);
+                const resData = await response.json();
+                
+                // التوافق مع الكود الجديد
+                if (resData.menu) {
+                    menuItems = resData.menu;
+                    let settings = resData.settings || {};
+                    deliveryActive = settings.DeliveryActive === "true" || settings.DeliveryActive === true;
+                    parseDeliveryZones(settings.DeliveryZones);
+                } else {
+                    menuItems = resData; // الكود القديم
+                }
                 
                 document.getElementById('loading-spinner').style.display = 'none';
+                initDeliveryDropdown();
                 applyFilters();
             } catch (error) {
-                console.warn("Using fallback menu data:", error);
-                menuItems = fallbackMenu;
-                document.getElementById('loading-spinner').style.display = 'none';
-                applyFilters();
+                document.getElementById('loading-spinner').innerHTML = '⚠️ تعذر الاتصال بالسيرفر';
             }
+        }
+
+        function parseDeliveryZones(zoneString) {
+            deliveryZones = [];
+            if(!zoneString) return;
+            const parts = zoneString.split(',');
+            parts.forEach(p => {
+                const kv = p.split(':');
+                if(kv.length === 2) deliveryZones.push({ name: kv[0].trim(), fee: Number(kv[1]) });
+            });
         }
 
         async function refreshPrices() {
             const icon = document.getElementById('refresh-icon');
-            const spinner = document.getElementById('loading-spinner');
             icon.classList.add('animate-spin');
-            spinner.style.display = 'block';
-            spinner.innerHTML = 'جاري تحديث الأسعار اللحظية... 🔄';
             await fetchMenu();
             icon.classList.remove('animate-spin');
         }
 
+        // ==========================================
+        // 🛒 عرض المنيو والسلة
+        // ==========================================
         function filterCategory(cat, btn) {
             currentCategory = cat;
             document.querySelectorAll('.cat-btn').forEach(b => {
-                b.className = "cat-btn bg-slate-100 text-slate-700 px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap hover:bg-slate-200 transition";
+                b.className = "cat-btn bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition";
             });
             btn.className = "cat-btn bg-red-800 text-white px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shadow-sm transition";
             applyFilters();
@@ -212,21 +281,9 @@
         function applyFilters() {
             const query = document.getElementById('search-input').value.trim().toLowerCase();
             let filtered = menuItems;
-            if (currentCategory !== 'all') {
-                filtered = filtered.filter(i => i.cat === currentCategory);
-            }
-            if (query !== '') {
-                filtered = filtered.filter(i => i.name.toLowerCase().includes(query) || (i.desc && i.desc.toLowerCase().includes(query)));
-            }
+            if (currentCategory !== 'all') filtered = filtered.filter(i => i.cat === currentCategory);
+            if (query !== '') filtered = filtered.filter(i => i.name.toLowerCase().includes(query));
             renderMenu(filtered);
-        }
-
-        function formatWeight(qty, unit) {
-            if (unit !== 'كيلو') return `${qty} ${unit}`;
-            if (qty === 0.25) return "ربع كيلو (250 جم)";
-            if (qty === 0.5) return "نصف كيلو (500 جم)";
-            if (qty === 0.75) return "إلا ربع (750 جم)";
-            return `${qty} كيلو`;
         }
 
         function renderMenu(items) {
@@ -236,36 +293,45 @@
                 const step = parseFloat(item.step) || 0.5;
                 const unit = item.unit || 'كيلو';
                 const prepList = item.prep_options ? item.prep_options.split(',') : ['تجهيز عادي'];
-                const currentQty = cart[item.id] ? cart[item.id].qty : 0;
-                const selectedPrep = cart[item.id] ? cart[item.id].prep : prepList[0];
-                const optionsHtml = prepList.map(opt => `<option value="${opt.trim()}" ${opt.trim() === selectedPrep ? 'selected' : ''}>${opt.trim()}</option>`).join('');
+                
+                const cartItem = cart[item.id] || { qty: 0, prep: prepList[0], note: '' };
+                const currentQty = cartItem.qty;
+                const optionsHtml = prepList.map(opt => `<option value="${opt.trim()}" ${opt.trim() === cartItem.prep ? 'selected' : ''}>${opt.trim()}</option>`).join('');
 
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-2xl p-3.5 border border-slate-200 shadow-sm flex flex-col justify-between";
+                card.className = "bg-white dark:bg-slate-800 rounded-2xl p-3.5 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between transition-colors";
                 card.innerHTML = `
                     <div>
                         <div class="relative mb-3">
                             <img src="${item.img}" class="w-full h-36 object-cover rounded-xl" onerror="this.src='https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=400'">
                             <span class="absolute top-2 left-2 bg-red-900/90 text-amber-300 font-black px-2.5 py-1 rounded-lg text-xs shadow">${item.price} ج.م / ${unit}</span>
                         </div>
-                        <h3 class="font-bold text-slate-900 text-sm mb-1">${item.name}</h3>
-                        <p class="text-[11px] text-slate-500 mb-2.5 line-clamp-2">${item.desc || ''}</p>
-                        <div class="mb-3">
-                            <label class="text-[10px] font-bold text-slate-600 block mb-1">🔪 طريقة التقطيع / التجهيز:</label>
-                            <select id="prep-${item.id}" onchange="updatePrep('${item.id}', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-semibold focus:outline-none focus:border-red-700">${optionsHtml}</select>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1">${item.name}</h3>
+                        
+                        <div class="mb-3 space-y-1.5">
+                            <label class="text-[10px] font-bold text-slate-600 dark:text-slate-400">🔪 التجهيز:</label>
+                            <select onchange="updateCartField('${item.id}', 'prep', this.value)" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-1.5 text-xs font-semibold focus:outline-none focus:border-red-700">${optionsHtml}</select>
+                            
+                            <input type="text" onchange="updateCartField('${item.id}', 'note', this.value)" value="${cartItem.note}" placeholder="📝 ملاحظات خاصة (اختياري)..." class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-1.5 text-[10px] focus:outline-none focus:border-red-700 placeholder-slate-400">
                         </div>
                     </div>
                     <div>
                         ${currentQty === 0 ? 
-                            `<button onclick="updateWeight('${item.id}', ${step})" class="w-full bg-red-800 hover:bg-red-900 text-white font-bold py-2 rounded-xl text-xs transition shadow-sm">⚖️ أضف بالوزن (+${step} ${unit})</button>` 
+                            `<button onclick="updateWeight('${item.id}', ${step})" class="w-full bg-red-800 hover:bg-red-700 text-white font-bold py-2 rounded-xl text-xs transition shadow-sm">⚖️ أضف للسلة (+${step} ${unit})</button>` 
                             : 
-                            `<div class="flex items-center justify-between bg-amber-50 rounded-xl p-1 border border-amber-300">
-                                <button onclick="updateWeight('${item.id}', -${step})" class="bg-white border w-8 h-8 rounded-lg font-black text-red-800 shadow-sm">-</button>
-                                <div class="text-center">
-                                    <span class="font-black text-xs text-red-950 block">${formatWeight(currentQty, unit)}</span>
-                                    <span class="text-[10px] text-slate-600 font-bold">${(currentQty * item.price).toFixed(0)} ج.م</span>
+                            `<div class="flex items-center justify-between bg-amber-50 dark:bg-slate-700 rounded-xl p-1 border border-amber-300 dark:border-slate-600">
+                                <button onclick="updateWeight('${item.id}', -${step})" class="bg-white dark:bg-slate-600 border dark:border-slate-500 w-8 h-8 rounded-lg font-black text-red-800 dark:text-red-300 shadow-sm">-</button>
+                                
+                                <div class="flex flex-col items-center">
+                                    <div class="flex items-center">
+                                        <!-- إدخال الوزن يدوياً -->
+                                        <input type="number" step="0.01" min="0" value="${currentQty}" onchange="setExactWeight('${item.id}', this.value)" class="w-12 bg-transparent text-center font-black text-red-950 dark:text-amber-400 text-sm outline-none">
+                                        <span class="text-[10px] font-bold dark:text-slate-300">${unit}</span>
+                                    </div>
+                                    <span class="text-[10px] text-slate-600 dark:text-slate-400 font-bold">${(currentQty * item.price).toFixed(0)} ج.م</span>
                                 </div>
-                                <button onclick="updateWeight('${item.id}', ${step})" class="bg-amber-500 w-8 h-8 rounded-lg font-black text-red-950 shadow-sm">+</button>
+                                
+                                <button onclick="updateWeight('${item.id}', ${step})" class="bg-amber-500 dark:bg-amber-600 w-8 h-8 rounded-lg font-black text-red-950 dark:text-white shadow-sm">+</button>
                             </div>`
                         }
                     </div>`;
@@ -273,20 +339,44 @@
             });
         }
 
-        function updatePrep(id, newPrep) { if (cart[id]) { cart[id].prep = newPrep; updateCartBar(); } }
+        function initItemInCart(id) {
+            if (!cart[id]) {
+                const item = menuItems.find(i => i.id === id);
+                const prepSelect = document.querySelector(`select[onchange="updateCartField('${id}', 'prep', this.value)"]`);
+                const prepVal = prepSelect ? prepSelect.value : (item.prep_options ? item.prep_options.split(',')[0] : 'عادي');
+                cart[id] = { ...item, qty: 0, prep: prepVal, note: '' };
+            }
+        }
 
         function updateWeight(id, delta) {
-            const item = menuItems.find(i => i.id === id);
-            const prepSelect = document.getElementById(`prep-${id}`);
-            const chosenPrep = prepSelect ? prepSelect.value : 'عادي';
-            if (!cart[id]) {
-                if (delta > 0) cart[id] = { ...item, qty: delta, prep: chosenPrep };
-            } else {
-                cart[id].qty = Math.round((cart[id].qty + delta) * 100) / 100;
-                if (cart[id].qty <= 0) delete cart[id];
+            initItemInCart(id);
+            cart[id].qty = Math.round((cart[id].qty + delta) * 100) / 100;
+            if (cart[id].qty <= 0) delete cart[id];
+            applyFilters(); updateCartBar();
+        }
+
+        function setExactWeight(id, val) {
+            const num = parseFloat(val);
+            if(isNaN(num) || num <= 0) { delete cart[id]; }
+            else { initItemInCart(id); cart[id].qty = num; }
+            applyFilters(); updateCartBar();
+        }
+
+        function updateCartField(id, field, val) {
+            if (cart[id]) { cart[id][field] = val; updateCartBar(); }
+            else if (val.trim() !== '') { initItemInCart(id); cart[id][field] = val; }
+        }
+
+        function initDeliveryDropdown() {
+            const container = document.getElementById('delivery-zone-container');
+            const select = document.getElementById('delivery-zone');
+            if(!deliveryActive) {
+                container.innerHTML = '<div class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-500 text-center">🛑 التوصيل غير متاح حالياً (استلام من الفرع فقط)</div>';
+                return;
             }
-            applyFilters();
-            updateCartBar();
+            container.innerHTML = '<select id="delivery-zone" onchange="updateCartBar()" class="w-full bg-amber-50 dark:bg-slate-900 border border-amber-400 dark:border-slate-600 rounded-xl px-3 py-2 text-xs font-bold focus:border-red-700 outline-none"></select>';
+            const newSelect = document.getElementById('delivery-zone');
+            newSelect.innerHTML = deliveryZones.map((z, idx) => `<option value="${idx}">${z.name} (${z.fee>0 ? z.fee+' ج.م' : 'مجاناً'})</option>`).join('');
         }
 
         function updateCartBar() {
@@ -294,11 +384,11 @@
             const cartContainer = document.getElementById('cart-items-container');
             const keys = Object.keys(cart);
             if (keys.length === 0) {
-                cartBar.classList.add('translate-y-full');
+                cartBar.classList.add('translate-y-[150%]');
                 cartContainer.innerHTML = '<p class="text-center text-xs text-slate-400 py-4">السلة فارغة</p>';
                 return;
             }
-            cartBar.classList.remove('translate-y-full');
+            cartBar.classList.remove('translate-y-[150%]');
             let subtotal = 0;
             cartContainer.innerHTML = '';
             keys.forEach(id => {
@@ -308,211 +398,205 @@
                 cartContainer.innerHTML += `
                     <div class="py-2 flex justify-between items-center text-xs">
                         <div>
-                            <span class="font-bold text-slate-800 block">${item.name} (${formatWeight(item.qty, item.unit || 'كيلو')})</span>
-                            <span class="text-[11px] text-red-700 font-semibold">🔪 التجهيز: ${item.prep}</span>
+                            <span class="font-bold text-slate-800 dark:text-white block">${item.name} (${item.qty} ${item.unit || 'كيلو'})</span>
+                            <span class="text-[10px] text-red-700 dark:text-red-400 font-semibold block">🔪 ${item.prep}</span>
+                            ${item.note ? `<span class="text-[10px] text-slate-500 block">📝 ${item.note}</span>` : ''}
                         </div>
-                        <span class="font-black text-slate-900">${itemTotal.toFixed(0)} ج.م</span>
+                        <span class="font-black text-slate-900 dark:text-amber-400">${itemTotal.toFixed(0)} ج</span>
                     </div>`;
             });
             document.getElementById('cart-count').innerText = keys.length;
-            document.getElementById('cart-total-price').innerText = subtotal.toFixed(0) + " ج.م";
+            
+            let total = subtotal;
+            const zoneSelect = document.getElementById('delivery-zone');
+            if(deliveryActive && zoneSelect && deliveryZones[zoneSelect.value]) {
+                total += deliveryZones[zoneSelect.value].fee;
+            }
+            document.getElementById('cart-total-price').innerText = total.toFixed(0) + " ج.م";
         }
 
         function toggleCartModal() { document.getElementById('cart-modal').classList.toggle('hidden'); }
-        function togglePaymentDetails() {
-            const method = document.querySelector('input[name="payment_method"]:checked').value;
-            const box = document.getElementById('electronic-payment-box');
-            if (method === "كاش عند الاستلام") box.classList.add('hidden');
-            else box.classList.remove('hidden');
-        }
-        function copyPaymentNumber() {
-            const num = document.getElementById('payment-target-number').innerText;
-            navigator.clipboard.writeText(num);
-            alert("تم نسخ الرقم: " + num);
-        }
+        function togglePaymentDetails() {} // مبسطة
         function getAutoLocation() {
             const btn = document.getElementById('gps-btn');
-            const status = document.getElementById('gps-status');
-            if (!navigator.geolocation) return alert("متصفحك لا يدعم تحديد الموقع التلقائي.");
-            btn.innerHTML = "⏳ جاري التقاط إشارة الـ GPS...";
+            if (!navigator.geolocation) return alert("الـ GPS غير مدعوم.");
+            btn.innerHTML = "⏳ جاري التحديد...";
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
                     document.getElementById('cust-gps-url').value = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
-                    btn.className = "w-full bg-emerald-50 text-emerald-800 border border-emerald-400 font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-2";
-                    btn.innerHTML = "✅ تم تحديد موقعك على الخريطة بنجاح";
-                    status.innerText = "سيتم إرفاق رابط الخريطة مع الطلب تلقائياً.";
-                    status.classList.remove('hidden');
+                    btn.className = "w-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 border border-emerald-400 font-bold py-2.5 px-3 rounded-xl text-xs flex justify-center gap-2";
+                    btn.innerHTML = "✅ تم التقاط الموقع";
                 },
-                (err) => {
-                    btn.innerHTML = "⚠️ تعذر تحديد الموقع تلقائياً (يرجى تفعيل الـ GPS)";
-                    alert("يرجى السماح للمتصفح بالوصول للموقع.");
-                },
+                (err) => { btn.innerHTML = "⚠️ فشل (يرجى تفعيل الـ GPS)"; },
                 { enableHighAccuracy: true, timeout: 10000 }
             );
         }
 
-        // ===========================================================
-        // دوال الإدارة المخفية CPanel (تمت إضافتها)
-        // ===========================================================
-        let tapCount = 0;
-        let tapTimeout;
-
-        function handleAdminTap() {
-            tapCount++;
-            clearTimeout(tapTimeout);
-            if (tapCount >= 5) {
-                tapCount = 0;
-                let pin = prompt("🔒 يرجى إدخال الرقم السري لفتح لوحة التحكم (CPanel):");
-                if (pin === ADMIN_PIN) {
-                    showCPanel();
-                } else if (pin !== null) {
-                    alert("❌ الرقم السري غير صحيح!");
-                }
-            } else {
-                tapTimeout = setTimeout(() => { tapCount = 0; }, 1500);
-            }
-        }
-
-        function showCPanel() {
-            document.getElementById('cpanel-view').classList.remove('hidden');
-            renderCPanelItems();
-        }
-
-        function hideCPanel() {
-            document.getElementById('cpanel-view').classList.add('hidden');
-            fetchMenu(); // جلب الأسعار المحدثة بعد الخروج
-        }
-
-        function renderCPanelItems() {
-            const container = document.getElementById('cpanel-items-container');
-            container.innerHTML = '';
-            menuItems.forEach(item => {
-                container.innerHTML += `
-                    <div class="bg-white p-3.5 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center gap-3">
-                        <div class="flex-1">
-                            <div class="text-sm font-bold text-slate-900">${item.name}</div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <input type="number" id="cpanel-price-${item.id}" value="${item.price}" class="w-16 border-2 border-slate-300 focus:border-red-700 rounded-lg px-2 py-1 text-center font-black text-sm bg-slate-50">
-                            <button onclick="saveNewPrice('${item.id}')" id="save-btn-${item.id}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-sm w-14">حفظ</button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        async function saveNewPrice(id) {
-            const newPrice = document.getElementById(`cpanel-price-${id}`).value;
-            const btn = document.getElementById(`save-btn-${id}`);
-            const originalText = btn.innerText;
-            btn.innerText = "⏳...";
-            btn.disabled = true;
-
-            try {
-                const response = await fetch(GOOGLE_SHEET_API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: "update_price", itemId: id, newPrice: newPrice })
-                });
-                const res = await response.json();
-                if (res.status === 'success') {
-                    btn.innerText = "✅ تم";
-                    btn.classList.replace('bg-emerald-600', 'bg-sky-600');
-                    const item = menuItems.find(i => i.id === id);
-                    if (item) item.price = Number(newPrice);
-                } else {
-                    btn.innerText = "❌ خطأ";
-                }
-            } catch (e) {
-                btn.innerText = "❌";
-            }
-            setTimeout(() => {
-                btn.innerText = originalText;
-                btn.classList.replace('bg-sky-600', 'bg-emerald-600');
-                btn.disabled = false;
-            }, 2000);
-        }
-
-        // ===========================================================
-        // دالة الإرسال للواتساب
-        // ===========================================================
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result.split(',')[1]);
-                reader.onerror = error => reject(error);
-                reader.readAsDataURL(file);
-            });
-        }
-
+        // ==========================================
+        // 💬 ترتيب وإرسال الأوردر على الواتساب
+        // ==========================================
         async function submitAndSendWhatsApp() {
             const name = document.getElementById('cust-name').value.trim();
             const phone = document.getElementById('cust-phone').value.trim();
             const address = document.getElementById('cust-address').value.trim();
             const gpsUrl = document.getElementById('cust-gps-url').value.trim();
             const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
-            const fileInput = document.getElementById('receipt-file');
-            const submitBtn = document.getElementById('submit-order-btn');
+            const btn = document.getElementById('submit-order-btn');
 
-            if (!name || !phone || !address) { return alert("يرجى إدخال اسم العميل، رقم الموبايل، والعنوان بالتفصيل!"); }
+            if (!name || !phone || !address) return alert("أكمل الاسم والموبايل والعنوان!");
 
-            const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
+            const orderId = "ORD-" + Math.floor(10000 + Math.random() * 90000);
             let sub = 0;
-            let itemsSummaryList = [];
+            let itemsText = ``;
 
             Object.values(cart).forEach(i => {
                 const lineTotal = (i.qty * i.price).toFixed(0);
                 sub += i.qty * i.price;
-                itemsSummaryList.push(`${i.name} [${formatWeight(i.qty, i.unit || 'كيلو')}] (${i.prep}) = ${lineTotal} ج.م`);
+                itemsText += `🔸 *${i.name}*\n   ⚖️ الوزن: ${i.qty} ${i.unit}\n   🔪 التجهيز: ${i.prep}\n${i.note ? `   📝 ملاحظة: ${i.note}\n` : ''}   💵 السعر: ${lineTotal} ج\n`;
             });
 
-            let uploadedReceiptUrl = "";
-
-            if (GOOGLE_SHEET_API_URL.startsWith("http")) {
-                try {
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = "⏳ جاري التسجيل...";
-                    let receiptBase64 = null, receiptName = null, receiptMimeType = null;
-                    if (fileInput.files.length > 0) {
-                        const file = fileInput.files[0];
-                        receiptBase64 = await fileToBase64(file);
-                        receiptName = file.name;
-                        receiptMimeType = file.type;
-                    }
-                    const response = await fetch(GOOGLE_SHEET_API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        body: JSON.stringify({
-                            orderId, customerName: name, customerPhone: phone, customerAddress: address,
-                            locationUrl: gpsUrl, itemsSummary: itemsSummaryList.join(" | "),
-                            totalPrice: sub.toFixed(0), paymentMethod: paymentMethod,
-                            receiptBase64: receiptBase64, receiptName: receiptName, receiptMimeType: receiptMimeType
-                        })
-                    });
-                    const resJson = await response.json();
-                    if (resJson.receiptUrl && resJson.receiptUrl.startsWith("http")) {
-                        uploadedReceiptUrl = resJson.receiptUrl;
-                    }
-                } catch (e) {
-                    console.warn("API Error:", e);
-                } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = "💬 تأكيد الطلب وإرسال عبر واتساب";
-                }
+            const zoneSelect = document.getElementById('delivery-zone');
+            let deliveryFee = 0;
+            let deliveryName = "استلام من الفرع";
+            if (deliveryActive && zoneSelect && deliveryZones[zoneSelect.value]) {
+                deliveryFee = deliveryZones[zoneSelect.value].fee;
+                deliveryName = deliveryZones[zoneSelect.value].name;
             }
 
-            let msg = `🐓 *طلب جديد - دواجن الطاحونة*\n🔖 رقم الطلب: *${orderId}*\n━━━━━━━━━━━━━━\n👤 *العميل:* ${name}\n📞 *الموبايل:* ${phone}\n🏠 *العنوان:* ${address}\n`;
-            if (gpsUrl) msg += `📍 *لوكيشن GPS:* ${gpsUrl}\n`;
-            msg += `━━━━━━━━━━━━━━\n⚖️ *الأصناف المطلوبة:*\n`;
-            Object.values(cart).forEach(i => {
-                msg += `▫️ *${i.name}*\n   الوزن: ${formatWeight(i.qty, i.unit || 'كيلو')} | التجهيز: ${i.prep} | ${(i.qty * i.price).toFixed(0)} ج.م\n`;
-            });
-            msg += `━━━━━━━━━━━━━━\n💰 *الإجمالي التقريبي:* ${sub.toFixed(0)} ج.م _(لحين الوزن الفعلي)_\n💳 *طريقة الدفع:* ${paymentMethod}\n`;
-            
-            if (uploadedReceiptUrl) msg += `🧾 *رابط إيصال الدفع:* ${uploadedReceiptUrl}\n`;
-            else if (fileInput.files.length > 0) msg += `📎 *ملاحظة:* تم إرفاق صورة الإيصال.\n`;
+            const total = sub + deliveryFee;
 
-            window.open(`https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank');
+            // تنسيق احترافي للرسالة
+            let msg = `🛒 *طلب جديد من دواجن الطاحونة*\n`;
+            msg += `🧾 رقم الطلب: #${orderId}\n\n`;
+            msg += `👤 *العميل:* ${name}\n`;
+            msg += `📞 *الموبايل:* ${phone}\n`;
+            msg += `🏠 *العنوان:* ${address}\n`;
+            if(gpsUrl) msg += `🗺️ *اللوكيشن:* ${gpsUrl}\n`;
+            
+            msg += `\n📦 *تفاصيل الطلب:*\n`;
+            msg += `➖➖➖➖➖➖➖➖\n`;
+            msg += itemsText;
+            msg += `➖➖➖➖➖➖➖➖\n`;
+            
+            msg += `💰 *الإجمالي للطلبات:* ${sub.toFixed(0)} ج.م\n`;
+            msg += `🚚 *التوصيل (${deliveryName}):* ${deliveryFee} ج.م\n`;
+            msg += `💳 *طريقة الدفع:* ${paymentMethod}\n\n`;
+            msg += `🛑 *تنويه:* الحساب الإجمالي يحدد بدقة وقت الوزن.`;
+
+            // تسجيل في جوجل شيت في الخلفية (بدون انتظار لتسريع العميل)
+            fetch(GOOGLE_SHEET_API_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    orderId, customerName: name, customerPhone: phone, customerAddress: address,
+                    deliveryZone: deliveryName, locationUrl: gpsUrl, itemsSummary: "تم الإرسال واتساب",
+                    subtotalPrice: sub, deliveryFee: deliveryFee, totalPrice: total, paymentMethod
+                })
+            }).catch(e=>{});
+
+            btn.innerHTML = "✅ تم... جاري فتح واتساب";
+            setTimeout(() => {
+                window.open(`https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank');
+                btn.innerHTML = "💬 تأكيد وإرسال واتساب";
+            }, 500);
+        }
+
+        // ==========================================
+        // ⚙️ نظام الإدارة المخفية CPanel
+        // ==========================================
+        let tapCount = 0, tapTimeout;
+        function handleAdminTap() {
+            tapCount++; clearTimeout(tapTimeout);
+            if (tapCount >= 5) {
+                tapCount = 0;
+                if (prompt("🔒 الرقم السري للوحة الإدارة:") === ADMIN_PIN) {
+                    document.getElementById('cpanel-view').classList.remove('hidden');
+                    renderCPanelPrices();
+                    renderCPanelDelivery();
+                } else { alert("❌ خطأ!"); }
+            } else { tapTimeout = setTimeout(() => tapCount = 0, 1500); }
+        }
+
+        function hideCPanel() { 
+            document.getElementById('cpanel-view').classList.add('hidden'); 
+            fetchMenu(); 
+        }
+
+        function switchCpanelTab(tab) {
+            document.getElementById('tab-prices').className = tab === 'prices' ? "flex-1 py-3 text-sm font-bold text-red-800 dark:text-red-400 border-b-2 border-red-800 dark:border-red-400 bg-slate-50 dark:bg-slate-700" : "flex-1 py-3 text-sm font-bold text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:bg-slate-50 dark:hover:bg-slate-700";
+            document.getElementById('tab-delivery').className = tab === 'delivery' ? "flex-1 py-3 text-sm font-bold text-red-800 dark:text-red-400 border-b-2 border-red-800 dark:border-red-400 bg-slate-50 dark:bg-slate-700" : "flex-1 py-3 text-sm font-bold text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:bg-slate-50 dark:hover:bg-slate-700";
+            document.getElementById('cpanel-prices-section').style.display = tab === 'prices' ? 'block' : 'none';
+            document.getElementById('cpanel-delivery-section').style.display = tab === 'delivery' ? 'block' : 'none';
+        }
+
+        function renderCPanelPrices() {
+            const container = document.getElementById('cpanel-prices-section');
+            container.innerHTML = '';
+            menuItems.forEach(item => {
+                container.innerHTML += `
+                    <div class="bg-white dark:bg-slate-800 p-3.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex justify-between items-center gap-3">
+                        <div class="flex-1 font-bold text-sm dark:text-white">${item.name}</div>
+                        <div class="flex gap-2">
+                            <input type="number" id="cp-price-${item.id}" value="${item.price}" class="w-16 border-2 dark:border-slate-600 dark:bg-slate-900 rounded-lg px-2 text-center font-black text-sm">
+                            <button onclick="saveNewPrice('${item.id}')" id="cp-btn-${item.id}" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold w-14">حفظ</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        async function saveNewPrice(id) {
+            const btn = document.getElementById(`cp-btn-${id}`);
+            const val = document.getElementById(`cp-price-${id}`).value;
+            btn.innerText = "⏳";
+            try {
+                await fetch(GOOGLE_SHEET_API_URL, { method: 'POST', body: JSON.stringify({ action: "update_price", itemId: id, newPrice: val }) });
+                btn.innerText = "✅"; btn.classList.replace('bg-emerald-600', 'bg-sky-600');
+                const itm = menuItems.find(i=>i.id===id); if(itm) itm.price = Number(val);
+            } catch(e) { btn.innerText = "❌"; }
+            setTimeout(() => { btn.innerText = "حفظ"; btn.classList.replace('bg-sky-600', 'bg-emerald-600'); }, 2000);
+        }
+
+        function renderCPanelDelivery() {
+            document.getElementById('cp-delivery-active').checked = deliveryActive;
+            const list = document.getElementById('cp-zones-list');
+            list.innerHTML = '';
+            deliveryZones.forEach((z, idx) => {
+                list.innerHTML += `
+                    <div class="flex justify-between items-center bg-slate-50 dark:bg-slate-900 p-2 rounded-lg border dark:border-slate-700">
+                        <span class="text-xs font-bold flex-1">${z.name}</span>
+                        <span class="text-xs font-bold text-red-700 dark:text-amber-400 mx-3">${z.fee} ج</span>
+                        <button onclick="removeDeliveryZone(${idx})" class="text-red-500 font-bold text-lg leading-none">&times;</button>
+                    </div>`;
+            });
+        }
+
+        function addDeliveryZone() {
+            const name = document.getElementById('cp-new-zone-name').value.trim();
+            const fee = Number(document.getElementById('cp-new-zone-fee').value);
+            if(name) {
+                deliveryZones.push({name, fee});
+                document.getElementById('cp-new-zone-name').value = '';
+                document.getElementById('cp-new-zone-fee').value = '';
+                renderCPanelDelivery();
+            }
+        }
+
+        function removeDeliveryZone(idx) { deliveryZones.splice(idx, 1); renderCPanelDelivery(); }
+
+        async function saveDeliverySettings() {
+            const btn = document.getElementById('save-del-btn');
+            deliveryActive = document.getElementById('cp-delivery-active').checked;
+            const zoneStr = deliveryZones.map(z => `${z.name}:${z.fee}`).join(',');
+            
+            btn.innerHTML = "⏳ جاري الحفظ...";
+            try {
+                await fetch(GOOGLE_SHEET_API_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ action: "update_delivery", deliveryActive: deliveryActive, deliveryZones: zoneStr }) 
+                });
+                btn.innerHTML = "✅ تم الحفظ بنجاح";
+                initDeliveryDropdown();
+            } catch(e) { btn.innerHTML = "❌ خطأ في الحفظ"; }
+            setTimeout(() => btn.innerHTML = "💾 حفظ إعدادات التوصيل", 2000);
         }
 
         fetchMenu();
