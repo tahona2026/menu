@@ -65,7 +65,11 @@ main{padding:6px 16px 16px;max-width:1200px;margin:0 auto}
 .desc{font-size:.75rem;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .sel,.note{width:100%;height:42px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);padding:0 10px}
 .sel{font-weight:600}
-.qty{margin-top:auto}
+.qty{margin-top:auto;display:flex;flex-direction:column;gap:6px}
+.wchips{display:flex;gap:6px}
+.wchip{flex:1;height:38px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border);font-weight:800;font-size:.85rem}
+.incart{font-size:.75rem;color:var(--ok);font-weight:700;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.link{background:none;text-decoration:underline;color:var(--danger);font-weight:700;font-size:.78rem;padding:10px 6px}
 .btn-add{width:100%;height:44px;border-radius:12px;background:var(--brand);color:#fff;font-weight:800}
 .step{display:flex;align-items:center;justify-content:space-between;background:var(--surface-2);border-radius:12px;padding:3px;height:46px}
 .step button{width:42px;height:40px;border-radius:10px;background:var(--surface);font-size:1.3rem;font-weight:900;color:var(--brand);border:1px solid var(--border)}
@@ -170,7 +174,18 @@ textarea.input{height:auto;padding:10px 12px;resize:vertical;min-height:72px}
 [data-theme="dark"] .tabs button.on{color:var(--gold);border-color:var(--gold)}
 .screen-body{flex:1;overflow-y:auto;padding:14px 16px calc(24px + var(--safe-b));-webkit-overflow-scrolling:touch}
 .wrap{max-width:640px;margin:0 auto}
-.row{display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:8px}
+.row{display:flex;flex-direction:column;gap:10px;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:8px}
+.row-top{display:flex;align-items:center;gap:10px}
+.row-tools{display:flex;align-items:center;gap:8px}
+.row-tools .input{flex:1;min-width:0}
+.qp{display:flex;align-items:center;gap:4px;flex:1;min-width:0;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:0 8px;height:44px}
+.qp input{width:100%;min-width:0;border:0;background:transparent;font-weight:900;height:40px;text-align:center}
+.qp span{font-size:.7rem;color:var(--muted);white-space:nowrap}
+.btn-sm{height:44px;padding:0 14px;border-radius:10px;font-weight:800;font-size:.82rem;border:1px solid var(--border);background:var(--surface-2);flex:none}
+.btn-sm.save{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn-sm.danger{color:var(--danger)}
+.inline{display:flex;gap:8px}
+.inline .input{flex:1;min-width:0}
 .row img{width:52px;height:52px;border-radius:10px;object-fit:cover;flex:none;background:var(--surface-2)}
 .row-info{flex:1;min-width:0}
 .row-info b{display:block;font-size:.88rem;line-height:1.3}
@@ -262,6 +277,7 @@ textarea.input{height:auto;padding:10px 12px;resize:vertical;min-height:72px}
         <div class="sum"><span>إجمالي الأصناف</span><b id="co-sub">0 ج.م</b></div>
         <div class="sum"><span>التوصيل</span><b id="co-fee">—</b></div>
         <div class="sum total"><span>الإجمالي التقريبي</span><b id="co-total">0 ج.م</b></div>
+        <p class="hint" id="free-hint" style="font-weight:700"></p>
       </div>
     </div>
 
@@ -284,6 +300,7 @@ textarea.input{height:auto;padding:10px 12px;resize:vertical;min-height:72px}
   <nav class="tabs">
     <button data-tab="items" class="on">📋 الأصناف</button>
     <button data-tab="form">➕ صنف</button>
+    <button data-tab="cats">📂 التصنيفات</button>
     <button data-tab="delivery">🛵 التوصيل</button>
   </nav>
   <div class="screen-body"><div class="wrap">
@@ -301,13 +318,35 @@ textarea.input{height:auto;padding:10px 12px;resize:vertical;min-height:72px}
       <div class="field"><label for="f-unit">الوحدة *</label><select class="input" id="f-unit"><option>كيلو</option><option>جوز</option><option>قطعة</option></select></div>
       <div class="field"><label for="f-step">أقل كمية / خطوة الزيادة *</label><input class="input" id="f-step" type="number" inputmode="decimal" min="0.05" step="any" value="0.5"></div>
       <div class="field"><label for="f-prep">خيارات التجهيز * (كل خيار في سطر)</label><textarea class="input" id="f-prep" rows="4" placeholder="تقطيع 4 قطع&#10;تقطيع 8 قطع&#10;سليمة"></textarea><span class="hint">ممنوع استخدام الفاصلة (, أو ،) جوه الخيار الواحد.</span></div>
-      <div class="field"><label for="f-img">رابط الصورة (https://...)</label><input class="input" id="f-img" type="url" inputmode="url" placeholder="https://"><img class="preview" id="f-preview" alt="معاينة"></div>
+      <div class="field"><label>الصورة</label>
+        <img class="preview" id="f-preview" alt="معاينة">
+        <input type="file" id="f-file" accept="image/*" class="hidden">
+        <button type="button" class="btn soft" id="f-pick">📷 اختيار صورة من الهاتف</button>
+        <p class="hint" id="f-upload-state"></p>
+        <label for="f-img" style="margin-top:6px">أو الصق رابط صورة (https://...)</label>
+        <input class="input" id="f-img" type="url" inputmode="url" placeholder="https://">
+      </div>
       <div class="field"><label for="f-desc">وصف قصير</label><textarea class="input" id="f-desc" rows="2"></textarea></div>
       <div class="two"><button class="btn dark" id="f-cancel" type="button">إلغاء</button><button class="btn primary" id="f-save" type="button">💾 حفظ</button></div>
     </div>
 
+    <div id="tab-cats" class="hidden">
+      <div class="box">
+        <h4>➕ تصنيف جديد</h4>
+        <div class="inline"><input class="input" id="cat-new" maxlength="30" placeholder="مثال: 🥚 بيض"><button type="button" class="btn-sm save" id="cat-add">إضافة</button></div>
+        <p class="hint">تقدر تكتب إيموجي قبل الاسم. الاسم بيظهر للزبون زي ما هو.</p>
+      </div>
+      <div id="cat-list"></div>
+    </div>
+
     <div id="tab-delivery" class="hidden">
       <div class="box"><label style="display:flex;align-items:center;gap:12px;font-weight:800;min-height:44px"><input type="checkbox" id="d-active" style="width:22px;height:22px;accent-color:#7f1d1d"> تفعيل خدمة التوصيل للزبائن</label></div>
+      <div class="box">
+        <h4>🎁 التوصيل المجاني</h4>
+        <label style="display:flex;align-items:center;gap:12px;font-weight:800;min-height:44px"><input type="checkbox" id="d-free" style="width:22px;height:22px;accent-color:#7f1d1d"> توصيل مجاني لكل الطلبات</label>
+        <div class="field" style="margin-top:8px"><label for="d-free-min">أو: مجاني لو إجمالي الطلب يوصل لـ (ج.م)</label><input class="input" id="d-free-min" type="number" inputmode="decimal" min="0" step="any" placeholder="سيبه فاضي لو مش عايزه"></div>
+        <p class="hint">لو شغّلت "لكل الطلبات"، سعر المناطق بيتجاهل وكل التوصيل بيبقى مجاناً.</p>
+      </div>
       <div class="box">
         <h4>📍 مناطق التوصيل والأسعار</h4>
         <div id="d-zones"></div>
@@ -321,7 +360,7 @@ textarea.input{height:auto;padding:10px 12px;resize:vertical;min-height:72px}
 <div id="pin-dialog" class="dialog hidden">
   <div class="dialog-box">
     <h3>🔒 الرقم السري للإدارة</h3>
-    <input class="input" id="pin-input" type="password" inputmode="numeric" autocomplete="off" maxlength="16" aria-label="الرقم السري">
+    <input class="input" id="pin-input" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="64" aria-label="الرقم السري">
     <div class="two"><button class="btn dark" id="pin-cancel" type="button">إلغاء</button><button class="btn primary" id="pin-ok" type="button">دخول</button></div>
   </div>
 </div>
@@ -334,10 +373,10 @@ const API = "https://script.google.com/macros/s/AKfycbybijlHYuVk2ZnDTLu4z_Gk96vt
 const WA = "201097022660";
 const PAY_NUMBER = "01097022660";
 const FALLBACK_IMG = "https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=500";
-const CAT_LABELS = {"CAT-RAW":"🐔 طازجة","CAT-CUTS":"🥩 مقطعات","CAT-DUCK":"🦆 بط وحمام","CAT-READY":"🌶️ متبل"};
+const DEFAULT_CATS = [{id:"CAT-RAW",label:"🐔 طازجة"},{id:"CAT-CUTS",label:"🥩 مقطعات"},{id:"CAT-DUCK",label:"🦆 بط وحمام"},{id:"CAT-READY",label:"🌶️ متبل"}];
 
 /* ===== الحالة ===== */
-const S = { menu: [], settings: {deliveryActive:false, deliveryZones:[]}, cart: {}, pref: {}, cat: "all", q: "",
+const S = { menu: [], cats: DEFAULT_CATS.slice(), uploading: false, pend: {}, settings: {deliveryActive:false, deliveryZones:[]}, cart: {}, pref: {}, cat: "all", q: "",
   pin: "", lastUpdate: null, gps: "", taps: 0, tapTimer: null, zonesDraft: [], editingId: "" };
 
 const $ = id => document.getElementById(id);
@@ -346,6 +385,7 @@ const safeImg = u => (/^https:\/\//.test(u || "") ? u : FALLBACK_IMG);
 const money = n => Math.round(n) + " ج.م";
 const num = n => String(Math.round(n * 100) / 100);
 const findItem = id => S.menu.find(m => m.id === id);
+const catLabel = id => (S.cats.find(c => c.id === id) || {}).label || id;
 const prepOpts = m => String(m.prep_options || "").split(",").map(s => s.trim()).filter(Boolean);
 const defPref = m => ({ prep: prepOpts(m)[0] || "تجهيز عادي", note: "" });
 const prefOf = (id, m) => S.cart[id] || S.pref[id] || defPref(m);
@@ -427,6 +467,8 @@ async function loadMenu(force) {
     const old = {}; S.menu.forEach(m => { old[m.id] = m.price; });
     S.menu = d.menu;
     S.settings = d.settings || { deliveryActive: false, deliveryZones: [] };
+    S.cats = Array.isArray(d.categories) && d.categories.length ? d.categories : DEFAULT_CATS.slice();
+    if (S.cat !== "all" && !S.cats.some(c => c.id === S.cat)) S.cat = "all";
     let changed = false, priceMoved = false;
     Object.keys(S.cart).forEach(id => {
       const m = findItem(id);
@@ -437,7 +479,7 @@ async function loadMenu(force) {
     S.lastUpdate = new Date(); setStatus();
     $("state").classList.add("hidden"); $("state").innerHTML = "";
     renderChips(); renderGrid(); updateBar();
-    if (!$("admin").classList.contains("hidden")) renderAdminItems();
+    if (!$("admin").classList.contains("hidden")) { renderAdminItems(); renderAdminCats(); }
     if (priceMoved) toast("اتغيرت أسعار بعض الأصناف اللي في سلتك", "warn");
     else if (force) toast("تم تحديث المنيو ✅");
   } catch (e) {
@@ -451,16 +493,20 @@ async function loadMenu(force) {
 
 /* ===== العرض ===== */
 function renderChips() {
-  const cats = Object.keys(CAT_LABELS).filter(c => S.menu.some(m => m.cat === c));
+  const cats = S.cats.map(c => c.id).filter(id => S.menu.some(m => m.cat === id));
   $("chips").innerHTML = ['all', ...cats].map(c =>
-    `<button class="chip" type="button" data-cat="${c}" aria-pressed="${S.cat === c}">${c === "all" ? "الكل" : CAT_LABELS[c]}</button>`).join("");
+    `<button class="chip" type="button" data-cat="${c}" aria-pressed="${S.cat === c}">${c === "all" ? "الكل" : esc(catLabel(c))}</button>`).join("");
 }
 function cardHtml(m) {
   const c = S.cart[m.id], p = prefOf(m.id, m), q = c ? c.qty : 0;
   const opts = prepOpts(m).map(o => `<option value="${esc(o)}"${o === p.prep ? " selected" : ""}>${esc(o)}</option>`).join("");
-  const stepper = q > 0
-    ? `<div class="step"><button type="button" data-act="dec" aria-label="تقليل">−</button><div class="qv"><input data-act="set" inputmode="decimal" value="${num(q)}" aria-label="الكمية"><span>${esc(m.unit)}</span></div><button type="button" class="plus" data-act="inc" aria-label="زيادة">+</button></div>`
-    : `<button type="button" class="btn-add" data-act="add">+ أضف للسلة</button>`;
+  const pq = S.pend[m.id] !== undefined ? S.pend[m.id] : (q > 0 ? q : m.step);
+  const chipVals = m.unit === "كيلو" ? [0.5, 1, 2, 3] : [1, 2, 3, 5];
+  const stepper = `
+    <div class="wchips">${chipVals.map(v => `<button type="button" class="wchip" data-act="pick" data-v="${v}">${num(v)}</button>`).join("")}</div>
+    <div class="step"><button type="button" data-act="dec" aria-label="تقليل">−</button><div class="qv"><input data-act="set" inputmode="decimal" value="${num(pq)}" aria-label="الكمية (اكتب الوزن)"><span>${esc(m.unit)}</span></div><button type="button" class="plus" data-act="inc" aria-label="زيادة">+</button></div>
+    <button type="button" class="btn-add" data-act="add">${q > 0 ? "🔄 تحديث الكمية في السلة" : "🛒 أضف للسلة"}</button>
+    ${q > 0 ? `<div class="incart">✅ في السلة: ${num(q)} ${esc(m.unit)} <button type="button" class="link" data-act="remove">إزالة</button></div>` : ""}`;
   return `<article class="card" data-id="${esc(m.id)}">
     <div class="thumb"><img loading="lazy" src="${esc(safeImg(m.img))}" alt="${esc(m.name)}" onerror="this.onerror=null;this.src='${FALLBACK_IMG}'"><span class="price">${money(m.price)}<small> / ${esc(m.unit)}</small></span></div>
     <div class="info">
@@ -491,14 +537,24 @@ function renderCheckoutItems() {
       </div></div>`).join("") : '<p class="empty" style="padding:16px">السلة فاضية</p>';
   renderTotals();
 }
+function deliveryFeeFor(sub, z) {
+  const st = S.settings; if (!z) return 0;
+  if (st.freeDelivery || (st.freeDeliveryMin > 0 && sub >= st.freeDeliveryMin)) return 0;
+  return Number(z.fee) || 0;
+}
 function renderTotals() {
   const sub = cartLines().reduce((a, l) => a + l.total, 0);
   let fee = 0, feeTxt = "—";
   if (dtype() === "delivery") {
     const z = (S.settings.deliveryZones || [])[Number($("c-zone").value)];
-    fee = z ? Number(z.fee) || 0 : 0; feeTxt = fee > 0 ? money(fee) : "مجاناً";
+    fee = deliveryFeeFor(sub, z); feeTxt = fee > 0 ? money(fee) : "مجاناً";
   }
   $("co-sub").textContent = money(sub); $("co-fee").textContent = feeTxt; $("co-total").textContent = money(sub + fee);
+  const st = S.settings, hint = $("free-hint");
+  if (dtype() !== "delivery" || !(st.deliveryActive)) hint.textContent = "";
+  else if (st.freeDelivery) hint.textContent = "🎉 التوصيل مجاني";
+  else if (st.freeDeliveryMin > 0) hint.textContent = sub >= st.freeDeliveryMin ? "🎉 التوصيل مجاني لطلبك" : `أضف ${money(st.freeDeliveryMin - sub)} وهيبقى التوصيل مجاني`;
+  else hint.textContent = "";
   $("co-submit").disabled = cartLines().length === 0;
 }
 function fillZones() {
@@ -507,7 +563,7 @@ function fillZones() {
   $("dt-delivery").disabled = !active;
   $("dt-hint").textContent = active ? "" : "التوصيل مش متاح حالياً — الاستلام من الفرع.";
   if (!active) document.querySelector("input[name=dtype][value=pickup]").checked = true;
-  $("c-zone").innerHTML = zs.map((z, i) => `<option value="${i}">${esc(z.name)} — ${Number(z.fee) > 0 ? Number(z.fee) + " ج" : "مجاناً"}</option>`).join("");
+  $("c-zone").innerHTML = zs.map((z, i) => `<option value="${i}">${esc(z.name)} — ${Number(z.fee) > 0 && !S.settings.freeDelivery ? Number(z.fee) + " ج" : "مجاناً"}</option>`).join("");
   applyDeliveryUI();
 }
 function applyDeliveryUI() { $("delivery-fields").classList.toggle("hidden", dtype() !== "delivery"); renderTotals(); }
@@ -588,7 +644,7 @@ function showDone(res, c, lines) {
   const saved = !!(res && res.ok), zs = S.settings.deliveryZones || [];
   const zone = c.deliveryType === "pickup" ? "استلام من الفرع" : ((zs[Number(c.zoneIndex)] || {}).name || "");
   const sub = saved ? res.subtotal : lines.reduce((a, l) => a + l.total, 0);
-  const fee = saved ? res.fee : (c.deliveryType === "delivery" ? Number((zs[Number(c.zoneIndex)] || {}).fee) || 0 : 0);
+  const fee = saved ? res.fee : (c.deliveryType === "delivery" ? deliveryFeeFor(sub, zs[Number(c.zoneIndex)]) : 0);
   const total = saved ? res.total : sub + fee;
   const msg = buildMsg({ orderId: saved ? res.orderId : "", saved, c, lines, zone, sub, fee, total, receiptUrl: saved ? res.receiptUrl : "" });
   $("done-wa").href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(msg);
@@ -600,7 +656,7 @@ function showDone(res, c, lines) {
   $("sheet-title").textContent = saved ? "✅ تم الطلب" : "⚠️ ابعت على واتساب";
   $("co-view").classList.add("hidden"); $("done-view").classList.remove("hidden");
   $("co-foot").classList.add("hidden"); $("done-foot").classList.remove("hidden");
-  if (saved) { S.cart = {}; S.pref = {}; saveCart(); renderGrid(); updateBar(); }
+  if (saved) { S.cart = {}; S.pref = {}; S.pend = {}; saveCart(); renderGrid(); updateBar(); }
 }
 
 /* ===== لوحة الإدارة ===== */
@@ -623,29 +679,39 @@ function openAdmin() {
   $("admin").classList.remove("hidden"); document.body.classList.add("lock");
   S.zonesDraft = JSON.parse(JSON.stringify(S.settings.deliveryZones || []));
   $("d-active").checked = !!S.settings.deliveryActive;
+  $("d-free").checked = !!S.settings.freeDelivery;
+  $("d-free-min").value = S.settings.freeDeliveryMin > 0 ? S.settings.freeDeliveryMin : "";
   showAdminTab("items");
 }
 function closeAdmin() { $("admin").classList.add("hidden"); document.body.classList.remove("lock"); }
 function showAdminTab(t) {
   document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
-  ["items", "form", "delivery"].forEach(x => $("tab-" + x).classList.toggle("hidden", x !== t));
+  ["items", "form", "cats", "delivery"].forEach(x => $("tab-" + x).classList.toggle("hidden", x !== t));
   if (t === "items") renderAdminItems();
+  if (t === "cats") renderAdminCats();
   if (t === "delivery") renderZones();
 }
 function renderAdminItems() {
   const q = $("a-search").value.trim().toLowerCase();
   const list = S.menu.filter(m => !q || m.name.toLowerCase().includes(q));
   $("a-list").innerHTML = list.map(m => `
-    <div class="row" data-id="${esc(m.id)}"><img src="${esc(safeImg(m.img))}" alt="" loading="lazy">
-      <div class="row-info"><b>${esc(m.name)}</b><small>${esc(CAT_LABELS[m.cat] || m.cat)} • ${money(m.price)} / ${esc(m.unit)} • ${esc(m.id)}</small></div>
-      <div class="row-act"><button type="button" data-act="edit">تعديل</button><button type="button" data-act="del" class="danger">حذف</button></div></div>`).join("")
+    <div class="row" data-id="${esc(m.id)}">
+      <div class="row-top"><img src="${esc(safeImg(m.img))}" alt="" loading="lazy">
+        <div class="row-info"><b>${esc(m.name)}</b><small>${esc(catLabel(m.cat))} • ${esc(m.id)}</small></div></div>
+      <div class="row-tools">
+        <div class="qp"><input type="number" inputmode="decimal" min="0" step="any" value="${m.price}" data-price aria-label="السعر"><span>ج / ${esc(m.unit)}</span></div>
+        <button type="button" class="btn-sm save" data-act="price">حفظ</button>
+        <button type="button" class="btn-sm" data-act="edit">تعديل</button>
+        <button type="button" class="btn-sm danger" data-act="del" aria-label="حذف الصنف">🗑</button>
+      </div></div>`).join("")
     || '<div class="empty">ما فيش أصناف</div>';
 }
 function openForm(id) {
   const m = id ? findItem(id) : null;
   S.editingId = m ? m.id : "";
   $("f-title").textContent = m ? "تعديل الصنف" : "صنف جديد";
-  $("f-name").value = m ? m.name : ""; $("f-cat").value = m ? m.cat : "CAT-RAW";
+  fillCatSelect(m ? m.cat : ""); $("f-upload-state").textContent = ""; S.uploading = false; $("f-pick").disabled = false;
+  $("f-name").value = m ? m.name : "";
   $("f-price").value = m ? m.price : ""; $("f-unit").value = m ? m.unit : "كيلو";
   $("f-step").value = m ? m.step : 0.5; $("f-prep").value = m ? prepOpts(m).join("\n") : "";
   $("f-img").value = m ? m.img : ""; $("f-desc").value = m ? m.desc : "";
@@ -672,6 +738,7 @@ function adminErr(r) {
   toast((r && r.error) || "حصل خطأ", "err");
 }
 async function saveItem() {
+  if (S.uploading) return toast("استنى لحد ما الصورة تخلص رفع", "warn");
   const it = readForm(), err = clientItemError(it); if (err) return toast(err, "err");
   const btn = $("f-save"); btn.disabled = true;
   try {
@@ -702,13 +769,117 @@ async function saveDelivery() {
   if (zones.some(z => !z.name)) return toast("اكتب اسم كل منطقة", "err");
   if (zones.some(z => z.fee < 0)) return toast("السعر مينفعش يكون سالب", "err");
   try {
-    const r = await post({ action: "save_delivery", pin: S.pin, deliveryActive: $("d-active").checked, deliveryZones: zones });
+    const r = await post({ action: "save_delivery", pin: S.pin, deliveryActive: $("d-active").checked, deliveryZones: zones,
+      freeDelivery: $("d-free").checked, freeDeliveryMin: Number($("d-free-min").value) || 0 });
     if (!r.ok) return adminErr(r);
     toast("تم حفظ التوصيل ✅"); await loadMenu(false);
   } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
 }
 
+async function quickPrice(id, btn) {
+  const inp = btn.closest("[data-id]").querySelector("[data-price]"), price = Number(inp.value);
+  if (!(price > 0)) return toast("اكتب سعر أكبر من صفر", "err");
+  const m = findItem(id);
+  if (m && m.price === price) return toast("السعر زي ما هو");
+  btn.disabled = true; btn.textContent = "⏳";
+  try {
+    const r = await post({ action: "update_price", pin: S.pin, id, price });
+    if (!r.ok) return adminErr(r);
+    if (m) m.price = r.price;
+    toast("تم تحديث السعر ✅"); renderGrid(); updateBar(); btn.textContent = "✅";
+  } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
+  finally { btn.disabled = false; setTimeout(() => { btn.textContent = "حفظ"; }, 1500); }
+}
+function fillCatSelect(sel) {
+  const cats = S.cats.slice();
+  if (sel && !cats.some(c => c.id === sel)) cats.push({ id: sel, label: sel });
+  $("f-cat").innerHTML = cats.map(c => `<option value="${esc(c.id)}">${esc(c.label)}</option>`).join("");
+  $("f-cat").value = sel || (cats[0] ? cats[0].id : "");
+}
+async function compressImage(file, maxDim, quality) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+    const k = Math.min(1, maxDim / Math.max(img.width, img.height));
+    const w = Math.round(img.width * k), h = Math.round(img.height * k);
+    const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+    cv.getContext("2d").drawImage(img, 0, 0, w, h);
+    return await new Promise((res, rej) => cv.toBlob(b => b ? res(b) : rej(new Error("toBlob")), "image/jpeg", quality));
+  } finally { URL.revokeObjectURL(url); }
+}
+async function handleImagePick(e) {
+  const file = e.target.files[0]; e.target.value = "";
+  if (!file) return;
+  if (!/^image\//.test(file.type)) return toast("اختار صورة بس", "err");
+  const st = $("f-upload-state"); S.uploading = true; $("f-pick").disabled = true; st.textContent = "⏳ جاري تجهيز الصورة...";
+  try {
+    const blob = await compressImage(file, 1000, 0.82);
+    $("f-preview").src = URL.createObjectURL(blob);
+    st.textContent = "⏳ جاري رفع الصورة...";
+    const r = await post({ action: "upload_image", pin: S.pin, mime: "image/jpeg", imageBase64: await readB64(blob) });
+    if (!r.ok) { st.textContent = "❌ " + (r.error || "فشل رفع الصورة"); return adminErr(r); }
+    $("f-img").value = r.url; st.textContent = "✅ تم رفع الصورة";
+  } catch (err) { st.textContent = "❌ تعذر قراءة الصورة أو رفعها، جرب صورة تانية"; }
+  finally { S.uploading = false; $("f-pick").disabled = false; }
+}
+function renderAdminCats() {
+  const counts = {}; S.menu.forEach(m => { counts[m.cat] = (counts[m.cat] || 0) + 1; });
+  $("cat-list").innerHTML = S.cats.map(c => `
+    <div class="row" data-cid="${esc(c.id)}">
+      <div class="row-tools">
+        <input class="input" data-clabel value="${esc(c.label)}" maxlength="30" aria-label="اسم التصنيف">
+        <button type="button" class="btn-sm save" data-act="csave">حفظ</button>
+        <button type="button" class="btn-sm danger" data-act="cdel" aria-label="حذف التصنيف">🗑</button>
+      </div>
+      <small class="hint" style="margin:0">${counts[c.id] || 0} صنف</small></div>`).join("")
+    || '<div class="empty">ما فيش تصنيفات</div>';
+}
+async function saveCategory(id, label) {
+  label = String(label || "").trim();
+  if (!label) return toast("اكتب اسم التصنيف", "err");
+  try {
+    const r = await post({ action: "upsert_category", pin: S.pin, id, label });
+    if (!r.ok) return adminErr(r);
+    if (!id) $("cat-new").value = "";
+    toast(id ? "تم حفظ التصنيف ✅" : "تمت إضافة التصنيف ✅"); await loadMenu(false);
+  } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
+}
+async function deleteCategory(id) {
+  const c = S.cats.find(x => x.id === id); if (!c) return;
+  if (!confirm(`حذف التصنيف "${c.label}"؟`)) return;
+  try {
+    const r = await post({ action: "delete_category", pin: S.pin, id });
+    if (!r.ok) return adminErr(r);
+    toast("تم حذف التصنيف"); await loadMenu(false);
+  } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
+}
+
 /* ===== الأحداث ===== */
+// الوزن اللي الزبون بيختاره قبل "أضف للسلة": أي رقم أكبر من صفر، وللجوز/القطعة أرقام صحيحة
+function normQty(m, v) {
+  let q = parseFloat(String(v).replace(",", "."));
+  if (!(q > 0)) return m.step;
+  q = Math.round(q * 100) / 100;
+  if (m.step >= 1) q = Math.max(1, Math.round(q));
+  return Math.min(q, 100);
+}
+function setPending(id, v, card) {
+  const m = findItem(id); if (!m) return;
+  const q = normQty(m, v); S.pend[id] = q;
+  const inp = card.querySelector('[data-act="set"]'); if (inp) inp.value = num(q);
+}
+function cardClick(e) {
+  const b = e.target.closest("button[data-act]"); if (!b) return;
+  const card = b.closest("[data-id]"); if (!card) return;
+  const id = card.dataset.id, m = findItem(id); if (!m) return;
+  const inp = card.querySelector('[data-act="set"]');
+  const cur = normQty(m, inp ? inp.value : m.step), act = b.dataset.act;
+  if (act === "pick") setPending(id, b.dataset.v, card);
+  if (act === "inc") setPending(id, cur + m.step, card);
+  if (act === "dec") setPending(id, Math.max(m.step, cur - m.step), card);
+  if (act === "add") { const had = !!S.cart[id]; delete S.pend[id]; setQty(id, cur); toast(had ? "تم تحديث الكمية ✅" : "تمت الإضافة للسلة ✅"); }
+  if (act === "remove") { delete S.pend[id]; setQty(id, 0); }
+}
 function qtyClick(e) {
   const b = e.target.closest("button[data-act]"); if (!b) return;
   const card = b.closest("[data-id]"); if (!card) return;
@@ -725,7 +896,6 @@ function init() {
   applyFont(parseInt(lsGet("tahona_font"), 10) || 100);
   S.cart = loadCart();
   $("pay-number").textContent = PAY_NUMBER;
-  $("f-cat").innerHTML = Object.keys(CAT_LABELS).map(c => `<option value="${c}">${CAT_LABELS[c]}</option>`).join("");
   try { const cu = JSON.parse(lsGet("tahona_cust") || "{}"); $("c-name").value = cu.name || ""; $("c-phone").value = cu.phone || ""; } catch (e) {}
 
   $("logo").addEventListener("click", onLogoTap);
@@ -738,13 +908,13 @@ function init() {
     const b = e.target.closest("[data-cat]"); if (!b) return;
     S.cat = b.dataset.cat; renderChips(); renderGrid();
   });
-  $("grid").addEventListener("click", qtyClick);
+  $("grid").addEventListener("click", cardClick);
   $("grid").addEventListener("change", e => {
     const el = e.target, card = el.closest("[data-id]"); if (!card) return;
     const id = card.dataset.id;
     if (el.dataset.act === "prep") setPrep(id, el.value);
     if (el.dataset.act === "note") setNote(id, el.value);
-    if (el.dataset.act === "set") setQty(id, parseFloat(String(el.value).replace(",", ".")));
+    if (el.dataset.act === "set") setPending(id, el.value, card);
   });
   $("co-items").addEventListener("click", qtyClick);
   $("cartbar").addEventListener("click", openSheet);
@@ -775,12 +945,26 @@ function init() {
   $("a-list").addEventListener("click", e => {
     const b = e.target.closest("button[data-act]"); if (!b) return;
     const id = b.closest("[data-id]").dataset.id;
+    if (b.dataset.act === "price") quickPrice(id, b);
     if (b.dataset.act === "edit") openForm(id);
     if (b.dataset.act === "del") deleteItem(id);
   });
   $("f-img").addEventListener("input", () => { $("f-preview").src = safeImg($("f-img").value.trim()); });
   $("f-cancel").addEventListener("click", () => showAdminTab("items"));
   $("f-save").addEventListener("click", saveItem);
+  $("a-list").addEventListener("keydown", e => {
+    if (e.key === "Enter" && e.target.matches("[data-price]")) { e.preventDefault(); e.target.closest("[data-id]").querySelector('[data-act="price"]').click(); }
+  });
+  $("f-pick").addEventListener("click", () => $("f-file").click());
+  $("f-file").addEventListener("change", handleImagePick);
+  $("cat-add").addEventListener("click", () => saveCategory("", $("cat-new").value));
+  $("cat-new").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); saveCategory("", $("cat-new").value); } });
+  $("cat-list").addEventListener("click", e => {
+    const b = e.target.closest("button[data-act]"); if (!b) return;
+    const row = b.closest("[data-cid]"), id = row.dataset.cid;
+    if (b.dataset.act === "csave") saveCategory(id, row.querySelector("[data-clabel]").value);
+    if (b.dataset.act === "cdel") deleteCategory(id);
+  });
   $("d-zones").addEventListener("input", e => {
     const row = e.target.closest("[data-i]"); if (!row) return;
     const z = S.zonesDraft[Number(row.dataset.i)]; if (!z) return;
