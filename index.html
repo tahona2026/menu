@@ -391,6 +391,47 @@ textarea.input{height:auto;padding:10px 12px;resize:vertical;min-height:72px}
   .inv-head img{width:90px;height:90px}
   .inv-head h2{font-size:1.05rem}
 }
+/* ---------- محرر الصور ---------- */
+#imged{position:fixed;inset:0;z-index:90;background:#0b1120;color:#f1f5f9;display:flex;flex-direction:column}
+#imged .ie-head{display:flex;justify-content:space-between;align-items:center;padding:0 14px;height:54px;background:#111a2e;border-bottom:2px solid var(--gold);flex:none}
+#imged .ie-head button{height:38px;padding:0 14px;border-radius:10px;background:rgba(255,255,255,.14);color:#fff;font-weight:700}
+.ie-stage{flex:none;display:flex;justify-content:center;padding:10px 12px 4px;background:#0b1120}
+.ie-stage canvas{display:block;border-radius:12px;background:#fff;touch-action:none;cursor:grab;box-shadow:0 0 0 2px #334155}
+.ie-hint{flex:none;text-align:center;font-size:.72rem;color:#94a3b8;padding:2px 12px 6px}
+.ie-panel{flex:1;overflow-y:auto;padding:4px 14px 12px;-webkit-overflow-scrolling:touch}
+.ie-sec{border-top:1px solid #1e293b;padding:10px 0}
+.ie-sec h5{font-size:.8rem;font-weight:800;color:#fde68a;margin-bottom:8px;display:flex;justify-content:space-between}
+.ie-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.ie-chips button,.ie-row button{min-height:40px;padding:0 12px;border-radius:10px;background:#1a2540;border:1px solid #334155;color:#e2e8f0;font-weight:700;font-size:.8rem}
+.ie-chips button[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#450a0a}
+.ie-row{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.ie-panel input[type=range]{width:100%;height:30px;accent-color:#f59e0b}
+.ie-panel .rv{color:#94a3b8;font-weight:700;font-variant-numeric:tabular-nums}
+.ie-panel .chk{color:#e2e8f0}
+.ie-foot{flex:none;display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:8px;padding:10px 12px calc(10px + var(--safe-b));background:#111a2e;border-top:1px solid #1e293b}
+.ie-foot button{min-height:48px;border-radius:12px;background:#1a2540;border:1px solid #334155;color:#e2e8f0;font-weight:800;font-size:.82rem}
+.ie-foot .primary{background:var(--ok);border-color:var(--ok);color:#fff;font-size:.95rem}
+
+.ie-panel{max-width:640px;width:100%;margin:0 auto}
+/* فلاتر الإدارة: تلف على سطور بدل ما تتقطع (شريط التمرير مخفي) */
+#ord-filters,#s-chips,#r-presets{flex-wrap:wrap;overflow-x:visible}
+@media (min-width:760px){
+  .tabs{flex-wrap:wrap}
+  .chips{flex-wrap:wrap;overflow-x:visible}
+  #admin .wrap{max-width:1100px}
+  #ord-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:10px;align-items:start}
+  #ord-list .row{margin-bottom:0}
+  #a-list,#o-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:10px;align-items:start}
+  #a-list .row,#o-list .row{margin-bottom:0}
+  #tab-sell{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;align-items:start}
+  #tab-sell > #s-search,#tab-sell > #s-chips{grid-column:1}
+  #tab-sell > #s-pick{grid-column:1;grid-template-columns:repeat(3,1fr)}
+  #tab-sell > .box{grid-column:2}
+  #tab-sell > .box:first-of-type{grid-row:1 / span 3}
+  #tab-reports .kpis{grid-template-columns:repeat(4,1fr)}
+  #r-out{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+  #r-out > p,#r-out > .kpis{grid-column:1 / -1}
+}
 </style>
 </head>
 <body>
@@ -789,6 +830,34 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
     <input class="input" id="pin-input" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="64" aria-label="الرقم السري">
     <div class="two"><button class="btn dark" id="pin-cancel" type="button">إلغاء</button><button class="btn primary" id="pin-ok" type="button">دخول</button></div>
   </div>
+</div>
+
+<!-- محرر الصور -->
+<div id="imged" class="hidden" role="dialog" aria-label="تعديل الصورة">
+  <div class="ie-head"><b id="ie-title">✂️ تعديل الصورة</b><button type="button" id="ie-cancel">إلغاء ✕</button></div>
+  <div class="ie-stage" id="ie-stage"><canvas id="ie-canvas"></canvas></div>
+  <div class="ie-hint">اسحب الصورة لتحريكها، وبإصبعين للتكبير والتصغير</div>
+  <div class="ie-panel" id="ie-panel">
+    <div class="ie-sec"><h5>شكل الإطار</h5><div class="ie-chips" id="ie-ratio"></div></div>
+    <div class="ie-sec"><h5>طريقة العرض</h5>
+      <div class="ie-chips" id="ie-fit"><button type="button" data-fit="cover">ملء الإطار (قص)</button><button type="button" data-fit="contain">الصورة كاملة</button></div>
+      <div class="ie-chips" id="ie-bg"><button type="button" data-bg="white">خلفية بيضاء</button><button type="button" data-bg="black">سوداء</button><button type="button" data-bg="blur">ضبابية</button></div>
+    </div>
+    <div class="ie-sec"><h5>التكبير <span class="rv" id="ie-zoom-v">100%</span></h5><input type="range" id="ie-zoom" min="20" max="400" value="100" step="1"></div>
+    <div class="ie-sec"><h5>التدوير والقلب <span class="rv" id="ie-fine-v">0°</span></h5>
+      <div class="ie-row"><button type="button" data-a="rl">↺ 90°</button><button type="button" data-a="rr">↻ 90°</button><button type="button" data-a="flip">↔ قلب</button></div>
+      <input type="range" id="ie-fine" min="-45" max="45" value="0" step="0.5" aria-label="ميل بسيط">
+    </div>
+    <div class="ie-sec"><h5>الألوان</h5>
+      <h5 style="margin:6px 0 0;font-weight:700">السطوع <span class="rv" id="ie-br-v">0</span></h5><input type="range" id="ie-br" min="-50" max="50" value="0">
+      <h5 style="margin:6px 0 0;font-weight:700">التباين <span class="rv" id="ie-ct-v">0</span></h5><input type="range" id="ie-ct" min="-50" max="50" value="0">
+      <h5 style="margin:6px 0 0;font-weight:700">الألوان (التشبّع) <span class="rv" id="ie-sat-v">0</span></h5><input type="range" id="ie-sat" min="-100" max="100" value="0">
+      <div class="ie-row" style="margin:8px 0 0"><button type="button" data-a="auto">✨ تحسين تلقائي</button><button type="button" data-a="clr">إلغاء الألوان</button></div>
+    </div>
+    <div class="ie-sec"><h5>حجم الملف <span class="rv" id="ie-dim"></span></h5><div class="ie-chips" id="ie-size"></div></div>
+    <div class="ie-sec"><label class="chk"><input type="checkbox" id="ie-guides"> أظهر أماكن السعر والعلامات فوق الصورة (للمعاينة بس)</label></div>
+  </div>
+  <div class="ie-foot"><button type="button" id="ie-reset">↺ ضبط</button><button type="button" id="ie-orig">👁 الأصلية</button><button type="button" id="ie-save" class="primary">✅ قص وحفظ</button></div>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -1535,6 +1604,7 @@ function statusMsg(o) {
   if (o.token) L.push("", "🔎 تتبّع طلبك: " + trackUrl(o.token));
   return L.join("\n");
 }
+const fixPhone = p => { const d = String(p == null ? "" : p).replace(/\D/g, ""); return /^1[0125]\d{8}$/.test(d) ? "0" + d : String(p == null ? "" : p); };   // لو الشيت شال الصفر الأولاني
 const phoneIntl = p => { const d = String(p).replace(/\D/g, ""); return d.startsWith("0") ? "20" + d.slice(1) : d; };
 function updateOrdBadge() {
   const b = document.querySelector('.tabs [data-tab="orders"]');
@@ -1546,7 +1616,8 @@ async function loadOrders(reset) {
   try {
     const r = await post({ action: "list_orders", pin: S.pin, limit: 40, offset: reset ? 0 : S.ordNext });
     if (!r.ok) return adminErr(r);
-    S.orders = reset ? r.orders : S.orders.concat(r.orders);
+    const fresh = r.orders.map(o => Object.assign({}, o, { phone: fixPhone(o.phone) }));
+    S.orders = reset ? fresh : S.orders.concat(fresh);
     S.ordNext = r.nextOffset; S.ordMore = r.hasMore; S.ordTotal = r.total; S.ordNew = r.newCount; S.ordToday = r.today;
     renderOrders(); updateOrdBadge();
   } catch (e) { toast("تعذر تحميل الطلبات", "err"); }
@@ -2086,12 +2157,130 @@ function fillShop() {
   if (!$("qr-url").value) $("qr-url").value = lsGet("tahona_qr_url") || menuUrl();
   drawQrPreview();
 }
+/* ===== محرر الصور: قص بنسبة اختيارية + تكبير + تدوير + ألوان، وبيرجّع صورة جاهزة للرفع ===== */
+const IE_RATIOS = [{ r: 2, l: "2:1 كارت المنيو" }, { r: 1, l: "1:1 مربع" }, { r: 4 / 3, l: "4:3" }, { r: 16 / 9, l: "16:9" }];
+function editImage(file, opt) {
+  opt = opt || {};
+  return new Promise(async resolve => {
+    const url = URL.createObjectURL(file);
+    const img = await new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = url; });
+    if (!img) { URL.revokeObjectURL(url); toast("تعذر قراءة الصورة، جرب صورة تانية", "err"); return resolve(null); }
+    const k0 = Math.min(1, 2000 / Math.max(img.naturalWidth, img.naturalHeight));     // نسخة أخف للمعاينة (الموبايل صوره كبيرة)
+    const src = document.createElement("canvas"); src.width = Math.max(1, Math.round(img.naturalWidth * k0)); src.height = Math.max(1, Math.round(img.naturalHeight * k0));
+    src.getContext("2d").drawImage(img, 0, 0, src.width, src.height); URL.revokeObjectURL(url);
+    const sizes = opt.sizes || [1000, 800, 640];
+    const def = { ratio: opt.ratio || 2, out: opt.out || sizes[0], quarter: 0, fine: 0, flip: false, zoom: 1, ox: 0, oy: 0, fit: "cover", bg: "white", br: 0, ct: 0, sat: 0 };
+    const st = Object.assign({ guides: def.ratio === 2, orig: false }, def);
+    const root = $("imged"), cv = $("ie-canvas"), ctx = cv.getContext("2d");
+    const canFilter = "filter" in CanvasRenderingContext2D.prototype;
+    const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+    $("ie-title").textContent = opt.title || "✂️ تعديل الصورة";
+
+    function drawFrame(c, W, H, s) {
+      c.save(); c.fillStyle = s.bg === "black" && !s.orig ? "#000" : "#fff"; c.fillRect(0, 0, W, H);
+      const q = s.orig ? 0 : s.quarter, odd = q % 2 === 1, iw = src.width, ih = src.height, rw = odd ? ih : iw, rh = odd ? iw : ih;
+      const cover = Math.max(W / rw, H / rh), contain = Math.min(W / rw, H / rh);
+      const base = s.orig || s.fit === "cover" ? cover : contain, sc = base * (s.orig ? 1 : s.zoom);
+      if (!s.orig && s.fit === "contain" && s.bg === "blur" && canFilter) {           // خلفية ضبابية من الصورة نفسها
+        c.save(); c.filter = "blur(18px) brightness(.85)"; c.translate(W / 2, H / 2); c.rotate(q * Math.PI / 2); c.scale(cover * 1.2, cover * 1.2); c.drawImage(src, -iw / 2, -ih / 2); c.restore();
+      }
+      c.translate(W / 2 + (s.orig ? 0 : s.ox * W), H / 2 + (s.orig ? 0 : s.oy * H));
+      c.rotate((q * 90 + (s.orig ? 0 : s.fine)) * Math.PI / 180);
+      if (!s.orig && s.flip) c.scale(-1, 1);
+      c.scale(sc, sc);
+      if (canFilter && !s.orig) c.filter = "brightness(" + (1 + s.br / 100) + ") contrast(" + (1 + s.ct / 100) + ") saturate(" + (1 + s.sat / 100) + ")";
+      c.drawImage(src, -iw / 2, -ih / 2);
+      c.restore();
+    }
+    function guides() {
+      if (!st.guides || st.orig || Math.abs(st.ratio - 2) > 0.01) return;
+      const W = cv.width, H = cv.height, boxes = [["السعر", .62, .68, .36, .26], ["عرض", .6, .05, .37, .16], ["في السلة", .03, .05, .33, .16], ["عداد", .03, .78, .3, .16]];
+      ctx.save(); ctx.setLineDash([8, 5]); ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,.95)"; ctx.fillStyle = "rgba(0,0,0,.35)"; ctx.textAlign = "center"; ctx.direction = "rtl"; ctx.font = "700 " + Math.round(H * .075) + 'px Cairo,sans-serif';
+      boxes.forEach(b => { const x = b[1] * W, y = b[2] * H, w = b[3] * W, h = b[4] * H; ctx.fillRect(x, y, w, h); ctx.strokeRect(x, y, w, h); ctx.fillStyle = "#fff"; ctx.fillText(b[0], x + w / 2, y + h / 2 + H * .026); ctx.fillStyle = "rgba(0,0,0,.35)"; });
+      ctx.restore();
+    }
+    function layout() {
+      const maxW = Math.min(root.clientWidth - 24, 520), maxH = Math.max(120, window.innerHeight * (st.ratio < 1.5 ? .40 : .34));
+      const cw = Math.round(Math.min(maxW, maxH * st.ratio)), ch = Math.round(cw / st.ratio), dpr = Math.min(2, window.devicePixelRatio || 1);
+      cv.style.width = cw + "px"; cv.style.height = ch + "px"; cv.width = Math.round(cw * dpr); cv.height = Math.round(ch * dpr);
+    }
+    function render() { drawFrame(ctx, cv.width, cv.height, st); guides(); }
+    function sync() {
+      $("ie-ratio").innerHTML = IE_RATIOS.map(x => '<button type="button" data-r="' + x.r + '" aria-pressed="' + (Math.abs(x.r - st.ratio) < 0.01) + '">' + x.l + "</button>").join("");
+      $("ie-size").innerHTML = sizes.map(n => '<button type="button" data-s="' + n + '" aria-pressed="' + (n === st.out) + '">' + n + " بكسل" + (n === sizes[0] ? " (أوضح)" : n === sizes[sizes.length - 1] ? " (أخف)" : "") + "</button>").join("");
+      document.querySelectorAll("#ie-fit [data-fit]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.fit === st.fit)));
+      document.querySelectorAll("#ie-bg [data-bg]").forEach(b => { b.setAttribute("aria-pressed", String(b.dataset.bg === st.bg)); });
+      $("ie-bg").classList.toggle("hidden", st.fit !== "contain");
+      $("ie-zoom").value = Math.round(st.zoom * 100); $("ie-zoom-v").textContent = Math.round(st.zoom * 100) + "%";
+      $("ie-fine").value = st.fine; $("ie-fine-v").textContent = st.fine + "°";
+      ["br", "ct", "sat"].forEach(n => { $("ie-" + n).value = st[n]; $("ie-" + n + "-v").textContent = st[n]; });
+      $("ie-dim").textContent = st.out + " × " + Math.round(st.out / st.ratio);
+      $("ie-guides").checked = st.guides; $("ie-guides").parentElement.classList.toggle("hidden", Math.abs(st.ratio - 2) > 0.01);
+    }
+    function all() { sync(); render(); }
+    function close(v) { root.classList.add("hidden"); cv.onpointerdown = cv.onpointermove = cv.onpointerup = cv.onpointercancel = cv.onwheel = null; window.removeEventListener("resize", onResize); resolve(v); }
+    const onResize = () => { layout(); render(); };
+    window.addEventListener("resize", onResize);
+
+    // تحريك بإصبع، وتكبير بإصبعين، وعجلة الماوس
+    const pts = new Map(); let pinch = null;
+    const dist = () => { const a = [...pts.values()]; return Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y) || 1; };
+    cv.onpointerdown = e => { try { cv.setPointerCapture(e.pointerId); } catch (er) {} pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); pinch = pts.size === 2 ? { d: dist(), z: st.zoom } : null; };
+    cv.onpointermove = e => {
+      const p = pts.get(e.pointerId); if (!p) return;
+      const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
+      const r = cv.getBoundingClientRect();
+      if (pts.size === 1) { st.ox = clamp(st.ox + dx / r.width, -1.5, 1.5); st.oy = clamp(st.oy + dy / r.height, -1.5, 1.5); }
+      else if (pts.size === 2 && pinch) st.zoom = clamp(pinch.z * dist() / pinch.d, .2, 4);
+      st.orig = false; $("ie-zoom").value = Math.round(st.zoom * 100); $("ie-zoom-v").textContent = Math.round(st.zoom * 100) + "%"; render();
+    };
+    cv.onpointerup = cv.onpointercancel = e => { pts.delete(e.pointerId); pinch = pts.size === 2 ? { d: dist(), z: st.zoom } : null; };
+    cv.onwheel = e => { e.preventDefault(); st.zoom = clamp(st.zoom * (e.deltaY < 0 ? 1.06 : 0.94), .2, 4); all(); };
+
+    $("ie-panel").onclick = e => {
+      const b = e.target.closest("button"); if (!b) return;
+      if (b.dataset.r) { st.ratio = Number(b.dataset.r); layout(); }
+      if (b.dataset.s) st.out = Number(b.dataset.s);
+      if (b.dataset.fit) { st.fit = b.dataset.fit; if (st.fit === "contain") { st.zoom = 1; st.ox = st.oy = 0; } }
+      if (b.dataset.bg) st.bg = b.dataset.bg;
+      const a = b.dataset.a;
+      if (a === "rl") st.quarter = (st.quarter + 3) % 4;
+      if (a === "rr") st.quarter = (st.quarter + 1) % 4;
+      if (a === "flip") st.flip = !st.flip;
+      if (a === "auto") { st.br = 8; st.ct = 12; st.sat = 15; }
+      if (a === "clr") { st.br = st.ct = st.sat = 0; }
+      all();
+    };
+    $("ie-panel").oninput = e => {
+      const t = e.target; st.orig = false;
+      if (t.id === "ie-zoom") st.zoom = Number(t.value) / 100;
+      if (t.id === "ie-fine") st.fine = Number(t.value);
+      if (t.id === "ie-br") st.br = Number(t.value);
+      if (t.id === "ie-ct") st.ct = Number(t.value);
+      if (t.id === "ie-sat") st.sat = Number(t.value);
+      if (t.id === "ie-guides") st.guides = t.checked;
+      all();
+    };
+    $("ie-reset").onclick = () => { Object.assign(st, def, { guides: def.ratio === 2, orig: false }); layout(); all(); };
+    const showOrig = on => { st.orig = on; render(); };       // اضغط وافضل ضاغط = الصورة الأصلية
+    const ob = $("ie-orig"); ob.onpointerdown = () => showOrig(true); ob.onpointerup = ob.onpointerleave = ob.onpointercancel = () => { if (st.orig) showOrig(false); };
+    $("ie-cancel").onclick = () => close(null);
+    $("ie-save").onclick = () => {
+      const W = st.out, H = Math.round(st.out / st.ratio), oc = document.createElement("canvas"); oc.width = W; oc.height = H;
+      drawFrame(oc.getContext("2d"), W, H, Object.assign({}, st, { orig: false }));
+      oc.toBlob(b => { if (!b) { toast("تعذر تجهيز الصورة", "err"); return; } close(b); }, "image/jpeg", 0.86);
+    };
+    root.classList.remove("hidden"); layout(); all();
+  });
+}
+
 async function handleShopLogo(e) {
   const file = e.target.files[0]; e.target.value = ""; if (!file) return;
   if (!/^image\//.test(file.type)) return toast("اختار صورة بس", "err");
-  const st = $("sh-upload-state"); $("sh-pick").disabled = true; st.textContent = "⏳ جاري تجهيز اللوجو ورفعه...";
+  const blob = await editImage(file, { ratio: 1, sizes: [512, 400, 256], out: 400, title: "✂️ تعديل اللوجو" });
+  if (!blob) return;
+  const st = $("sh-upload-state"); $("sh-pick").disabled = true; st.textContent = "⏳ جاري رفع اللوجو...";
   try {
-    const blob = await compressImage(file, 400, 0.85);
     const r = await post({ action: "upload_image", pin: S.pin, mime: "image/jpeg", imageBase64: await readB64(blob) });
     if (!r.ok) { st.textContent = "❌ " + (r.error || "فشل الرفع"); return adminErr(r); }
     $("sh-logo").value = r.url; $("sh-prev").src = r.url; st.textContent = "✅ تم الرفع، دوس حفظ لتثبيته";
@@ -2335,9 +2524,10 @@ async function handleBundleImage(e) {
   const file = e.target.files[0]; e.target.value = "";
   if (!file) return;
   if (!/^image\//.test(file.type)) return toast("اختار صورة بس", "err");
+  const blob = await editImage(file, { ratio: 2, sizes: [1000, 800, 640], out: 1000, title: "✂️ تعديل صورة الباقة" });
+  if (!blob) return;
   const st = $("b-upload-state"); S.uploading = true; $("b-pick").disabled = true; st.textContent = "⏳ جاري تجهيز الصورة...";
   try {
-    const blob = await compressImage(file, 1000, 0.82);
     $("b-preview").src = URL.createObjectURL(blob);
     st.textContent = "⏳ جاري رفع الصورة...";
     const r = await post({ action: "upload_image", pin: S.pin, mime: "image/jpeg", imageBase64: await readB64(blob) });
@@ -2467,9 +2657,10 @@ async function handleImagePick(e) {
   const file = e.target.files[0]; e.target.value = "";
   if (!file) return;
   if (!/^image\//.test(file.type)) return toast("اختار صورة بس", "err");
+  const blob = await editImage(file, { ratio: 2, sizes: [1000, 800, 640], out: 1000, title: "✂️ تعديل صورة الصنف" });
+  if (!blob) return;
   const st = $("f-upload-state"); S.uploading = true; $("f-pick").disabled = true; st.textContent = "⏳ جاري تجهيز الصورة...";
   try {
-    const blob = await compressImage(file, 1000, 0.82);
     $("f-preview").src = URL.createObjectURL(blob);
     st.textContent = "⏳ جاري رفع الصورة...";
     const r = await post({ action: "upload_image", pin: S.pin, mime: "image/jpeg", imageBase64: await readB64(blob) });
