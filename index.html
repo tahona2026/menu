@@ -414,7 +414,7 @@ textarea.input{height:auto;padding:10px 12px;resize:vertical;min-height:72px}
 
 .ie-panel{max-width:640px;width:100%;margin:0 auto}
 /* فلاتر الإدارة: تلف على سطور بدل ما تتقطع (شريط التمرير مخفي) */
-#ord-filters,#s-chips,#r-presets{flex-wrap:wrap;overflow-x:visible}
+#ord-filters,#s-chips,#r-presets,#cp-fmt,#cp-src,#cp-quick{flex-wrap:wrap;overflow-x:visible}
 @media (min-width:760px){
   .tabs{flex-wrap:wrap}
   .chips{flex-wrap:wrap;overflow-x:visible}
@@ -540,6 +540,7 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
     <button data-tab="sell" data-need="sell">🧾 كاشير</button>
     <button data-tab="orders" data-need="orders">📦 الطلبات</button>
     <button data-tab="reports" data-need="admin">📊 التقارير</button>
+    <button data-tab="campaign" data-need="admin">📣 الحملة</button>
     <button data-tab="items" data-need="admin" class="on">📋 الأصناف</button>
     <button data-tab="form" data-need="admin">➕ صنف</button>
     <button data-tab="cats" data-need="admin">📂 التصنيفات</button>
@@ -572,6 +573,33 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
         <h4>📅 إقفال اليوم</h4>
         <button class="btn dark" id="s-sumbtn" type="button">عرض ملخص مبيعات النهاردة</button>
         <div id="s-summary" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <div id="tab-campaign" class="hidden">
+      <div class="box">
+        <h4>📣 بوستر أسعار وعروض النهاردة</h4>
+        <p class="hint" style="margin:0 0 8px">بيتعمل من أسعار المنيو الحالية. نزّله وانشره في جروب واتساب أو الحالة أو صفحة فيسبوك.</p>
+        <div class="chips" id="cp-fmt" style="padding:0 0 6px;margin:0"></div>
+        <div class="field" style="margin-bottom:6px"><label>هتنشره فين؟ (الـ QR والرابط بيتسجّلوا بالمصدر عشان نعرف كام طلب جه منه)</label></div>
+        <div class="chips" id="cp-src" style="padding:0 0 6px;margin:0"></div>
+        <div class="field hidden" id="cp-src-custom-w"><label for="cp-src-custom">اسم المصدر (حروف وأرقام، لحد 20)</label><input class="input" id="cp-src-custom" maxlength="20" placeholder="مثال: عرض-الجمعة"></div>
+        <div class="field"><label for="cp-title">العنوان</label><input class="input" id="cp-title" maxlength="40" value="أسعار وعروض النهاردة"></div>
+        <div class="field"><label for="cp-note">سطر إضافي (اختياري)</label><input class="input" id="cp-note" maxlength="60" placeholder="مثال: توصيل مجاني للطلبات فوق 300 ج"></div>
+        <img id="cp-prev" alt="معاينة البوستر" style="width:100%;max-width:340px;margin:0 auto 10px;border:1px solid var(--border);border-radius:12px;background:#fff">
+        <div class="two" style="margin:0 0 8px"><button class="btn dark" id="cp-dl" type="button">⬇️ تنزيل الصورة</button><button class="btn primary" id="cp-share" type="button" style="min-height:46px">📤 مشاركة</button></div>
+        <div class="two" style="margin:0"><button class="btn dark" id="cp-copy" type="button">📋 انسخ نص الرسالة</button><button class="btn wa" id="cp-wa" type="button" style="min-height:46px">💬 واتساب بالنص</button></div>
+        <p class="hint" id="cp-link" dir="ltr" style="text-align:left"></p>
+      </div>
+      <div class="box">
+        <h4>🛒 اختار اللي هيظهر في البوستر</h4>
+        <div class="chips" id="cp-quick" style="padding:0 0 6px;margin:0">
+          <button class="chip" type="button" data-q="offers" aria-pressed="false">🔥 اللي عليه عرض</button>
+          <button class="chip" type="button" data-q="all" aria-pressed="false">الكل</button>
+          <button class="chip" type="button" data-q="none" aria-pressed="false">مسح الاختيار</button>
+        </div>
+        <div id="cp-items"></div>
+        <p class="hint" id="cp-count"></p>
       </div>
     </div>
 
@@ -1396,7 +1424,7 @@ async function submitOrder() {
   const btn = $("co-submit"); btn.disabled = true; btn.textContent = "⏳ جاري تسجيل الطلب...";
   try {
     const file = $("c-receipt").files[0];
-    const customer = { ...c, receiptBase64: file ? await readB64(file) : "", receiptMimeType: file ? file.type : "" };
+    const customer = { ...c, src: currentSrc(), receiptBase64: file ? await readB64(file) : "", receiptMimeType: file ? file.type : "" };
     const items = lines.map(l => ({ id: l.id, qty: l.c.qty, prep: l.c.prep, note: l.c.note }));
     const bundles = bls.map(l => ({ id: l.id, qty: l.c.qty, note: l.c.note || "" }));
     let res = null;
@@ -1487,9 +1515,10 @@ function showAdminTab(t) {
   if (need && need.need === "admin" && !isAdmin()) return;
   if (need && need.need === "orders" && !canOrders()) return;
   document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
-  ["sell", "orders", "reports", "items", "form", "cats", "offers", "bundles", "delivery", "users", "shop"].forEach(x => $("tab-" + x).classList.toggle("hidden", x !== t));
+  ["sell", "orders", "reports", "campaign", "items", "form", "cats", "offers", "bundles", "delivery", "users", "shop"].forEach(x => $("tab-" + x).classList.toggle("hidden", x !== t));
   if (t === "sell") renderSell();
   if (t === "reports") initReports();
+  if (t === "campaign") campInit();
   if (t === "users") showUserList();
   if (t === "shop") fillShop();
   if (t === "orders") { renderOrders(); loadOrders(true); }
@@ -1642,7 +1671,7 @@ function orderCardHtml(o) {
   const opts = (o.status ? "" : '<option value="" selected disabled>— الحالة —</option>') + ALL_STAGES.map(s => `<option value="${s}"${o.status === s ? " selected" : ""}>${s}</option>`).join("");
   const shop = o.source === "محل", hasPhone = /\d{6,}/.test(String(o.phone)), locked = shop && !isAdmin();
   return `<div class="row ord${o.status === "جديد" ? " new" : ""}" data-oid="${esc(o.id)}">
-    <div class="ord-head"><div><span class="ord-id">${esc(o.id)}</span> <span class="src${shop ? " shop" : ""}">${shop ? "🏪 محل" : "🌐 أونلاين"}</span><br><span class="ord-time">${esc(o.time)}${o.invoiceNo ? " • " + esc(o.invoiceNo) : ""}</span></div>${o.status ? `<span class="st ${ST_CLASS[o.status]}">${esc(o.status)}</span>` : `<span class="st">بدون حالة</span>`}</div>
+    <div class="ord-head"><div><span class="ord-id">${esc(o.id)}</span> <span class="src${shop ? " shop" : ""}">${shop ? "🏪 محل" : "🌐 أونلاين"}</span>${o.camp ? ` <span class="src">📣 ${esc(o.camp)}</span>` : ""}<br><span class="ord-time">${esc(o.time)}${o.invoiceNo ? " • " + esc(o.invoiceNo) : ""}</span></div>${o.status ? `<span class="st ${ST_CLASS[o.status]}">${esc(o.status)}</span>` : `<span class="st">بدون حالة</span>`}</div>
     <div><span class="ord-name">${esc(o.name)}</span>${hasPhone ? ` <span class="ord-meta">• ${esc(o.phone)}</span>` : ""}</div>
     <div class="ord-meta">${shop ? `👤 الكاشير: ${esc(o.cashier || "—")}${o.discount > 0 ? " • خصم " + money(o.discount) : ""}` : o.type === "pickup" ? "🏬 استلام من الفرع" : `🛵 توصيل • ${esc(o.zone)}${o.address ? "<br>🏠 " + esc(o.address) : ""}`}</div>
     <div class="ord-items">${o.items.map(x => esc(x)).join("\n")}</div>
@@ -1713,17 +1742,17 @@ function qrCanvas(text, size, logo) {
 const loadImgEl = src => new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
 const qrUrlInput = () => ($("qr-url").value.trim() || menuUrl());
 async function drawQrPreview() {
-  const url = qrUrlInput(), logo = await loadImgEl(LOGO_URI);
+  const url = withSrc(qrUrlInput(), "qr"), logo = await loadImgEl(LOGO_URI);
   $("qr-prev").src = qrCanvas(url, 480, logo).toDataURL();
 }
 function saveCanvas(cv, name) {
   cv.toBlob(b => { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast("تم تنزيل الملف ✅"); }, "image/png");
 }
 async function downloadQr() {
-  const logo = await loadImgEl(LOGO_URI); saveCanvas(qrCanvas(qrUrlInput(), 1000, logo), "menu-qr.png");
+  const logo = await loadImgEl(LOGO_URI); saveCanvas(qrCanvas(withSrc(qrUrlInput(), "qr"), 1000, logo), "menu-qr.png");
 }
 async function downloadPoster() {
-  const sh = shopOf(), url = qrUrlInput(), W = 1080, H = 1560;
+  const sh = shopOf(), url = withSrc(qrUrlInput(), "qr"), W = 1080, H = 1560;
   try { await document.fonts.load('700 40px Cairo'); await document.fonts.load('400 30px Cairo'); } catch (e) {}
   const logo = await loadImgEl(LOGO_URI), cv = document.createElement("canvas"); cv.width = W; cv.height = H;
   const c = cv.getContext("2d"); c.direction = "rtl"; c.textAlign = "center"; c.fillStyle = "#fff"; c.fillRect(0, 0, W, H);
@@ -1756,6 +1785,17 @@ function initInstall() {
     deferredInstall = null; $("install-bar").classList.add("hidden");
   });
   $("install-x").addEventListener("click", () => { lsSet("tahona_install_x", "1"); $("install-bar").classList.add("hidden"); });
+}
+
+/* ===== مصدر الطلب (من رابط الحملة ?src=...) ===== */
+function captureSrc() {
+  const m = /[?&]src=([^&#]+)/.exec(location.search); if (!m) return;
+  let v = ""; try { v = decodeURIComponent(m[1]); } catch (e) { return; }
+  if (/^[A-Za-z0-9_\-\u0600-\u06FF]{1,20}$/.test(v)) lsSet("tahona_src", JSON.stringify({ v, t: Date.now() }));
+}
+function currentSrc() {                       // آخر مصدر دخل منه الزبون خلال 14 يوم
+  try { const o = JSON.parse(lsGet("tahona_src") || "null"); if (o && o.v && Date.now() - o.t < 14 * 86400000) return o.v; } catch (e) {}
+  return "";
 }
 
 /* ===== الكاشير: بيع من المحل ===== */
@@ -1890,7 +1930,7 @@ function renderInvoice(v) {
       ${v.fee > 0 ? `<div><span>التوصيل</span><b>${moneyP(v.fee)}</b></div>` : ""}
       <div class="g"><span>${v.estimated ? "الإجمالي (تقديري)" : "الإجمالي"}</span><b>${moneyP(v.total)}</b></div>
     </div>
-    <div class="inv-foot">${v.estimated ? "المبلغ تقديري وبيتحدد بدقة بعد الوزن.<br>" : ""}${esc(sh.footer)}<br><small>إيصال بيع — ليس فاتورة ضريبية</small><br><img src="${qrCanvas(menuUrl(), 300, null).toDataURL()}" alt="QR" style="width:110px;height:110px;margin:8px auto 0"><br><small>امسح الكود واطلب أونلاين</small></div></div>`;
+    <div class="inv-foot">${v.estimated ? "المبلغ تقديري وبيتحدد بدقة بعد الوزن.<br>" : ""}${esc(sh.footer)}<br><small>إيصال بيع — ليس فاتورة ضريبية</small><br><img src="${qrCanvas(withSrc(baseMenuUrl(), "receipt"), 300, null).toDataURL()}" alt="QR" style="width:110px;height:110px;margin:8px auto 0"><br><small>امسح الكود واطلب أونلاين</small></div></div>`;
 }
 function closeInvoice() {
   $("invoice").classList.add("hidden");
@@ -1937,7 +1977,7 @@ async function invoiceCanvas(v) {
   if (v.estimated) text("المبلغ تقديري وبيتحدد بدقة بعد الوزن", 20, "400", "c");
   if (sh.footer) text(sh.footer, 22, "400", "c");
   text("إيصال بيع — ليس فاتورة ضريبية", 18, "400", "c");
-  const qrSz = 200; ops.push({ t: "i", img: qrCanvas(menuUrl(), qrSz, null), x: (W - qrSz) / 2, y: y + 8, w: qrSz, h: qrSz }); y += qrSz + 14;
+  const qrSz = 200; ops.push({ t: "i", img: qrCanvas(withSrc(baseMenuUrl(), "receipt"), qrSz, null), x: (W - qrSz) / 2, y: y + 8, w: qrSz, h: qrSz }); y += qrSz + 14;
   text("امسح الكود واطلب أونلاين", 20, "700", "c");
   y += 16;
   const cv = document.createElement("canvas"); cv.width = W; cv.height = y;
@@ -2079,6 +2119,7 @@ function renderReport(r) {
     <div class="box"><h4>🏆 أكتر الأصناف مبيعاً</h4>${r.topItems.length ? '<div class="bars">' + r.topItems.map(x => `<div class="bar" style="grid-template-columns:1fr auto"><span>${esc(x.n)}</span><span>${num(x.q)} ${esc(x.u)} • ${moneyP(x.t)}</span></div>`).join("") + "</div>" : '<div class="empty" style="padding:8px">—</div>'}</div>
     <div class="box"><h4>💳 حسب طريقة الدفع</h4>${barsHtml(r.byPayment)}</div>
     <div class="box"><h4>👤 حسب الكاشير / أونلاين</h4>${barsHtml(r.byCashier)}</div>
+    <div class="box"><h4>📣 حسب مصدر الطلب (أونلاين)</h4>${barsHtml(r.byCamp, k => ({ group: "👥 جروب واتساب", facebook: "📘 فيسبوك", status: "📱 حالة واتساب", qr: "🔳 QR مطبوع", receipt: "🧾 QR الفاتورة" }[k] || k))}</div>
     <div class="box"><h4>📍 حسب منطقة التوصيل (أونلاين)</h4>${barsHtml(r.byZone)}</div>
     <div class="box"><h4>🕐 حسب الساعة</h4>${barsHtml(r.byHour, h => h + ":00")}</div>`;
 }
@@ -2091,8 +2132,8 @@ async function exportCsv() {
     if (!r.ok) return adminErr(r);
     if (!r.rows.length) return toast("ما فيش مبيعات في الفترة دي", "warn");
     const q = v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
-    const head = ["رقم الطلب", "اليوم", "الوقت", "المصدر", "الكاشير", "العميل", "الدفع", "المبلغ", "الخصم", "الأصناف"];
-    const lines = [head.map(q).join(",")].concat(r.rows.map(x => [x.id, x.day, x.time, x.source, x.cashier, x.customer, x.payment, x.amount, x.discount, x.items].map(q).join(",")));
+    const head = ["رقم الطلب", "اليوم", "الوقت", "المصدر", "مصدر الحملة", "الكاشير", "العميل", "الدفع", "المبلغ", "الخصم", "الأصناف"];
+    const lines = [head.map(q).join(",")].concat(r.rows.map(x => [x.id, x.day, x.time, x.source, x.camp, x.cashier, x.customer, x.payment, x.amount, x.discount, x.items].map(q).join(",")));
     const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `sales_${from}_${to}.csv`;
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
@@ -2273,6 +2314,137 @@ function editImage(file, opt) {
     root.classList.remove("hidden"); layout(); all();
   });
 }
+
+/* ===== الحملة الدعائية: بوستر أسعار وعروض النهاردة + رابط بمصدر عشان نقيس النتيجة ===== */
+const CP_FMT = { story: { h: 1920, label: "ستوري / حالة 1080×1920", cap: 12 }, post: { h: 1350, label: "بوست فيسبوك وإنستجرام 1080×1350", cap: 6 } };
+const CP_SRC = [["group", "👥 جروب واتساب"], ["facebook", "📘 فيسبوك"], ["status", "📱 حالة واتساب"], ["qr", "🔳 QR مطبوع"], ["__custom", "✏️ غير كده"]];
+S.camp = { fmt: "story", src: "group", sel: null, t: 0 };
+const withSrc = (u, tag) => (String(u).indexOf("?") === -1 ? u + "?src=" + encodeURIComponent(tag) : u);
+const bundleLabel = n => (/^\s*باقة/.test(n) ? n : "باقة " + n);
+const baseMenuUrl = () => (lsGet("tahona_qr_url") || menuUrl()).split("?")[0];
+function campTag() {
+  const v = S.camp.src === "__custom" ? $("cp-src-custom").value.trim() : S.camp.src;
+  return /^[A-Za-z0-9_\-؀-ۿ]{1,20}$/.test(v) ? v : "group";
+}
+const campLink = () => baseMenuUrl() + "?src=" + encodeURIComponent(campTag());
+function campChosen() {
+  const sel = S.camp.sel || new Set();
+  return { items: S.menu.filter(m => sel.has("i:" + m.id)), bundles: activeBundles().filter(b => sel.has("b:" + b.id)) };
+}
+function campInit() {
+  if (!S.camp.sel) {                      // أول مرة: اللي عليه عرض الأول وبعدين باقي الأصناف لحد ما المساحة تخلص
+    const arr = []; activeOffers().forEach(m => arr.push("i:" + m.id)); activeBundles().forEach(b => arr.push("b:" + b.id));
+    S.menu.forEach(m => { if (!arr.includes("i:" + m.id)) arr.push("i:" + m.id); });
+    S.camp.sel = new Set(arr.slice(0, CP_FMT[S.camp.fmt].cap));
+  }
+  campRenderCtl(); campRefresh(true);
+}
+function campRenderCtl() {
+  $("cp-fmt").innerHTML = Object.keys(CP_FMT).map(k => `<button class="chip" type="button" data-f="${k}" aria-pressed="${S.camp.fmt === k}">${CP_FMT[k].label}</button>`).join("");
+  $("cp-src").innerHTML = CP_SRC.map(x => `<button class="chip" type="button" data-s="${x[0]}" aria-pressed="${S.camp.src === x[0]}">${x[1]}</button>`).join("");
+  $("cp-src-custom-w").classList.toggle("hidden", S.camp.src !== "__custom");
+  const sel = S.camp.sel;
+  $("cp-items").innerHTML = S.menu.map(m => `<label class="chk"><input type="checkbox" data-k="i:${esc(m.id)}"${sel.has("i:" + m.id) ? " checked" : ""}> ${esc(m.name)} <span class="off-tag">${money(m.price)}/${esc(m.unit)}${offerActive(m) ? " 🔥" : ""}</span></label>`).join("")
+    + activeBundles().map(b => `<label class="chk"><input type="checkbox" data-k="b:${esc(b.id)}"${sel.has("b:" + b.id) ? " checked" : ""}> 🎁 ${esc(b.name)} <span class="off-tag">${money(b.price)}</span></label>`).join("");
+  campCount();
+}
+function campCount() {
+  const n = campChosen(), tot = n.items.length + n.bundles.length, cap = CP_FMT[S.camp.fmt].cap;
+  $("cp-count").textContent = `اخترت ${tot} من ${cap} (أقصى عدد بيتحط بوضوح في المقاس ده).` + (tot > cap ? " ⚠️ زيادة: الخط هيصغر، فكّر تقلل أو اختار ستوري." : "");
+}
+let campTimer = 0;
+function campRefresh(now) {
+  clearTimeout(campTimer);
+  campTimer = setTimeout(async () => { try { $("cp-prev").src = (await campCanvas()).toDataURL("image/jpeg", 0.85); } catch (e) { toast("تعذر تجهيز البوستر", "err"); } }, now ? 0 : 180);
+  $("cp-link").textContent = campLink();
+}
+async function loadShopLogo(sh) {
+  let logo = /^https:\/\//.test(sh.logo || "") ? await new Promise(res => { const i = new Image(); i.crossOrigin = "anonymous"; i.onload = () => res(i); i.onerror = () => res(null); i.src = sh.logo; }) : null;
+  return logo || await loadImgEl(LOGO_URI);
+}
+async function campCanvas() {
+  const f = CP_FMT[S.camp.fmt], W = 1080, H = f.h, sh = shopOf(), story = S.camp.fmt === "story";
+  try { await document.fonts.load('700 40px Cairo'); await document.fonts.load('400 30px Cairo'); } catch (e) {}
+  const logo = await loadShopLogo(sh), cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const c = cv.getContext("2d"); c.direction = "rtl";
+  const F = (w, px) => w + " " + Math.round(px) + 'px "Cairo","Segoe UI",Tahoma,sans-serif';
+  const fit = (txt, w, px, maxW) => { let p = px; c.font = F(w, p); while (c.measureText(txt).width > maxW && p > 18) { p -= 2; c.font = F(w, p); } return p; };
+  const rr = (x, y, w, h, r) => { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); };
+  // الخلفية والهيدر
+  c.fillStyle = "#fffaf0"; c.fillRect(0, 0, W, H);
+  const hdr = story ? 250 : 210, g = c.createLinearGradient(0, 0, W, 0); g.addColorStop(0, "#7f1d1d"); g.addColorStop(1, "#b45309");
+  c.fillStyle = g; c.fillRect(0, 0, W, hdr); c.fillStyle = "#f59e0b"; c.fillRect(0, hdr, W, 10);
+  const ls = hdr - 50; c.fillStyle = "#fff"; rr(W - 40 - ls, 25, ls, ls, 24); c.fill(); if (logo) c.drawImage(logo, W - 40 - ls + 6, 31, ls - 12, ls - 12);
+  c.textAlign = "right"; c.fillStyle = "#fff"; c.font = F("700", fit(sh.name, "700", 76, 700)); c.fillText(sh.name, W - 40 - ls - 28, hdr / 2 - (sh.slogan ? 6 : -24));
+  if (sh.slogan) { c.fillStyle = "#fde68a"; c.font = F("700", fit(sh.slogan, "700", 40, 700)); c.fillText(sh.slogan, W - 40 - ls - 28, hdr / 2 + 52); }
+  // العنوان والتاريخ
+  let y = hdr + 40; const title = $("cp-title").value.trim() || "أسعار وعروض النهاردة";
+  c.fillStyle = "#f59e0b"; rr(70, y, W - 140, 100, 28); c.fill();
+  c.textAlign = "center"; c.fillStyle = "#450a0a"; c.font = F("700", fit(title, "700", 58, W - 200)); c.fillText(title, W / 2, y + 68);
+  y += 100; const dstr = new Date(nowMs()).toLocaleDateString("ar-EG", { weekday: "long", day: "numeric", month: "long", timeZone: "Africa/Cairo" });
+  c.fillStyle = "#6b7280"; c.font = F("400", 34); c.fillText(dstr, W / 2, y + 50); y += 76;
+  // الصفوف
+  const ch = campChosen(), rows = ch.items.length + ch.bundles.length, note = $("cp-note").value.trim();
+  const footH = (story ? 500 : 420) + (note ? 80 : 0), avail = H - footH - y, rowH = Math.max(52, Math.min(story ? 150 : 130, Math.floor(avail / Math.max(1, rows))));
+  let i = 0;
+  const band = () => { if (i % 2 === 0) { c.fillStyle = "rgba(127,29,29,.06)"; rr(50, y + 2, W - 100, rowH - 6, 18); c.fill(); } };
+  ch.items.forEach(m => {
+    band(); const on = offerActive(m), mid = y + rowH / 2;
+    const nameP = fit(m.name, "700", rowH * .42, 600); c.fillStyle = "#111827"; c.textAlign = "right"; c.font = F("700", nameP); c.fillText(m.name, W - 80, on ? mid - rowH * .02 : mid + nameP * .34);
+    if (on) { c.fillStyle = "#dc2626"; c.font = F("700", rowH * .27); c.fillText("🔥 عرض: " + num(m.offer_qty) + " " + m.unit + " بـ " + money(m.offer_total), W - 80, mid + rowH * .3); }
+    const price = money(m.price) + " / " + m.unit; c.textAlign = "left"; c.fillStyle = "#7f1d1d"; c.font = F("700", fit(price, "700", rowH * .4, 340)); c.fillText(price, 80, mid + rowH * .13);
+    y += rowH; i++;
+  });
+  ch.bundles.forEach(b => {
+    c.fillStyle = "rgba(220,38,38,.09)"; rr(50, y + 2, W - 100, rowH - 6, 18); c.fill(); c.strokeStyle = "#dc2626"; c.lineWidth = 3; rr(50, y + 2, W - 100, rowH - 6, 18); c.stroke();
+    const mid = y + rowH / 2, label = "🎁 " + bundleLabel(b.name), nameP = fit(label, "700", rowH * .4, 600);
+    c.fillStyle = "#111827"; c.textAlign = "right"; c.font = F("700", nameP); c.fillText(label, W - 80, b.desc ? mid - rowH * .02 : mid + nameP * .34);
+    if (b.desc) { c.fillStyle = "#6b7280"; c.font = F("400", fit(b.desc, "400", rowH * .26, 620)); c.fillText(b.desc, W - 80, mid + rowH * .3); }
+    const price = money(b.price); c.textAlign = "left"; c.fillStyle = "#dc2626"; c.font = F("700", fit(price, "700", rowH * .44, 300)); c.fillText(price, 80, mid + rowH * .15);
+    y += rowH; i++;
+  });
+  if (!rows) { c.textAlign = "center"; c.fillStyle = "#9ca3af"; c.font = F("400", 40); c.fillText("اختار أصناف من تحت", W / 2, y + 100); }
+  // الفوتر: السطر الإضافي + QR + الأرقام
+  const fy = H - (story ? 500 : 420);
+  if (note) { c.fillStyle = "#fde68a"; rr(60, fy - 10, W - 120, 66, 20); c.fill(); c.textAlign = "center"; c.fillStyle = "#450a0a"; c.font = F("700", fit(note, "700", 40, W - 160)); c.fillText(note, W / 2, fy + 36); }
+  const base = fy + (note ? 80 : 0), qs = story ? 300 : 230;
+  c.fillStyle = "#fff"; rr(60, base + 10, qs + 20, qs + 20, 20); c.fill(); c.strokeStyle = "#7f1d1d"; c.lineWidth = 6; rr(60, base + 10, qs + 20, qs + 20, 20); c.stroke();
+  c.drawImage(qrCanvas(campLink(), 700, null), 70, base + 20, qs, qs);
+  c.textAlign = "right"; c.fillStyle = "#7f1d1d"; c.font = F("700", story ? 58 : 48); c.fillText("اطلب أونلاين الآن", W - 70, base + (story ? 90 : 76));
+  c.fillStyle = "#111827"; c.font = F("700", story ? 34 : 30); c.fillText("📱 امسح الكود أو افتح الرابط", W - 70, base + (story ? 140 : 120));
+  c.fillStyle = "#374151"; c.font = F("400", story ? 34 : 29);
+  phonesOf(sh).slice(0, 3).forEach((p, k) => c.fillText("📞 " + p, W - 70, base + (story ? 200 : 170) + k * (story ? 46 : 40)));
+  c.font = F("400", story ? 30 : 26); c.fillText(sh.address, W - 70, base + (story ? 200 : 170) + Math.min(3, phonesOf(sh).length) * (story ? 46 : 40) + 8);
+  c.fillStyle = "#7f1d1d"; c.fillRect(0, H - 22, W, 22); c.fillStyle = "#f59e0b"; c.fillRect(0, H - 30, W, 8);
+  return cv;
+}
+function campCaption() {
+  const sh = shopOf(), ch = campChosen(), title = $("cp-title").value.trim() || "أسعار وعروض النهاردة", note = $("cp-note").value.trim();
+  const dstr = new Date(nowMs()).toLocaleDateString("ar-EG", { weekday: "long", day: "numeric", month: "long", timeZone: "Africa/Cairo" });
+  const L = [`🐔 ${sh.name} — ${title}`, `📅 ${dstr}`, ""];
+  ch.items.forEach(m => L.push(`• ${m.name}: ${num(m.price)} ج / ${m.unit}` + (offerActive(m) ? `  🔥 عرض: ${num(m.offer_qty)} ${m.unit} بـ ${num(m.offer_total)} ج` : "")));
+  ch.bundles.forEach(b => L.push(`🎁 ${bundleLabel(b.name)}: ${num(b.price)} ج`));
+  if (note) L.push("", "✨ " + note);
+  L.push("", "🛒 اطلب من المنيو: " + campLink(), "📞 " + phonesOf(sh).join(" - "));
+  if (sh.slogan) L.push(sh.slogan);
+  return L.join("\n");
+}
+async function campFile() {
+  const cv = await campCanvas(), blob = await new Promise((res, rej) => cv.toBlob(b => b ? res(b) : rej(new Error("toBlob")), "image/jpeg", 0.9));
+  return new File([blob], "offers-" + cairoDay(nowMs()) + "-" + S.camp.fmt + ".jpg", { type: "image/jpeg" });
+}
+async function campDownload() {
+  try { const f = await campFile(), a = document.createElement("a"); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast("تم تنزيل البوستر ✅"); }
+  catch (e) { toast("تعذر تجهيز البوستر", "err"); }
+}
+async function campShare() {
+  try {
+    const f = await campFile();
+    if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], text: campCaption() }); return; } catch (e) { if (e && e.name === "AbortError") return; } }
+    await campDownload();
+  } catch (e) { toast("تعذر المشاركة", "err"); }
+}
+async function campCopy() { try { await navigator.clipboard.writeText(campCaption()); toast("تم نسخ النص ✅"); } catch (e) { toast("تعذر النسخ، افتح واتساب بالنص من الزرار اللي جنبه", "warn"); } }
 
 async function handleShopLogo(e) {
   const file = e.target.files[0]; e.target.value = ""; if (!file) return;
@@ -3019,10 +3191,26 @@ function init() {
   $("sh-file").addEventListener("change", handleShopLogo);
   $("sh-logo").addEventListener("input", () => { $("sh-prev").src = logoOf({ logo: $("sh-logo").value.trim() }); });
   $("sh-save").addEventListener("click", saveShop);
+  $("cp-fmt").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (!b) return; S.camp.fmt = b.dataset.f; campRenderCtl(); campRefresh(true); });
+  $("cp-src").addEventListener("click", e => { const b = e.target.closest("[data-s]"); if (!b) return; S.camp.src = b.dataset.s; campRenderCtl(); campRefresh(true); });
+  $("cp-src-custom").addEventListener("input", () => campRefresh());
+  ["cp-title", "cp-note"].forEach(id => $(id).addEventListener("input", () => campRefresh()));
+  $("cp-items").addEventListener("change", e => { const k = e.target.dataset.k; if (!k) return; if (e.target.checked) S.camp.sel.add(k); else S.camp.sel.delete(k); campCount(); campRefresh(); });
+  $("cp-quick").addEventListener("click", e => {
+    const b = e.target.closest("[data-q]"); if (!b) return; const q = b.dataset.q, set = new Set();
+    if (q === "offers") { activeOffers().forEach(m => set.add("i:" + m.id)); activeBundles().forEach(x => set.add("b:" + x.id)); }
+    if (q === "all") { S.menu.forEach(m => set.add("i:" + m.id)); activeBundles().forEach(x => set.add("b:" + x.id)); }
+    S.camp.sel = set; campRenderCtl(); campRefresh(true);
+  });
+  $("cp-dl").addEventListener("click", campDownload);
+  $("cp-share").addEventListener("click", campShare);
+  $("cp-copy").addEventListener("click", campCopy);
+  $("cp-wa").addEventListener("click", () => window.open("https://wa.me/?text=" + encodeURIComponent(campCaption()), "_blank", "noopener"));
   $("qr-url").addEventListener("input", () => { lsSet("tahona_qr_url", $("qr-url").value.trim()); drawQrPreview(); });
   $("qr-dl").addEventListener("click", downloadQr);
   $("qr-poster").addEventListener("click", downloadPoster);
 
+  captureSrc();
   applyShop();
   initInstall();
   updateMyBadge();
