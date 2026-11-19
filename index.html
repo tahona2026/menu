@@ -379,7 +379,7 @@ textarea.input{height:auto;padding:10px 12px;resize:vertical;min-height:72px}
 .inv-sum .g{font-size:1.1rem;font-weight:900;border-top:2px solid #111;padding-top:6px;margin-top:4px}
 .inv-foot{text-align:center;font-size:.76rem;color:#444;margin-top:12px;border-top:2px dashed #bbb;padding-top:8px}
 .inv-void{background:#fef2f2;border:2px solid #dc2626;color:#b91c1c;font-weight:900;text-align:center;border-radius:10px;padding:6px;margin-bottom:8px}
-@page{size:80mm auto;margin:3mm}
+@page{size:80mm auto;margin:2mm}
 @media print{
   html{font-size:100%!important}
   body{background:#fff;padding:0;overflow:visible}
@@ -458,9 +458,9 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
       <div class="box">
         <h4>💳 طريقة الدفع</h4>
         <div class="seg c3">
-          <label class="seg-opt"><input type="radio" name="pay" value="كاش" checked><span>💵 نقدي</span></label>
+          <label class="seg-opt"><input type="radio" name="pay" value="نقدي" checked><span>💵 نقدي</span></label>
           <label class="seg-opt"><input type="radio" name="pay" value="إنستاباي"><span>⚡ إنستاباي</span></label>
-          <label class="seg-opt"><input type="radio" name="pay" value="فودافون كاش"><span>📱 محفظة</span></label>
+          <label class="seg-opt"><input type="radio" name="pay" value="محفظة إلكترونية"><span>📱 محفظة إلكترونية</span></label>
         </div>
         <div id="pay-box" class="hidden" style="margin-top:12px">
           <span class="hint" style="display:block;margin:0 0 6px">حوّل المبلغ على الرقم ده:</span>
@@ -521,7 +521,7 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
           <div class="field" style="margin:0"><label for="s-cname">اسم الزبون (اختياري)</label><input class="input" id="s-cname" maxlength="60"></div>
           <div class="field" style="margin:0"><label for="s-cphone">موبايل (اختياري)</label><input class="input" id="s-cphone" type="tel" inputmode="numeric" maxlength="11" placeholder="01XXXXXXXXX"></div>
         </div>
-        <div class="field"><label for="s-pay">طريقة الدفع</label><select class="input" id="s-pay"><option>كاش</option><option>إنستاباي</option><option>فودافون كاش</option></select></div>
+        <div class="field"><label for="s-pay">طريقة الدفع</label><select class="input" id="s-pay"><option>نقدي</option><option>إنستاباي</option><option>محفظة إلكترونية</option></select></div>
         <div class="field"><label for="s-note">ملاحظة (اختياري)</label><input class="input" id="s-note" maxlength="200"></div>
         <div class="inv-sum" id="s-sum" style="color:inherit"></div>
         <button class="btn primary" id="s-save" type="button" style="margin-top:10px">✅ تسجيل البيع وإصدار فاتورة</button>
@@ -854,7 +854,9 @@ function saveCust(o) { lsSet("tahona_cust", JSON.stringify(o)); }
 function restoreCust() {
   const cu = loadCust();
   $("c-name").value = cu.name || ""; $("c-phone").value = cu.phone || ""; $("c-address").value = cu.address || "";
-  const pay = cu.pay ? document.querySelector(`input[name=pay][value="${cu.pay}"]`) : null;
+  const oldPay = { "كاش": "نقدي", "فودافون كاش": "محفظة إلكترونية", "فودافون": "محفظة إلكترونية" };
+  const payName = oldPay[cu.pay] || cu.pay;
+  const pay = payName ? document.querySelector(`input[name=pay][value="${payName}"]`) : null;
   if (pay) { pay.checked = true; applyPayUI(); }
 }
 
@@ -1256,7 +1258,7 @@ function fillZones() {
   applyDeliveryUI();
 }
 function applyDeliveryUI() { $("delivery-fields").classList.toggle("hidden", dtype() !== "delivery"); renderTotals(); }
-function applyPayUI() { $("pay-box").classList.toggle("hidden", payMethod() === "كاش"); }
+function applyPayUI() { $("pay-box").classList.toggle("hidden", payMethod() === "نقدي"); }
 function showCoView() {
   $("co-view").classList.remove("hidden"); $("done-view").classList.add("hidden");
   $("co-foot").classList.remove("hidden"); $("done-foot").classList.add("hidden");
@@ -1826,14 +1828,14 @@ function closeInvoice() {
 }
 /* ===== الإيصال كصورة (80 مم = 576 نقطة): للطباعة بلوتوث + المشاركة على واتساب ===== */
 async function invoiceCanvas(v) {
-  const W = 576, M = 14, sh = Object.assign({}, shopOf(), v.shop || {});
+  const W = 576, M = 16, sh = Object.assign({}, shopOf(), v.shop || {});
   try { await document.fonts.load('700 24px Cairo'); await document.fonts.load('400 22px Cairo'); } catch (e) {}
   const loadImg = (src, cors) => new Promise(res => { const i = new Image(); if (cors) i.crossOrigin = "anonymous"; i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
   let logo = /^https:\/\//.test(sh.logo || "") ? await loadImg(sh.logo, true) : null;
   if (!logo) logo = await loadImg(LOGO_URI, false);
   const F = (w, px) => w + " " + px + 'px "Cairo","Segoe UI",Tahoma,sans-serif';
   const m = document.createElement("canvas").getContext("2d"); m.direction = "rtl";
-  const ops = []; let y = 8;
+  const ops = []; let y = 16;
   const wrap = (txt, font, maxW) => { m.font = font; const words = String(txt).split(" "), lines = []; let cur = "";
     words.forEach(w => { const t = cur ? cur + " " + w : w; if (m.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; });
     if (cur) lines.push(cur); return lines; };
