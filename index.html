@@ -413,6 +413,39 @@ textarea.input{height:auto;padding:10px 12px;resize:vertical;min-height:72px}
 .ie-foot .primary{background:var(--ok);border-color:var(--ok);color:#fff;font-size:.95rem}
 
 .ie-panel{max-width:640px;width:100%;margin:0 auto}
+.tiers{display:grid;gap:6px}
+.tier-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:12px;background:var(--surface-2)}
+.tier-row.on{border-color:var(--ok);background:#ecfdf5}
+.tier-row .ti b{font-size:.95rem}
+.tier-row .tp{font-weight:800;color:var(--brand)}
+.tier-row .tp small{color:var(--muted);font-weight:600}
+.co-t{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:4px;font-size:.8rem}
+.btn.blue{background:#2563eb;color:#fff;min-height:50px;font-size:1rem}
+.os-steps{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.os-st{font-size:.7rem;font-weight:800;border-radius:999px;padding:3px 9px;background:var(--surface-2);color:var(--muted);border:1px solid var(--border)}
+.os-st.done{background:#dcfce7;color:#166534;border-color:#bbf7d0}
+.os-st.now{background:var(--brand);color:#fff;border-color:var(--brand)}
+.os-line{padding:8px 0;border-bottom:1px dashed var(--border)}
+.os-line .nm{font-weight:800}
+.os-in{display:flex;gap:8px;align-items:center;margin-top:4px;flex-wrap:wrap}
+.os-in .input{width:150px;flex:none;text-align:center;font-weight:800}
+.os-in span{font-size:.85rem}
+.os-fixed{margin-top:2px;font-size:.88rem}
+.os-line .err{color:#dc2626;font-size:.72rem;display:block;min-height:1em}
+.btn-sm.vis.on{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
+.btn-sm.vis:not(.on){background:#fef2f2;border-color:#fecaca;color:#991b1b}
+.co-del{background:none;color:var(--danger);font-weight:800;font-size:.78rem;padding:6px 0;text-align:right}
+body.admin-app .tools,body.admin-app .chips-wrap,body.admin-app main,body.admin-app .cartbar,body.admin-app #font-btn,body.admin-app #refresh-btn{display:none!important}
+body.admin-app #pin-cancel{display:none}
+body.admin-app{padding-bottom:0}
+.bs{display:inline-block;background:#fef3c7;color:#92400e;border-radius:999px;font-size:.66rem;font-weight:800;padding:1px 8px;vertical-align:middle}
+.bsnote{font-size:.74rem;color:var(--muted);margin-top:-2px}
+.mode{display:flex;gap:6px}
+.mode button{flex:1;min-height:38px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);font-weight:800;font-size:.8rem}
+.mode button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.cntbox{display:grid;gap:8px}
+.wr{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.85rem;font-weight:700}
+.wr select{height:40px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);padding:0 6px;font-weight:800;min-width:64px}
 /* فلاتر الإدارة: تلف على سطور بدل ما تتقطع (شريط التمرير مخفي) */
 #ord-filters,#s-chips,#r-presets,#cp-fmt,#cp-src,#cp-quick{flex-wrap:wrap;overflow-x:visible}
 @media (min-width:760px){
@@ -459,6 +492,7 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
 <div class="chips-wrap"><nav class="chips" id="chips" aria-label="الأقسام"></nav></div>
 
 <main>
+  <div id="closed-bar" class="hidden" style="background:#7f1d1d;color:#fff;padding:10px 14px;border-radius:12px;font-weight:800;margin:0 0 10px;text-align:center;line-height:1.7"></div>
   <button type="button" class="offers-banner hidden" id="offers-banner"></button>
   <div class="state" id="state"></div>
   <div class="grid" id="grid"></div>
@@ -476,6 +510,11 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
   <div class="sheet-head"><h2 id="sheet-title">🛒 مراجعة الطلب</h2><button class="x-btn" id="sheet-close" aria-label="إغلاق">✕</button></div>
   <div class="sheet-body">
     <div id="co-view">
+      <div class="notice hidden" id="co-closed" style="background:#fee2e2;color:#7f1d1d;border-color:#fca5a5"></div>
+      <label class="chk hidden" id="rv-on-row" style="margin:6px 0"><input type="checkbox" id="rv-on"> 📅 حجز لموعد لاحق (بدل طلب دلوقتي)</label>
+      <div class="box hidden" id="resv-box"><h4>📅 موعد الحجز</h4>
+        <div class="two"><div class="field"><label for="rv-date">اليوم</label><input class="input" type="date" id="rv-date"></div><div class="field"><label for="rv-time">الساعة (اختياري)</label><input class="input" type="time" id="rv-time"></div></div>
+        <p class="hint" id="rv-hint"></p></div>
       <div class="notice" id="co-notice">⚖️ الإجمالي تقريبي، والحساب النهائي بيتحدد بدقة على الميزان الديجيتال.</div>
       <div class="box" id="co-items"></div>
 
@@ -521,6 +560,7 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
 
     <div id="done-view" class="hidden">
       <div class="done"><div class="tick" id="done-tick">✅</div><h3 id="done-title"></h3><p id="done-text"></p></div>
+      <p class="hint hidden" id="wa-count" style="text-align:center;font-weight:800"></p>
     </div>
   </div>
   <div class="sheet-foot">
@@ -652,6 +692,42 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
         <button class="btn primary" id="sh-save" type="button">💾 حفظ بيانات المحل</button>
       </div>
       <div class="box">
+        <h4>🔄 سرعة تحديث الطلبات (على الجهاز ده)</h4>
+        <select class="input" id="poll-sec"><option value="30">سريع — كل 30 ثانية</option><option value="60">عادي — كل دقيقة</option><option value="300">موفّر — كل 5 دقايق</option><option value="0">إيقاف (بالزرار 🔄 بس)</option></select>
+        <p class="hint">كل تحديث بيستهلك من حصة جوجل اليومية. السريع أنسب وقت الزحمة، والموفّر لباقي اليوم. بيقف لوحده لو الصفحة مخفية.</p>
+      </div>
+      <div class="box">
+        <h4>🕒 مواعيد العمل والحجز</h4>
+        <div class="field"><label for="hr-mode">وضع المحل</label><select class="input" id="hr-mode"><option value="open">مفتوح دايماً (من غير جدول)</option><option value="auto">حسب الجدول الأسبوعي</option><option value="closed">مقفول دلوقتي (يدوي)</option></select></div>
+        <div id="hr-days"></div>
+        <label class="chk"><input type="checkbox" id="hr-resv"> السماح بالحجز لما المحل يكون مقفول (الزبون يختار يوم وساعة)</label>
+        <div class="field"><label for="hr-max">أقصى مدة للحجز (بالأيام)</label><input class="input" type="number" id="hr-max" min="1" max="30" value="7"></div>
+        <button class="btn primary" id="hr-save" type="button">💾 حفظ المواعيد</button>
+        <p class="hint">التوقيت بتوقيت القاهرة. لو المحل بيقفل بعد نص الليل اكتب ساعة قفل أصغر من ساعة الفتح (مثلاً من 20:00 لـ 02:00). وضع «مقفول دلوقتي» بيقفل الطلبات فوراً لحد ما ترجّعه.</p>
+      </div>
+      <div class="box">
+        <h4>🔔 صوت وتنبيه الطلبات (على الجهاز ده)</h4>
+        <label class="chk"><input type="checkbox" id="sn-on"> تشغيل صوت مع كل طلب جديد (ومع رد العميل على الموافقة)</label>
+        <div class="field"><label for="sn-sel">الصوت</label><select class="input" id="sn-sel"></select></div>
+        <div class="field"><label for="sn-vol">مستوى الصوت</label><input type="range" id="sn-vol" min="10" max="100" step="5" style="width:100%"></div>
+        <div class="field"><label>صوت من موبايلك (ملف mp3 أو m4a أو wav، حتى 1.5 ميجا)</label><input type="file" id="sn-file" accept="audio/*" class="hidden"><button class="btn soft" id="sn-pick" type="button">📁 اختيار صوت من الموبايل</button><p class="hint" id="sn-state"></p><button class="btn dark hidden" id="sn-clear" type="button">🗑 مسح الصوت المرفوع</button></div>
+        <label class="chk"><input type="checkbox" id="sn-wake"> خلّي الشاشة صاحية (عشان الصوت يشتغل طول وقت الشغل)</label>
+        <div class="two" style="margin:8px 0 0"><button class="btn dark" id="sn-test" type="button">▶️ تجربة الصوت</button><button class="btn dark hidden" id="sn-notif" type="button">🔔 إشعارات النظام</button></div>
+        <p class="hint">الصوت بيشتغل والصفحة مفتوحة (حتى لو الشاشة في الخلفية). ولو الصفحة اتقفلت خالص محتاجين خدمة إشعارات إضافية.</p>
+      </div>
+      <div class="box">
+        <h4>⚖️ قواعد الوزن والموافقة والإلغاء</h4>
+        <div class="two" style="margin:0 0 8px">
+          <div class="field" style="margin:0"><label for="fl-pct">فرق مسموح بدون موافقة (%)</label><input class="input" id="fl-pct" type="number" inputmode="decimal" min="0" max="50" step="any"></div>
+          <div class="field" style="margin:0"><label for="fl-egp">أو (جنيه)</label><input class="input" id="fl-egp" type="number" inputmode="decimal" min="0" max="10000" step="any"></div>
+        </div>
+        <p class="hint" style="margin:0 0 8px">لو الوزن الفعلي في الحد ده، الطلب يكمل من غير ما يستنى العميل (والفرق بيتسجّل ويظهر في الفاتورة). صفر = يطلب موافقة دايماً.</p>
+        <div class="field"><label for="fl-display">إظهار الحد للعميل وقت الطلب</label><select class="input" id="fl-display"><option value="exact">الرقم الدقيق (مثال: ±5%)</option><option value="generic">عبارة عامة (قد يختلف قليلاً)</option><option value="hide">إخفاء الرقم</option></select></div>
+        <label class="chk"><input type="checkbox" id="fl-cancel"> السماح للعميل بإلغاء طلبه (قبل الذبح والموافقة بس)</label>
+        <div class="field" style="margin-top:8px"><label for="fl-trusted">عملاء موثوقين: بدون موافقة (رقم في كل سطر)</label><textarea class="input" id="fl-trusted" rows="3" placeholder="01012345678"></textarea></div>
+        <button class="btn primary" id="fl-save" type="button">💾 حفظ القواعد</button>
+      </div>
+      <div class="box">
         <h4>📱 QR المنيو (الزبون يمسحه ويدخل على طول)</h4>
         <div class="field"><label for="qr-url">الرابط اللي الـ QR هيفتحه</label><input class="input" id="qr-url" type="url" inputmode="url" dir="ltr"></div>
         <img id="qr-prev" alt="QR" style="width:240px;height:240px;margin:0 auto 10px;background:#fff;border:1px solid var(--border);border-radius:12px">
@@ -666,6 +742,7 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
         <button class="chip" type="button" data-f="all" aria-pressed="true">الكل</button>
         <button class="chip" type="button" data-f="today" aria-pressed="false">النهاردة</button>
         <button class="chip" type="button" data-f="new" aria-pressed="false">🔴 جديد</button>
+        <button class="chip" type="button" data-f="wait" aria-pressed="false">⏳ بانتظار موافقة</button>
         <button class="chip" type="button" data-f="prep" aria-pressed="false">🟠 قيد التجهيز</button>
         <button class="chip" type="button" data-f="out" aria-pressed="false">🔵 في الطريق / جاهز</button>
         <button class="chip" type="button" data-f="done" aria-pressed="false">🟢 اتسلّم</button>
@@ -690,6 +767,15 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
       <div class="field"><label for="f-cat">القسم *</label><select class="input" id="f-cat"></select></div>
       <div class="field"><label for="f-price">السعر (ج.م) *</label><input class="input" id="f-price" type="number" inputmode="decimal" min="0" step="any"></div>
       <div class="field"><label for="f-unit">الوحدة *</label><select class="input" id="f-unit"><option>كيلو</option><option>جوز</option><option>قطعة</option></select></div>
+      <div class="field"><label for="f-basis">أساس الوزن (بيظهر للزبون)</label><select class="input" id="f-basis"><option value="">— من غير تحديد —</option><option value="قائم">وزن قائم (الفراخ حيّة، قبل الذبح والتنظيف)</option><option value="صافي">وزن صافي (بعد الذبح والتنظيف)</option></select></div>
+      <div class="box" id="f-count-box">
+        <label class="chk" style="margin:0"><input type="checkbox" id="f-count"> 🐔 يتباع بالعدد كمان (فراخ كاملة)</label>
+        <div class="two hidden" id="f-count-fields" style="margin:8px 0 0">
+          <div class="field" style="margin:0"><label for="f-pmin">أقل وزن للفرخة (كيلو)</label><input class="input" id="f-pmin" type="number" inputmode="decimal" min="0.1" step="any" placeholder="1"></div>
+          <div class="field" style="margin:0"><label for="f-pmax">أكبر وزن للفرخة (كيلو)</label><input class="input" id="f-pmax" type="number" inputmode="decimal" min="0.1" max="20" step="any" placeholder="2.5"></div>
+        </div>
+        <p class="hint">الزبون هيختار عدد الفراخ ونطاق الوزن، وبيفضل جوه الحدود دي. السعر النهائي بالوزن الفعلي.</p>
+      </div>
       <div class="field"><label for="f-step">أقل كمية / خطوة الزيادة *</label><input class="input" id="f-step" type="number" inputmode="decimal" min="0.05" step="any" value="0.5"></div>
       <div class="field"><label for="f-prep">خيارات التجهيز * (كل خيار في سطر)</label><textarea class="input" id="f-prep" rows="4" placeholder="تقطيع 4 قطع&#10;تقطيع 8 قطع&#10;سليمة"></textarea><span class="hint">ممنوع استخدام الفاصلة (, أو ،) جوه الخيار الواحد.</span></div>
       <div class="box" id="f-offer-box">
@@ -831,6 +917,38 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
   </div>
 </div>
 
+<div id="install-sheet" class="dialog hidden" role="dialog" aria-label="تثبيت التطبيق" style="place-items:end center;padding:0">
+  <div class="dialog-box" style="max-width:520px;width:100%;border-radius:24px 24px 0 0;padding:24px 18px calc(20px + var(--safe-b));text-align:center">
+    <img id="is-logo" alt="" style="width:96px;height:96px;margin:0 auto 8px;border-radius:20px;border:2px solid var(--gold)">
+    <h3 style="font-size:1.3rem;margin-bottom:6px">📲 ثبّت التطبيق على موبايلك</h3>
+    <p class="hint" style="font-size:.9rem;margin:0 0 6px">أيقونة على شاشتك الرئيسية، بيفتح بملء الشاشة وأسرع، وأسعار النهاردة قدامك بضغطة.</p>
+    <p class="hint hidden" id="is-steps" style="font-weight:800;color:var(--brand)"></p>
+    <div style="display:grid;gap:8px;margin-top:12px">
+      <button class="btn primary" id="is-install" type="button" style="min-height:54px;font-size:1.1rem">📲 تثبيت الآن</button>
+      <button class="btn dark" id="is-later" type="button">مش دلوقتي</button>
+    </div>
+  </div>
+</div>
+<div id="tiers-dialog" class="dialog hidden">
+  <div class="dialog-box" style="max-width:430px">
+    <h3 id="td-title" style="font-size:1.05rem"></h3>
+    <p class="hint" style="margin-bottom:6px">اكتب كل وزن في سطر: <b>الوزن=السعر</b> (مثال: <b dir="ltr">1.9=170</b>). ابدأ السطر بـ <b dir="ltr">-</b> لو الوزن مقفول النهاردة. بتتحدّث عند الزبائن في ثواني.</p>
+    <textarea class="input" id="td-text" rows="9" dir="ltr" style="font-weight:800" placeholder="1.900=170&#10;2.000=180&#10;-2.350=210"></textarea>
+    <p class="hint" id="td-prev" style="min-height:2.4em"></p>
+    <div class="two" style="margin-top:8px"><button class="btn dark" id="td-cancel" type="button">إلغاء</button><button class="btn primary" id="td-save" type="button">💾 حفظ الأوزان</button></div>
+    <button class="btn dark" id="td-clear" type="button" style="margin-top:8px">🗑 مسح كل الأوزان (يرجع للكيلو/العدد)</button>
+  </div>
+</div>
+<div id="qty-dialog" class="dialog hidden">
+  <div class="dialog-box">
+    <h3 id="qd-title"></h3>
+    <p class="hint" id="qd-hint" style="margin-bottom:8px"></p>
+    <input class="input" id="qd-input" inputmode="decimal" autocomplete="off" placeholder="الكمية" aria-label="الكمية" style="font-size:1.3rem;text-align:center;font-weight:900">
+    <div class="presets" id="qd-chips" style="margin:8px 0;grid-template-columns:repeat(3,1fr)"></div>
+    <p class="hint" id="qd-preview" style="min-height:1.2em;font-weight:800"></p>
+    <div class="two"><button class="btn dark" id="qd-cancel" type="button">إلغاء</button><button class="btn primary" id="qd-ok" type="button">إضافة للفاتورة</button></div>
+  </div>
+</div>
 <div id="offer-dialog" class="dialog hidden">
   <div class="dialog-box">
     <h3 id="od-title">🔥 تشغيل العرض</h3>
@@ -860,6 +978,11 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
   </div>
 </div>
 
+<!-- شاشة الطلب (الوزن والموافقة والحالة) -->
+<div id="order-screen" class="screen hidden" role="dialog" aria-label="تفاصيل الطلب">
+  <div class="screen-head"><b id="os-title">📝 الطلب</b><button id="os-close" type="button">رجوع ✕</button></div>
+  <div class="screen-body"><div class="wrap" id="os-body"></div></div>
+</div>
 <!-- محرر الصور -->
 <div id="imged" class="hidden" role="dialog" aria-label="تعديل الصورة">
   <div class="ie-head"><b id="ie-title">✂️ تعديل الصورة</b><button type="button" id="ie-cancel">إلغاء ✕</button></div>
@@ -896,6 +1019,8 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 </script>
 <script>
 /* ===== الإعدادات ===== */
+// نفس الملف بيتولّد منه صفحتين: index.html (الزبائن: APP_MODE=customer) و admin.html (الإدارة: APP_MODE=admin) بسكريبت make_admin
+const APP_MODE = "customer";
 const WA = "201097022660";
 const PAY_NUMBER = "01097022660";
 const FALLBACK_IMG = "https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=500";
@@ -917,11 +1042,14 @@ function applyShop() {
   const sh = shopOf(), img = $("logo-img");
   if (img) { img.onerror = () => { if (img.src !== LOGO_URI) img.src = LOGO_URI; }; if (img.getAttribute("src") !== logoOf(sh)) img.src = logoOf(sh); }
   const h = document.querySelector(".brand h1"); if (h) h.textContent = sh.name;
-  document.title = sh.name + " - المنيو";
+  try { renderClosed(); } catch (e) {}
+  document.title = APP_MODE === "admin" ? "الإدارة — " + sh.name : sh.name + " - المنيو";
 }
 const isAdmin = () => S.role === "admin";
 const canOrders = () => isAdmin() || !!(S.perms && S.perms.orders);
-const invoiceUrl = tk => location.href.split("#")[0].split("?")[0] + "?invoice=" + tk;
+// روابط الزبائن (تتبّع/فاتورة/منيو) دايماً على صفحة الزبائن، حتى لو اتولّدت من صفحة الإدارة
+const custBase = () => location.href.split("#")[0].split("?")[0].replace(/admin(\.html)?$/, "");
+const invoiceUrl = tk => custBase() + "?invoice=" + tk;
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -1085,11 +1213,151 @@ function offersTick() {
 /* ===== السلة ===== */
 function loadCart() { try { return JSON.parse(lsGet("tahona_cart") || "{}") || {}; } catch (e) { return {}; } }
 function saveCart() { lsSet("tahona_cart", JSON.stringify(S.cart)); }
+/* ===== وزن قائم / صافي + الطلب بالعدد (فراخ كاملة بنطاق وزن) ===== */
+S.cpend = {}; S.cmode = {};
+const BASIS_NOTE = { "قائم": "السعر على وزن الفرخة وهي حيّة، قبل الذبح والتنظيف.", "صافي": "السعر على الوزن الصافي بعد الذبح والتنظيف." };
+const rangeStr = (a, b) => "من " + money(a) + " إلى " + money(b);
+const f3 = n => Number(n).toFixed(3);          // وزن الفرخة بتلات خانات عشان محدش يفهم 1.9 كيلو وتسعين جرام
+/* ===== أوزان متاحة بسعر نهائي لكل وزن (فراخ كاملة): المدير بيحدّثها، والزبون بيختار الوزن والعدد ===== */
+const activeTiers = m => (m.tiers || []).filter(t => t.on);
+const tierOf = (m, w) => activeTiers(m).find(t => Math.abs(t.w - Number(w)) < 0.0005);
+const tierCountOf = c => Object.keys(c.tiers || {}).reduce((a, w) => a + c.tiers[w], 0);
+const tierKg = tiers => Math.round(Object.keys(tiers).reduce((a, w) => a + Number(w) * tiers[w], 0) * 1000) / 1000;
+function setTierCount(id, w, n) {
+  const m = findItem(id); if (!m || !tierOf(m, w)) return;
+  const old = S.cart[id], tiers = Object.assign({}, old && old.tiers ? old.tiers : {});
+  const key = String(Number(w));
+  if (n > 0) tiers[key] = Math.min(50, n); else delete tiers[key];
+  if (!Object.keys(tiers).length) { delete S.cart[id]; return commit(); }
+  const p = prefOf(id, m);
+  S.cart[id] = { qty: tierKg(tiers), prep: p.prep, note: p.note, tiers };
+  commit();
+}
+function sanitizeTiers(id, m) {                       // أوزان اتقفلت/اتغيّرت بعد ما الزبون اختارها
+  const c = S.cart[id], keep = {}; let ch = false;
+  Object.keys(c.tiers).forEach(w => { if (tierOf(m, w)) keep[w] = c.tiers[w]; else ch = true; });
+  if (!Object.keys(keep).length) { delete S.cart[id]; return true; }
+  if (ch) { c.tiers = keep; c.qty = tierKg(keep); }
+  return ch;
+}
+// أدوات المدير: قايمة الأوزان بسطر لكل وزن (1.9=170، وبـ - للمقفول)
+const AR2 = c => ({ "٠": "0", "١": "1", "٢": "2", "٣": "3", "٤": "4", "٥": "5", "٦": "6", "٧": "7", "٨": "8", "٩": "9", "٫": ".", "،": "." }[c]);
+function parseTiers(text) {
+  const tiers = [], errors = [], seen = {};
+  String(text || "").split("\n").forEach((raw, i) => {
+    let t = raw.trim(); if (!t) return;
+    t = t.replace(/[٠-٩٫،]/g, AR2).replace(/(وزن|كجم|كيلو|جنيه|جم|ج\.م|ج)/g, " ").replace(/,/g, ".");
+    const m = /^(-)?\s*(\d+(?:\.\d+)?)\s*(?:=|:|ب|-)?\s*(\d+(?:\.\d+)?)\s*$/.exec(t.replace(/\s+/g, " ").replace(/ب(?=\d)/, "= "));
+    if (!m) return errors.push(`سطر ${i + 1}: مش مفهوم (اكتب مثلاً 1.9=170)`);
+    let w = Number(m[2]); const p = Number(m[3]);
+    if (w > 20 && w <= 20000) w = w / 1000;                // 1900 = 1.900 كجم
+    w = Math.round(w * 1000) / 1000;
+    if (!(w > 0 && w <= 20)) return errors.push(`سطر ${i + 1}: الوزن لازم بين 0.001 و20 كجم`);
+    if (!(p > 0 && p <= 100000)) return errors.push(`سطر ${i + 1}: السعر غير صحيح`);
+    if (seen[w]) return errors.push(`سطر ${i + 1}: الوزن ${f3(w)} متكرر`);
+    seen[w] = true; tiers.push({ w, p, on: !m[1] });
+  });
+  return { tiers, errors };
+}
+function openTiers(id) {
+  const m = findItem(id); if (!m) return;
+  S.tdId = id; $("td-title").textContent = "⚖️ الأوزان المتاحة: " + m.name;
+  $("td-text").value = (m.tiers || []).map(t => (t.on ? "" : "-") + f3(t.w) + "=" + t.p).join("\n"); tdPreview();
+  $("tiers-dialog").classList.remove("hidden"); setTimeout(() => $("td-text").focus(), 50);
+}
+function tdPreview() {
+  const r = parseTiers($("td-text").value);
+  $("td-prev").innerHTML = r.errors.length ? r.errors.map(e => "⚠️ " + esc(e)).join("<br>")
+    : (r.tiers.length ? `✅ ${r.tiers.length} وزن (${r.tiers.filter(t => t.on).length} متاح): ` + r.tiers.map(t => `${t.on ? "" : "🚫 "}${f3(t.w)} كجم = ${num(t.p)} ج (≈ ${num(Math.round(t.p / t.w * 10) / 10)}/كجم)`).join(" • ") : "مفيش أوزان: الصنف بيتباع بالكيلو/العدد.");
+}
+async function tdSave(clear) {
+  const id = S.tdId; if (!id) return;
+  const r = clear ? { tiers: [], errors: [] } : parseTiers($("td-text").value);
+  if (r.errors.length) return toast(r.errors[0], "err");
+  try {
+    const res = await post({ action: "save_tiers", pin: S.pin, id, tiers: r.tiers });
+    if (!res.ok) return adminErr(res);
+    $("tiers-dialog").classList.add("hidden"); toast(clear ? "اتمسحت الأوزان" : "تم حفظ الأوزان ✅"); await loadMenu(false);
+  } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
+}
+const invQty = (l, v) => (l.u === "كيلو" && v && v.hasWeighed ? f3(l.q) + " كجم" : num(l.q) + " " + esc(l.u));
+const invName = l => esc(l.n) + (l.w ? ` <small>(وزن ${esc(l.w)})</small>` : "") + (l.c ? `<br><small>🐔 ${l.c} فرخة (من ${f3(l.a)} إلى ${f3(l.z)} كجم للفرخة)</small>` : "");
+// اختيارات وزن الفرخة بين أقل وأكبر وزن حدّده البائع (بخطوة 0.1)
+function pieceOpts(m) {
+  const a = []; for (let v = m.piece_min; v < m.piece_max - 0.001; v = Math.round((v + 0.1) * 100) / 100) a.push(v);
+  a.push(m.piece_max); return a;
+}
+const modeOf = (m) => {
+  const avail = ["kg"]; if (m.count_mode) avail.push("count"); if (activeTiers(m).length) avail.push("tier");
+  const c = S.cart[m.id];
+  if (c && c.tiers && avail.includes("tier")) return "tier";
+  if (c && c.count && avail.includes("count")) return "count";
+  if (S.cmode[m.id] && avail.includes(S.cmode[m.id])) return S.cmode[m.id];
+  return avail.includes("tier") ? "tier" : "kg";
+};
+function cpOf(m) {
+  if (S.cpend[m.id]) return S.cpend[m.id];
+  const c = S.cart[m.id];
+  if (c && c.count) return { count: c.count, wmin: c.wmin, wmax: c.wmax };
+  return { count: 1, wmin: m.piece_min, wmax: m.piece_max };
+}
+function countEst(m, cp) {
+  const qlo = Math.round(cp.count * cp.wmin * 100) / 100, qhi = Math.round(cp.count * cp.wmax * 100) / 100, qmid = Math.round((qlo + qhi) / 2 * 100) / 100;
+  return { qlo, qhi, qmid, lo: lineCalc(m, qlo).total, hi: lineCalc(m, qhi).total, mid: lineCalc(m, qmid).total };
+}
+function countText(m, cp) {
+  const e = countEst(m, cp);
+  return `≈ من ${f3(e.qlo)} إلى ${f3(e.qhi)} كجم • ${rangeStr(e.lo, e.hi)} — السعر النهائي بالوزن الفعلي`;
+}
+function refreshCount(card, m) {
+  const cp = cpOf(m), cv = card.querySelector("[data-cv]"), est = card.querySelector("[data-cest]");
+  if (cv) cv.textContent = cp.count;
+  if (est) est.textContent = countText(m, cp);
+  const a = card.querySelector('[data-act="cmin"]'), z = card.querySelector('[data-act="cmax"]');
+  if (a) a.value = String(cp.wmin); if (z) z.value = String(cp.wmax);
+}
+function countAct(id, m, card, act) {
+  const cp = { ...cpOf(m) };
+  if (act === "cinc") cp.count = Math.min(50, cp.count + 1);
+  if (act === "cdec") cp.count = Math.max(1, cp.count - 1);
+  if (act === "cadd") {
+    const e = countEst(m, cp), p = prefOf(id, m), had = !!S.cart[id];
+    S.cart[id] = { qty: e.qmid, prep: p.prep, note: p.note, count: cp.count, wmin: cp.wmin, wmax: cp.wmax };
+    delete S.cpend[id]; commit(); toast(had ? "تم التحديث ✅" : "تمت الإضافة للسلة ✅"); return;
+  }
+  S.cpend[id] = cp; refreshCount(card, m);
+}
+function setCartCount(id, n) {
+  const c = S.cart[id], m = findItem(id); if (!c || !m) return;
+  if (n < 1) delete S.cart[id];
+  else { c.count = Math.min(50, n); c.qty = countEst(m, c).qmid; }
+  commit();
+}
+function msgLine(l) {
+  const nm = l.m.name + (l.m.weight_basis ? ` (وزن ${l.m.weight_basis})` : "");
+  if (l.c.tiers) return Object.keys(l.c.tiers).map(w => `• ${nm} × ${l.c.tiers[w]} فرخة بوزن ${f3(w)} كجم = ${Math.round(((tierOf(l.m, w) || { p: 0 }).p) * l.c.tiers[w])} ج 🔒 سعر نهائي`).join("\n");
+  if (l.c.count) return `• ${nm} × ${l.c.count} فرخة (من ${f3(l.c.count * l.c.wmin)} إلى ${f3(l.c.count * l.c.wmax)} كجم) - ${l.c.prep}${l.c.note ? ` (${l.c.note})` : ""} = من ${Math.round(l.lo)} إلى ${Math.round(l.hi)} ج${l.hit ? " 🔥عرض" : ""}`;
+  return `• ${nm} × ${num(l.c.qty)} ${l.m.unit} - ${l.c.prep}${l.c.note ? ` (${l.c.note})` : ""} = ${Math.round(l.total)} ج${l.hit ? " 🔥عرض" : ""}`;
+}
+// أدوات نموذج الصنف (الإدارة): أساس الوزن + الطلب بالعدد
+function syncCountBox() {
+  const kg = $("f-unit").value === "كيلو";
+  $("f-count-box").classList.toggle("hidden", !kg);
+  $("f-count-fields").classList.toggle("hidden", !(kg && $("f-count").checked));
+}
 function cartLines() {
   return Object.keys(S.cart).map(id => {
     const m = findItem(id); if (!m) return null;
-    const c = S.cart[id], lc = lineCalc(m, c.qty);
-    return { id, m, c, total: lc.total, regular: lc.regular, hit: lc.hit, saving: lc.saving };
+    const c = S.cart[id];
+    if (c.tiers) {                                // أوزان متاحة: السعر نهائي (عدد × سعر الوزن)
+      let tt = 0; Object.keys(c.tiers).forEach(w => { const t = tierOf(m, w); if (t) tt += t.p * c.tiers[w]; });
+      tt = Math.round(tt * 100) / 100;
+      return { id, m, c, total: tt, regular: tt, hit: false, saving: 0, lo: tt, hi: tt };
+    }
+    const lc = lineCalc(m, c.qty);
+    let lo = lc.total, hi = lc.total;
+    if (c.count) { lo = lineCalc(m, c.count * c.wmin).total; hi = lineCalc(m, c.count * c.wmax).total; }
+    return { id, m, c, total: lc.total, regular: lc.regular, hit: lc.hit, saving: lc.saving, lo, hi };
   }).filter(Boolean);
 }
 function commit() {
@@ -1179,6 +1447,9 @@ async function loadMenu(force) {
     S.settings = d.settings || { deliveryActive: false, deliveryZones: [] }; applyShop();
     S.bundles = Array.isArray(d.bundles) ? d.bundles : [];
     S.cats = Array.isArray(d.categories) && d.categories.length ? d.categories : DEFAULT_CATS.slice();
+    if (S.role === "admin") {                    // المدير بيشوف كل الأصناف والتصنيفات حتى المخفي
+      try { const ar = await post({ action: "admin_menu", pin: S.pin }); if (ar.ok) { S.menu = ar.menu; S.cats = ar.categories; S.trusted = ar.trusted || []; } } catch (er) {}
+    }
     if (S.cat !== "all" && S.cat !== "__offers" && !S.cats.some(c => c.id === S.cat)) S.cat = "all";
     let changed = false, priceMoved = false;
     Object.keys(S.cart).forEach(id => {
@@ -1186,6 +1457,7 @@ async function loadMenu(force) {
       if (!m) { delete S.cart[id]; changed = true; }
       else if (old[id] !== undefined && old[id] !== m.price) priceMoved = true;
     });
+    Object.keys(S.cart).forEach(id => { const m = findItem(id); if (m && S.cart[id].tiers && sanitizeTiers(id, m)) changed = true; });   // أوزان اتقفلت
     const offerMoved = sigBefore !== null && sigBefore !== hitSig();
     if (changed || priceMoved || offerMoved) saveCart();
     S.lastUpdate = new Date(); setStatus();
@@ -1217,25 +1489,45 @@ function renderChips() {
     : `<button class="chip" type="button" data-cat="${c}" aria-pressed="${S.cat === c}">${c === "all" ? "الكل" : esc(catLabel(c))}</button>`).join("");
 }
 function cardHtml(m, idx) {
-  const c = S.cart[m.id], p = prefOf(m.id, m), q = c ? c.qty : 0;
+  const c = S.cart[m.id], p = prefOf(m.id, m), q = c ? c.qty : 0, mode = modeOf(m), tiers = activeTiers(m);
   const opts = prepOpts(m).map(o => `<option value="${esc(o)}"${o === p.prep ? " selected" : ""}>${esc(o)}</option>`).join("");
-  const pq = S.pend[m.id] !== undefined ? S.pend[m.id] : (q > 0 ? q : m.step);
+  const pq = S.pend[m.id] !== undefined ? S.pend[m.id] : (q > 0 && !(c && (c.tiers || c.count)) ? q : m.step);
   const chipVals = m.unit === "كيلو" ? [0.5, 1, 2, 3] : [1, 2, 3, 5];
   const stepper = `
     <div class="wchips">${chipVals.map(v => `<button type="button" class="wchip" data-act="pick" data-v="${v}">${num(v)} ${esc(m.unit)}</button>`).join("")}</div>
     <div class="addrow">
       <div class="step"><button type="button" data-act="dec" aria-label="تقليل">−</button><div class="qv"><input data-act="set" inputmode="decimal" value="${num(pq)}" style="width:${Math.max(2, num(pq).length) + 1}ch" aria-label="الكمية (اكتب الوزن)"><span>${esc(m.unit)}</span></div><button type="button" class="plus" data-act="inc" aria-label="زيادة">+</button></div>
-      <button type="button" class="btn-add" data-act="add">${q > 0 ? "تحديث" : "🛒 أضف للسلة"}</button>
+      <button type="button" class="btn-add" data-act="add">${q > 0 && !(c && (c.count || c.tiers)) ? "تحديث" : "🛒 أضف للسلة"}</button>
     </div>`;
+  const cp = m.count_mode ? cpOf(m) : null, po = m.count_mode ? pieceOpts(m) : [];
+  const optHtml = sel => po.map(v => `<option value="${v}"${Math.abs(v - sel) < 0.001 ? " selected" : ""}>${f3(v)}</option>`).join("");
+  const counter = !m.count_mode ? "" : `
+    <div class="cntbox">
+      <div class="addrow">
+        <div class="step"><button type="button" data-act="cdec" aria-label="تقليل العدد">−</button><div class="qv"><b data-cv>${cp.count}</b><span>فرخة</span></div><button type="button" class="plus" data-act="cinc" aria-label="زيادة العدد">+</button></div>
+        <button type="button" class="btn-add" data-act="cadd">${c && c.count ? "تحديث" : "🛒 أضف للسلة"}</button>
+      </div>
+      <div class="wr">وزن الفرخة من <select data-act="cmin" aria-label="أقل وزن">${optHtml(cp.wmin)}</select> إلى <select data-act="cmax" aria-label="أكبر وزن">${optHtml(cp.wmax)}</select> كيلو</div>
+      <div class="offer-hint" data-cest>${esc(countText(m, cp))}</div>
+    </div>`;
+  const tierUi = !tiers.length ? "" : `<div class="tiers">${tiers.map(t => { const n = (c && c.tiers && c.tiers[String(t.w)]) || 0; return `
+    <div class="tier-row${n ? " on" : ""}" data-w="${t.w}"><div class="ti"><b>${f3(t.w)} كجم</b> <span class="bs" style="background:#e0f2fe;color:#075985">🔒 سعر نهائي</span><br><span class="tp">${money(t.p)} <small>≈ ${num(Math.round(t.p / t.w * 10) / 10)} ج/كجم</small></span></div>
+      <div class="step sm"><button type="button" data-act="tdec" aria-label="تقليل">−</button><span>${n}</span><button type="button" class="plus" data-act="tinc" aria-label="زيادة">+</button></div></div>`; }).join("")}</div>`;
+  const modes = [tiers.length ? ["tier", "🏷️ الأوزان المتاحة"] : null, m.count_mode ? ["count", "🐔 بالعدد"] : null, (tiers.length || m.count_mode) ? ["kg", "⚖️ بالكيلو"] : null].filter(Boolean);
+  const toggle = modes.length < 2 ? "" : `<div class="mode">${modes.map(x => `<button type="button" class="${mode === x[0] ? "on" : ""}" data-act="mode" data-m="${x[0]}">${x[1]}</button>`).join("")}</div>`;
+  const inBadge = q > 0 ? `<span class="in-badge">✅ في السلة: ${c && c.tiers ? tierCountOf(c) + " فرخة" : c && c.count ? c.count + " فرخة" : num(q) + " " + esc(m.unit)}</span>` : "";
+  const priceBadge = mode === "tier" ? `من ${money(Math.min(...tiers.map(t => t.p)))}<small> / فرخة</small>` : `${money(m.price)}<small> / ${esc(m.unit)}</small>`;
   return `<article class="card" data-id="${esc(m.id)}">
-    <div class="thumb"><img ${idx < 2 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" src="${esc(cardImg(m.img))}" alt="${esc(m.name)}" onerror="this.onerror=null;this.src='${FALLBACK_IMG}'">${q > 0 ? `<span class="in-badge">✅ في السلة: ${num(q)} ${esc(m.unit)}</span>` : ""}${offerActive(m) ? `<span class="offer-badge">🔥 ${num(m.offer_qty)} ${esc(m.unit)} بـ ${money(m.offer_total)}</span>` : ""}${offerActive(m) && offerTimer(m) ? timerHtml(m.offer_until) : ""}<span class="price">${money(m.price)}<small> / ${esc(m.unit)}</small></span></div>
+    <div class="thumb"><img ${idx < 2 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" src="${esc(cardImg(m.img))}" alt="${esc(m.name)}" onerror="this.onerror=null;this.src='${FALLBACK_IMG}'">${inBadge}${offerActive(m) && mode === "kg" ? `<span class="offer-badge">🔥 ${num(m.offer_qty)} ${esc(m.unit)} بـ ${money(m.offer_total)}</span>` : ""}${offerActive(m) && offerTimer(m) && mode === "kg" ? timerHtml(m.offer_until) : ""}<span class="price">${priceBadge}</span></div>
     <div class="info">
-      <div class="ttl"><h3>${esc(m.name)}</h3>${q > 0 ? `<button type="button" class="iconbtn del" data-act="remove" aria-label="إزالة من السلة">🗑</button>` : ""}</div>
+      <div class="ttl"><h3>${esc(m.name)}${m.weight_basis ? ` <span class="bs">وزن ${esc(m.weight_basis)}</span>` : ""}</h3>${q > 0 ? `<button type="button" class="iconbtn del" data-act="remove" aria-label="إزالة من السلة">🗑</button>` : ""}</div>
+      ${m.weight_basis ? `<p class="bsnote">${esc(BASIS_NOTE[m.weight_basis] || "")}</p>` : ""}
       ${m.desc ? `<p class="desc">${esc(m.desc)}</p>` : ""}
-      ${offerActive(m) ? `<div class="offer-hint${lineCalc(m, pq).hit ? " hit" : ""}" data-offer-hint>${esc(offerHintText(m, pq))}</div>` : ""}
+      ${offerActive(m) && mode === "kg" ? `<div class="offer-hint${lineCalc(m, pq).hit ? " hit" : ""}" data-offer-hint>${esc(offerHintText(m, pq))}</div>` : ""}
       <div class="prow"><select class="sel" data-act="prep" aria-label="التجهيز">${opts}</select><button type="button" class="iconbtn${p.note ? " on" : ""}" data-act="notetoggle" aria-label="إضافة ملاحظة">📝</button></div>
       ${p.note ? `<input class="note" data-act="note" value="${esc(p.note)}" placeholder="📝 ملاحظة (اختياري)" maxlength="200" aria-label="ملاحظة">` : ""}
-      <div class="qty">${stepper}</div>
+      ${toggle}
+      <div class="qty">${mode === "tier" ? tierUi : mode === "count" ? counter : stepper}</div>
     </div></article>`;
 }
 function renderGrid() {
@@ -1297,20 +1589,32 @@ function bundleClick(e) {
 }
 
 /* ===== الطلب ===== */
+function coLineHtml(l) {
+  const bs = l.m.weight_basis ? ` <span class="bs">وزن ${esc(l.m.weight_basis)}</span>` : "";
+  if (l.c.tiers) {
+    return `<div class="co-line" data-id="${esc(l.id)}">
+      <div class="co-info"><b>${esc(l.m.name)}${bs} <span class="bs" style="background:#e0f2fe;color:#075985">🔒 سعر نهائي</span></b><small>🔪 ${esc(l.c.prep)}${l.c.note ? " • 📝 " + esc(l.c.note) : ""}</small>
+        ${Object.keys(l.c.tiers).map(w => `<div class="co-t" data-w="${esc(w)}"><span>${f3(w)} كجم × ${l.c.tiers[w]} = <b>${money(((tierOf(l.m, w) || { p: 0 }).p) * l.c.tiers[w])}</b></span><div class="step sm"><button type="button" data-act="tdec" aria-label="تقليل">−</button><span>${l.c.tiers[w]} فرخة</span><button type="button" class="plus" data-act="tinc" aria-label="زيادة">+</button></div></div>`).join("")}
+      </div>
+      <div class="co-right"><div><b>${money(l.total)}</b></div><button type="button" class="co-del" data-act="del" aria-label="حذف الصنف من الطلب">🗑 حذف</button></div></div>`;
+  }
+  return `<div class="co-line" data-id="${esc(l.id)}">
+      <div class="co-info"><b>${esc(l.m.name)}${bs}</b><small>🔪 ${esc(l.c.prep)}${l.c.note ? " • 📝 " + esc(l.c.note) : ""}</small>${l.c.count ? `<small>🐔 ${l.c.count} فرخة • الفرخة من ${f3(l.c.wmin)} إلى ${f3(l.c.wmax)} كجم</small>` : ""}${l.hit ? `<small class="off">🔥 عرض: وفّرت ${money(l.saving)}</small>` : ""}</div>
+      <div class="co-right">
+        <div class="step sm"><button type="button" data-act="dec" aria-label="تقليل">−</button><span>${l.c.count ? l.c.count + " فرخة" : num(l.c.qty) + " " + esc(l.m.unit)}</span><button type="button" class="plus" data-act="inc" aria-label="زيادة">+</button></div>
+        <div>${l.c.count ? "≈ " + rangeStr(l.lo, l.hi) : (l.hit ? `<s>${money(l.regular)}</s> ` : "") + `<b>${money(l.total)}</b>`}</div>
+        <button type="button" class="co-del" data-act="del" aria-label="حذف الصنف من الطلب">🗑 حذف</button>
+      </div></div>`;
+}
 function renderCheckoutItems() {
   const lines = cartLines(), bls = bundleLines();
-  $("co-items").innerHTML = (lines.length || bls.length) ? lines.map(l => `
-    <div class="co-line" data-id="${esc(l.id)}">
-      <div class="co-info"><b>${esc(l.m.name)}</b><small>🔪 ${esc(l.c.prep)}${l.c.note ? " • 📝 " + esc(l.c.note) : ""}</small>${l.hit ? `<small class="off">🔥 عرض: وفّرت ${money(l.saving)}</small>` : ""}</div>
-      <div class="co-right">
-        <div class="step sm"><button type="button" data-act="dec" aria-label="تقليل">−</button><span>${num(l.c.qty)} ${esc(l.m.unit)}</span><button type="button" class="plus" data-act="inc" aria-label="زيادة">+</button></div>
-        <div>${l.hit ? `<s>${money(l.regular)}</s> ` : ""}<b>${money(l.total)}</b></div>
-      </div></div>`).join("") + bls.map(l => `
+  $("co-items").innerHTML = (lines.length || bls.length) ? lines.map(coLineHtml).join("") + bls.map(l => `
     <div class="co-line" data-bid="${esc(l.id)}">
       <div class="co-info"><b>🎁 ${esc(l.b.name)}</b><small>${esc(bundleContents(l.b, l.c.qty).join("، "))}</small><small class="off">جاهزة وموزونة • وفّرت ${money(l.saving)}</small>${l.c.note ? `<small>📝 ${esc(l.c.note)}</small>` : ""}</div>
       <div class="co-right">
         <div class="step sm"><button type="button" data-act="bdec" aria-label="تقليل">−</button><span>${l.c.qty} باقة</span><button type="button" class="plus" data-act="binc" aria-label="زيادة">+</button></div>
         <div><s>${money(l.regular)}</s> <b>${money(l.total)}</b></div>
+        <button type="button" class="co-del" data-act="bdel" aria-label="حذف الباقة من الطلب">🗑 حذف</button>
       </div></div>`).join("") : '<p class="empty" style="padding:16px">السلة فاضية</p>';
   renderTotals();
 }
@@ -1322,22 +1626,27 @@ function deliveryFeeFor(sub, z) {
 function renderTotals() {
   const lns = cartLines(), bls = bundleLines();
   const sub = lns.reduce((a, l) => a + l.total, 0) + bls.reduce((a, l) => a + l.total, 0);
+  const subLo = lns.reduce((a, l) => a + l.lo, 0) + bls.reduce((a, l) => a + l.total, 0), subHi = lns.reduce((a, l) => a + l.hi, 0) + bls.reduce((a, l) => a + l.total, 0);
+  const ranged = lns.some(l => l.c.count && l.hi > l.lo);
   const save = lns.reduce((a, l) => a + l.saving, 0) + bls.reduce((a, l) => a + l.saving, 0);
-  $("co-notice").classList.toggle("hidden", lns.length === 0);           // تنويه الميزان بس لو فيه أصناف بالوزن
-  $("co-total-label").textContent = lns.length ? "الإجمالي التقريبي" : "الإجمالي";
+  const variable = lns.some(l => l.m.unit === "كيلو" && !l.m.fixed_price && !l.c.tiers);   // الأصناف بالكيلو بتتوزن، والباقات/القطعة/الثابت سعرها نهائي
+  $("co-notice").classList.toggle("hidden", !variable);
+  $("co-notice").textContent = "⚖️ " + (toleranceText((S.settings || {}).flow) || "الإجمالي تقريبي، والحساب النهائي بيتحدد بعد الوزن.");
+  $("co-total-label").textContent = variable ? "الإجمالي التقريبي" : "الإجمالي النهائي";
+  renderClosed();
   $("co-save-row").classList.toggle("hidden", !(save > 0)); $("co-save").textContent = money(save);
   let fee = 0, feeTxt = "—";
   if (dtype() === "delivery") {
     const z = (S.settings.deliveryZones || [])[Number($("c-zone").value)];
     fee = deliveryFeeFor(sub, z); feeTxt = fee > 0 ? money(fee) : "مجاناً";
   }
-  $("co-sub").textContent = money(sub); $("co-fee").textContent = feeTxt; $("co-total").textContent = money(sub + fee);
+  $("co-sub").textContent = ranged ? rangeStr(subLo, subHi) : money(sub); $("co-fee").textContent = feeTxt; $("co-total").textContent = ranged ? rangeStr(subLo + fee, subHi + fee) : money(sub + fee);
   const st = S.settings, hint = $("free-hint");
   if (dtype() !== "delivery" || !(st.deliveryActive)) hint.textContent = "";
   else if (st.freeDelivery) hint.textContent = "🎉 التوصيل مجاني";
   else if (st.freeDeliveryMin > 0) hint.textContent = sub >= st.freeDeliveryMin ? "🎉 التوصيل مجاني لطلبك" : `أضف ${money(st.freeDeliveryMin - sub)} وهيبقى التوصيل مجاني`;
   else hint.textContent = "";
-  $("co-submit").disabled = cartCount() === 0;
+  $("co-submit").disabled = cartCount() === 0; renderClosed();
 }
 function fillZones() {
   const zs = S.settings.deliveryZones || [];
@@ -1365,7 +1674,7 @@ function openSheet() {
   showCoView(); fillZones(); renderCheckoutItems();
   $("overlay").classList.add("show"); $("sheet").classList.add("show"); document.body.classList.add("lock");
 }
-function closeSheet() { $("overlay").classList.remove("show"); $("sheet").classList.remove("show"); document.body.classList.remove("lock"); }
+function closeSheet() { clearInterval(waTimer); $("overlay").classList.remove("show"); $("sheet").classList.remove("show"); document.body.classList.remove("lock"); }
 
 function getGps() {
   if (!navigator.geolocation) return toast("الموقع غير متاح على الجهاز ده", "err");
@@ -1396,20 +1705,21 @@ function checkCustomer(c) {
 function buildMsg(o) {
   const L = ["🛒 *طلب جديد - دواجن الطاحونة*"];
   if (o.orderId) L.push("🧾 رقم الطلب: " + o.orderId);
+  if (o.resv) L.push(resvText(o.resv) + " (الأسعار والوزن بيتأكدوا يوم التنفيذ)");
   if (!o.saved) L.push("⚠️ الطلب ده ما اتسجلش على النظام، برجاء التأكيد");
   L.push("", "👤 " + o.c.name, "📞 " + o.c.phone);
   L.push(o.c.deliveryType === "pickup" ? "🏬 استلام من الفرع" : `🛵 توصيل - ${o.zone}\n🏠 ${o.c.address}`);
   if (o.c.gps) L.push("🗺️ " + o.c.gps);
   L.push("", "📦 *الأصناف:*");
-  o.lines.forEach(l => L.push(`• ${l.m.name} × ${num(l.c.qty)} ${l.m.unit} - ${l.c.prep}${l.c.note ? ` (${l.c.note})` : ""} = ${Math.round(l.total)} ج${l.hit ? " 🔥عرض" : ""}`));
+  o.lines.forEach(l => L.push(msgLine(l)));
   (o.bundles || []).forEach(x => L.push(`• 🎁 باقة ${x.b.name} × ${x.c.qty} = ${Math.round(x.total)} ج (جاهزة وموزونة)\n   ↳ ${bundleContents(x.b, x.c.qty).join("، ")}${x.c.note ? `\n   📝 ${x.c.note}` : ""}`));
   const sv = o.lines.reduce((a, l) => a + (l.hit ? Math.max(0, l.m.price * l.c.qty - l.total) : 0), 0) + (o.bundles || []).reduce((a, x) => a + x.saving, 0);
   if (sv > 0) L.push("🔥 وفّرت من العروض: " + money(sv));
-  L.push("", "💰 الأصناف: " + money(o.sub), "🛵 التوصيل: " + (o.fee > 0 ? money(o.fee) : "—"), (o.lines.length ? "✅ *الإجمالي التقريبي: " : "✅ *الإجمالي: ") + money(o.total) + "*", "💳 الدفع: " + o.c.payment);
+  L.push("", "💰 الأصناف: " + money(o.sub), "🛵 التوصيل: " + (o.fee > 0 ? money(o.fee) : "—"), (o.variable ? "✅ *الإجمالي التقريبي: " : "✅ *الإجمالي النهائي: ") + (o.totalTxt || money(o.total)) + "*", "💳 الدفع: " + o.c.payment);
   if (o.receiptUrl) L.push("🧾 الإيصال: " + o.receiptUrl);
   if (o.track) L.push("", "🔎 تتبّع الطلب: " + trackUrl(o.track));
-  if (o.lines.length) L.push("", "⚖️ الوزن النهائي بيتحدد على الميزان" + ((o.bundles || []).length ? " (ما عدا الباقات: جاهزة وموزونة بسعر ثابت)." : "."));
-  else L.push("", "🎁 الباقات جاهزة وموزونة بسعر ثابت.");
+  if (o.variable) L.push("", "⚖️ الوزن النهائي بيتحدد على الميزان" + ((o.bundles || []).length ? " (ما عدا الباقات: جاهزة وموزونة بسعر ثابت)." : "."));
+  else L.push("", "🔒 السعر نهائي (باقات/أصناف بسعر ثابت).");
   return L.join("\n");
 }
 async function post(obj) {
@@ -1420,19 +1730,27 @@ async function submitOrder() {
   const lines = cartLines(), bls = bundleLines(); if (!lines.length && !bls.length) return toast("السلة فاضية", "warn");
   const c = readCustomer(), bad = checkCustomer(c);
   if (bad) { toast(bad[1], "err"); $(bad[0]).focus(); return; }
+  const st = shopState(); let rv = {}; S.lastResv = null;
+  if (!st.open || (st.resv && $("rv-on").checked)) {
+    if (!st.resv) return toast("المحل مقفول دلوقتي، جرّب وقت الشغل", "warn");
+    if (!$("rv-date").value) { toast("اختار يوم الحجز", "err"); $("rv-date").focus(); return; }
+    const se = slotErr($("rv-date").value, $("rv-time").value); if (se) { toast(se, "err"); return; }
+    rv = { reserve: true, reserveDate: $("rv-date").value, reserveTime: $("rv-time").value || "" }; S.lastResv = { d: rv.reserveDate, t: rv.reserveTime };
+  }
   saveCust({ name: c.name, phone: c.phone, address: c.address, dtype: c.deliveryType, zone: ((S.settings.deliveryZones || [])[Number(c.zoneIndex)] || {}).name || "", pay: c.payment });
   const btn = $("co-submit"); btn.disabled = true; btn.textContent = "⏳ جاري تسجيل الطلب...";
   try {
     const file = $("c-receipt").files[0];
     const customer = { ...c, src: currentSrc(), receiptBase64: file ? await readB64(file) : "", receiptMimeType: file ? file.type : "" };
-    const items = lines.map(l => ({ id: l.id, qty: l.c.qty, prep: l.c.prep, note: l.c.note }));
+    const items = lines.flatMap(l => l.c.tiers ? Object.keys(l.c.tiers).map(w => ({ id: l.id, tier: Number(w), count: l.c.tiers[w], prep: l.c.prep, note: l.c.note }))
+      : [l.c.count ? { id: l.id, count: l.c.count, wmin: l.c.wmin, wmax: l.c.wmax, prep: l.c.prep, note: l.c.note } : { id: l.id, qty: l.c.qty, prep: l.c.prep, note: l.c.note }]);
     const bundles = bls.map(l => ({ id: l.id, qty: l.c.qty, note: l.c.note || "" }));
     let res = null;
-    try { res = await post({ action: "create_order", customer, items, bundles }); } catch (e) { res = null; }
+    try { res = await post({ action: "create_order", customer, items, bundles, ...rv }); } catch (e) { res = null; }
     if (res && !res.ok) { toast(res.error || "تعذر تسجيل الطلب", "err"); return; }
     showDone(res, c, lines, bls);
   } catch (e) { toast("حصل خطأ، حاول تاني", "err"); }
-  finally { btn.disabled = false; btn.textContent = "✅ تأكيد الطلب"; }
+  finally { btn.disabled = false; renderClosed(); if (shopState().open) btn.textContent = "✅ تأكيد الطلب"; }
 }
 function showDone(res, c, lines0, bls0 = []) {
   const saved = !!(res && res.ok), zs = S.settings.deliveryZones || [];
@@ -1441,37 +1759,43 @@ function showDone(res, c, lines0, bls0 = []) {
     : bls0;
   // أسعار السيرفر هي المعتمدة (لو العرض اتغيّر بين اللحظة دي وبين ما الزبون شافه)
   const lines = saved && Array.isArray(res.lines)
-    ? lines0.map(l => { const sl = res.lines.find(x => x.id === l.id); return sl ? { ...l, total: sl.total, hit: !!sl.offer } : l; })
+    ? lines0.map(l => { const sl = l.c.tiers ? null : res.lines.find(x => x.id === l.id); return sl ? { ...l, total: sl.total, hit: !!sl.offer } : l; })
     : lines0;
   if (saved && Math.abs(res.subtotal - lines0.reduce((a, l) => a + l.total, 0) - bls0.reduce((a, l) => a + l.total, 0)) > 0.5) toast("الأسعار اتحدّثت (العرض اتغيّر)، راجع الإجمالي", "warn");
   const zone = c.deliveryType === "pickup" ? "استلام من الفرع" : ((zs[Number(c.zoneIndex)] || {}).name || "");
   const sub = saved ? res.subtotal : lines.reduce((a, l) => a + l.total, 0) + bls.reduce((a, l) => a + l.total, 0);
   const fee = saved ? res.fee : (c.deliveryType === "delivery" ? deliveryFeeFor(sub, zs[Number(c.zoneIndex)]) : 0);
   const total = saved ? res.total : sub + fee;
-  const msg = buildMsg({ orderId: saved ? res.orderId : "", saved, c, lines, bundles: bls, zone, sub, fee, total, receiptUrl: saved ? res.receiptUrl : "", track: saved ? res.track : "" });
+  const ranged = lines.some(l => l.c.count && l.hi > l.lo);
+  const variable = lines.some(l => l.m.unit === "كيلو" && !l.m.fixed_price && !l.c.tiers);
+  const totalTxt = ranged ? rangeStr(lines.reduce((a, l) => a + l.lo, 0) + bls.reduce((a, l) => a + l.total, 0) + fee, lines.reduce((a, l) => a + l.hi, 0) + bls.reduce((a, l) => a + l.total, 0) + fee) : money(total);
+  const msg = buildMsg({ orderId: saved ? res.orderId : "", saved, c, lines, bundles: bls, zone, sub, fee, total, totalTxt, variable, receiptUrl: saved ? res.receiptUrl : "", track: saved ? res.track : "", resv: S.lastResv });
   S.doneToken = saved && res.track ? res.track : "";
   $("done-track").classList.toggle("hidden", !S.doneToken);
   if (S.doneToken) {                       // نسخة الطلب على جهاز الزبون: للتتبّع و"اطلب تاني"
     upsertMyOrder({ token: res.track, id: res.orderId, t: Date.now(), time: "", total, final: null, status: "جديد", type: c.deliveryType,
-      lines: [...lines.map(l => `${l.m.name} × ${num(l.c.qty)} ${l.m.unit}`), ...bls.map(l => `🎁 ${l.b.name} × ${l.c.qty}`)].slice(0, 4),
-      cart: { items: lines0.map(l => ({ id: l.id, qty: l.c.qty, prep: l.c.prep, note: l.c.note })), bundles: bls0.map(l => ({ id: l.id, qty: l.c.qty, note: l.c.note || "" })) } });
+      lines: [...lines.map(l => l.c.tiers ? `${l.m.name} × ${tierCountOf(l.c)} فرخة` : l.c.count ? `${l.m.name} × ${l.c.count} فرخة` : `${l.m.name} × ${num(l.c.qty)} ${l.m.unit}`), ...bls.map(l => `🎁 ${l.b.name} × ${l.c.qty}`)].slice(0, 4),
+      cart: { items: lines0.map(l => ({ id: l.id, qty: l.c.qty, prep: l.c.prep, note: l.c.note, count: l.c.count || 0, wmin: l.c.wmin || 0, wmax: l.c.wmax || 0, tiers: l.c.tiers || null })), bundles: bls0.map(l => ({ id: l.id, qty: l.c.qty, note: l.c.note || "" })) } });
   }
   $("done-wa").href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(msg);
   $("done-tick").textContent = saved ? "✅" : "⚠️";
-  $("done-title").textContent = saved ? "تم استلام طلبك" : "الطلب جاهز للإرسال";
+  $("done-title").textContent = saved ? (S.lastResv ? "📅 تم تسجيل حجزك" : "تم استلام طلبك") : "الطلب جاهز للإرسال";
   $("done-text").innerHTML = saved
-    ? `رقم الطلب <b>${esc(res.orderId)}</b><br>${lines.length ? "الإجمالي التقريبي" : "الإجمالي"} <b>${money(total)}</b><br>اضغط الزرار تحت وابعت الطلب على واتساب عشان نأكده.`
+    ? `رقم الطلب <b>${esc(res.orderId)}</b>${S.lastResv ? "<br><b>" + esc(resvText(S.lastResv)) + "</b>" : ""}<br>${variable ? "الإجمالي التقريبي" : "الإجمالي النهائي"} <b>${totalTxt}</b>${variable && toleranceText((S.settings || {}).flow) ? "<br><small>" + esc(toleranceText((S.settings || {}).flow)) + "</small>" : ""}<br>اضغط الزرار تحت وابعت الطلب على واتساب عشان نأكده.`
     : "ما قدرناش نسجل الطلب على النظام (مشكلة اتصال). ابعته على واتساب مباشرة وهنستلمه.";
   $("sheet-title").textContent = saved ? "✅ تم الطلب" : "⚠️ ابعت على واتساب";
   $("co-view").classList.add("hidden"); $("done-view").classList.remove("hidden");
   $("co-foot").classList.add("hidden"); $("done-foot").classList.remove("hidden");
-  if (saved) { S.cart = {}; S.pref = {}; S.pend = {}; S.bcart = {}; S.bpend = {}; saveCart(); saveBCart(); renderGrid(); updateBar(); }
+  if (saved) { S.cart = {}; S.pref = {}; S.pend = {}; S.bcart = {}; S.bpend = {}; saveCart(); saveBCart(); renderGrid(); updateBar(); startWaCountdown(); }
 }
 
 /* ===== لوحة الإدارة ===== */
-function onLogoTap() {
-  S.taps++; clearTimeout(S.tapTimer);
-  if (S.taps >= 5) { S.taps = 0; openPin(); } else S.tapTimer = setTimeout(() => { S.taps = 0; }, 1500);
+// صفحة الإدارة المنفصلة: مفيش منيو ولا سلة، بس شاشة الدخول ثم اللوحة. الخروج بيرجّع لشاشة الدخول
+function adminBoot() {
+  document.body.classList.add("admin-app");
+  const st = $("status"); if (st) st.textContent = "لوحة الإدارة";
+  $("pin-dialog").querySelector("h3").textContent = "🔒 دخول الإدارة (مدير أو كاشير)";
+  openPin();
 }
 function openPin() { $("pin-dialog").classList.remove("hidden"); $("pin-input").value = ""; setTimeout(() => $("pin-input").focus(), 50); }
 async function verifyPin() {
@@ -1500,12 +1824,16 @@ function openAdmin() {
   $("d-free").checked = !!S.settings.freeDelivery;
   $("d-free-min").value = S.settings.freeDeliveryMin > 0 ? S.settings.freeDeliveryMin : "";
   applyRole();
+  S.ordSeen = null; applyWake(sndCfg().wake);
+  if (isAdmin()) loadMenu(false);               // يجيب الأصناف المخفية كمان
   showAdminTab(isAdmin() ? "items" : "sell");
   if (canOrders()) loadOrders(true);         // في الخلفية: عشان رقم الطلبات الجديدة يظهر على التبويب
 }
 // الخروج بيمسح كلمة السر والدور من الذاكرة (الجهاز ممكن يتشارك بين الكاشيرات)
 function closeAdmin() {
   $("admin").classList.add("hidden"); document.body.classList.remove("lock");
+  $("order-screen").classList.add("hidden"); S.os = null;
+  if (APP_MODE === "admin") setTimeout(openPin, 50);
   S.pin = ""; S.role = ""; S.userName = ""; S.perms = {}; S.orders = []; S.users = []; S.rLast = null;
   S.bill = { items: {}, bundles: {} }; $("s-disc").value = ""; $("s-cname").value = ""; $("s-cphone").value = ""; $("s-note").value = "";
   $("r-out").innerHTML = ""; $("s-summary").innerHTML = "";
@@ -1534,11 +1862,13 @@ function renderAdminItems() {
   $("a-list").innerHTML = list.map(m => `
     <div class="row" data-id="${esc(m.id)}">
       <div class="row-top"><img src="${esc(safeImg(m.img))}" alt="" loading="lazy">
-        <div class="row-info"><b>${esc(m.name)}</b><small>${esc(catLabel(m.cat))} • ${esc(m.id)}</small></div></div>
+        <div class="row-info"><b>${esc(m.name)}</b><small>${esc(catLabel(m.cat))} • ${esc(m.id)}${m.weight_basis ? " • وزن " + esc(m.weight_basis) : ""}${m.count_mode ? " • 🐔 بالعدد" : ""}${m.visible === false ? " • 🚫 مخفي عن الزبائن" : (catHiddenId(m.cat) ? " • 🚫 تصنيفه مخفي" : "")}</small></div></div>
       ${hasOffer(m) ? `<div class="row-offer">${offerTag(m)}<button type="button" class="btn-sm offer-toggle${offerActive(m) ? " save" : ""}" data-act="offer">${offerActive(m) ? "إيقاف العرض" : "تشغيل العرض"}</button></div>` : ""}
       <div class="row-tools">
         <div class="qp"><input type="number" inputmode="decimal" min="0" step="any" value="${m.price}" data-price aria-label="السعر"><span>ج / ${esc(m.unit)}</span></div>
         <button type="button" class="btn-sm save" data-act="price">حفظ</button>
+        ${m.unit === "كيلو" ? `<button type="button" class="btn-sm" data-act="tiers">⚖️ الأوزان${(m.tiers || []).length ? " (" + activeTiers(m).length + ")" : ""}</button>` : ""}
+        <button type="button" class="btn-sm vis${m.visible === false ? "" : " on"}" data-act="vis">${m.visible === false ? "🚫 مخفي" : "👁 ظاهر"}</button>
         <button type="button" class="btn-sm" data-act="edit">تعديل</button>
         <button type="button" class="btn-sm danger" data-act="del" aria-label="حذف الصنف">🗑</button>
       </div></div>`).join("")
@@ -1610,27 +1940,40 @@ async function stopAllOffers() {
   } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
 }
 /* ===== الطلبات في لوحة الإدارة (بدل ما تفتح الشيت) ===== */
-const ST_CLASS = { "جديد": "s-new", "تم الوزن والذبح": "s-prep", "تم التقطيع والتجهيز": "s-prep", "خرج للتوصيل": "s-out", "جاهز للاستلام": "s-out", "تم التسليم": "s-done", "ملغي": "s-cancel" };
-const ALL_STAGES = ["جديد", "تم الوزن والذبح", "تم التقطيع والتجهيز", "خرج للتوصيل", "جاهز للاستلام", "تم التسليم", "ملغي"];
-const FLOW_DELIVERY = ["جديد", "تم الوزن والذبح", "تم التقطيع والتجهيز", "خرج للتوصيل", "تم التسليم"];
-const FLOW_PICKUP = ["جديد", "تم الوزن والذبح", "تم التقطيع والتجهيز", "جاهز للاستلام", "تم التسليم"];
-const flowFor = t => (t === "pickup" ? FLOW_PICKUP : FLOW_DELIVERY);
-const stageLabel = s => (s === "جديد" ? "تم استلام طلبك" : s);
+const ST_CLASS = { "جديد": "s-new", "تم الوزن": "s-prep", "تمت الموافقة": "s-prep", "تم الذبح": "s-prep", "تم التقطيع والتجهيز": "s-prep", "خرج للتوصيل": "s-out", "جاهز للاستلام": "s-out", "تم التسليم": "s-done", "ملغي": "s-cancel" };
+// مراحل الطلب. قبل «تم الذبح» ينفع الرجوع (إعادة الوزن)، وبعدها ما ينفعش
+const ALL_STAGES = ["جديد", "تم الوزن", "تمت الموافقة", "تم الذبح", "تم التقطيع والتجهيز", "خرج للتوصيل", "جاهز للاستلام", "تم التسليم", "ملغي"];
+const FLOW_DELIVERY = ["جديد", "تم الوزن", "تمت الموافقة", "تم الذبح", "تم التقطيع والتجهيز", "خرج للتوصيل", "تم التسليم"];
+const FLOW_PICKUP = ["جديد", "تم الوزن", "تمت الموافقة", "تم الذبح", "تم التقطيع والتجهيز", "جاهز للاستلام", "تم التسليم"];
+const SL_IDX = 3;                                            // «تم الذبح»
+const flowFor = (t, appr) => (t === "pickup" ? FLOW_PICKUP : FLOW_DELIVERY).filter(s => !(appr === "na" && (s === "تم الوزن" || s === "تمت الموافقة")));
+const STAGE_NAMES = { "جديد": "تم استلام طلبك", "تم الوزن": "تم الوزن", "تمت الموافقة": "تمت الموافقة على الوزن والسعر" };
+const stageLabel = s => STAGE_NAMES[s] || s;
+const stageIdx = s => ALL_STAGES.indexOf(s || "جديد");
+const apprOk = a => ["", "na", "approved", "auto"].includes(a || "");
 const isTerminal = s => s === "تم التسليم" || s === "ملغي";
 const moneyP = n => (Number.isInteger(n) ? n : Number(n).toFixed(2)) + " ج.م";
-const trackUrl = tk => location.href.split("#")[0].split("?")[0] + "?track=" + tk;
-// الخطوة الجاية في مسار الطلب (توصيل أو استلام). فاضي = مفيش بعدها حاجة
-function nextStageOf(o) {
-  if (o.status === "ملغي" || o.status === "تم التسليم") return "";
-  const f = flowFor(o.type);
-  if (!o.status) return f[1];
-  const i = f.indexOf(o.status);
-  return i === -1 ? "تم التسليم" : (f[i + 1] || "");
-}
+const trackUrl = tk => custBase() + "?track=" + tk;
+const isFixedLn = l => l.f === 1 || l.b === 1 || (l.f === undefined && l.u !== "كيلو");
+const LATE_MIN = 15;                                         // مهلة موافقة العميل قبل التذكير
+const isLate = o => o.approval === "pending" && o.approvalAt && (Date.now() - o.approvalAt) > LATE_MIN * 60000;
+const fmtTime = ms => (ms ? new Date(ms).toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" }) : "");
 function statusMsg(o) {
   const L = [`مرحباً ${o.name} 👋`, `طلبك رقم ${o.id}: *${stageLabel(o.status || "جديد")}*`];
-  L.push(o.final ? `💰 المبلغ النهائي: ${moneyP(o.final)}` : `💰 المبلغ التقديري: ${moneyP(o.total)} (بيتحدد بدقة بعد الوزن)`);
+  if (o.final) L.push(`💰 المبلغ النهائي: ${moneyP(o.final)}`);
+  else if (o.approval === "na") L.push(`💰 المبلغ: ${moneyP(o.total)} (سعر ثابت)`);
+  else L.push(`💰 المبلغ التقديري: ${o.range ? rangeStr(o.range.lo, o.range.hi) : moneyP(o.total)} (بيتحدد بدقة بعد الوزن)`);
   if (o.token) L.push("", "🔎 تتبّع طلبك: " + trackUrl(o.token));
+  return L.join("\n");
+}
+// رسالة طلب موافقة العميل بعد الوزن (الأوزان الفعلية + الإجمالي النهائي + الفرق عن التقديري)
+function approvalMsg(o, wl, final, late) {
+  const L = [`مرحباً ${o.name} 👋`, late ? `⏰ تذكير: طلبك رقم ${o.id} مستني موافقتك على الوزن والسعر` : `تم وزن طلبك رقم ${o.id}:`, ""];
+  wl.forEach(l => L.push(`• ${l.n}${l.w ? ` (وزن ${l.w})` : ""}: ${l.f ? num(l.q) + " " + l.u : f3(l.q) + " كجم"} × ${num(l.p)} = ${moneyP(l.t)}`));
+  if (o.fee > 0) L.push(`🛵 التوصيل: ${moneyP(o.fee)}`);
+  const d = Math.round((final - o.total) * 100) / 100;
+  L.push("", `💰 الإجمالي النهائي: *${moneyP(final)}*` + (Math.abs(d) > 0.005 ? ` (التقديري كان ${moneyP(o.total)} • الفرق ${d > 0 ? "+" : "−"}${moneyP(Math.abs(d))})` : ""));
+  L.push("", "✅ للموافقة أو الرفض افتح الرابط:", trackUrl(o.token), "(أو ردّ على الرسالة بـ «موافق»)");
   return L.join("\n");
 }
 const fixPhone = p => { const d = String(p == null ? "" : p).replace(/\D/g, ""); return /^1[0125]\d{8}$/.test(d) ? "0" + d : String(p == null ? "" : p); };   // لو الشيت شال الصفر الأولاني
@@ -1646,6 +1989,7 @@ async function loadOrders(reset) {
     const r = await post({ action: "list_orders", pin: S.pin, limit: 40, offset: reset ? 0 : S.ordNext });
     if (!r.ok) return adminErr(r);
     const fresh = r.orders.map(o => Object.assign({}, o, { phone: fixPhone(o.phone) }));
+    if (reset) ownerDetect(fresh);
     S.orders = reset ? fresh : S.orders.concat(fresh);
     S.ordNext = r.nextOffset; S.ordMore = r.hasMore; S.ordTotal = r.total; S.ordNew = r.newCount; S.ordToday = r.today;
     renderOrders(); updateOrdBadge();
@@ -1656,7 +2000,8 @@ function ordMatch(o) {
   const f = S.ordF, q = S.ordQ.trim().toLowerCase();
   if (f === "today" && !String(o.time).startsWith(S.ordToday)) return false;
   if (f === "new" && o.status !== "جديد") return false;
-  if (f === "prep" && o.status !== "تم الوزن والذبح" && o.status !== "تم التقطيع والتجهيز") return false;
+  if (f === "wait" && o.approval !== "pending") return false;
+  if (f === "prep" && !["تم الوزن", "تمت الموافقة", "تم الذبح", "تم التقطيع والتجهيز"].includes(o.status)) return false;
   if (f === "out" && o.status !== "خرج للتوصيل" && o.status !== "جاهز للاستلام") return false;
   if (f === "done" && o.status !== "تم التسليم") return false;
   if (f === "cancel" && o.status !== "ملغي") return false;
@@ -1665,27 +2010,33 @@ function ordMatch(o) {
   if (q && !(o.name + " " + o.phone + " " + o.id).toLowerCase().includes(q)) return false;
   return true;
 }
+function apprBadge(o) {
+  if (o.source === "محل" || isTerminal(o.status)) return "";
+  if (o.approval === "pending") return isLate(o) ? `<span class="st s-cancel" style="background:#dc2626">⏰ تأخر الرد ${Math.round((Date.now() - o.approvalAt) / 60000)} د</span>` : `<span class="st s-prep">⏳ بانتظار موافقة العميل</span>`;
+  if (o.approval === "rejected") return `<span class="st s-cancel" style="background:#dc2626">❌ العميل رفض</span>`;
+  if (o.approval === "todo" && (o.status || "جديد") === "جديد") return `<span class="st s-new">⚖️ محتاج وزن</span>`;
+  if (o.approval === "approved" || o.approval === "auto") return `<span class="st s-done">✅ موافقة</span>`;
+  return "";
+}
 function orderCardHtml(o) {
   const waMsg = encodeURIComponent(statusMsg(o));
-  const next = nextStageOf(o);
-  const opts = (o.status ? "" : '<option value="" selected disabled>— الحالة —</option>') + ALL_STAGES.map(s => `<option value="${s}"${o.status === s ? " selected" : ""}>${s}</option>`).join("");
-  const shop = o.source === "محل", hasPhone = /\d{6,}/.test(String(o.phone)), locked = shop && !isAdmin();
+  const shop = o.source === "محل", hasPhone = /\d{6,}/.test(String(o.phone));
+  const needsContact = !shop && !o.contactedAt && !isTerminal(o.status) && ["جديد", "تم الوزن"].includes(o.status || "جديد");
   return `<div class="row ord${o.status === "جديد" ? " new" : ""}" data-oid="${esc(o.id)}">
-    <div class="ord-head"><div><span class="ord-id">${esc(o.id)}</span> <span class="src${shop ? " shop" : ""}">${shop ? "🏪 محل" : "🌐 أونلاين"}</span>${o.camp ? ` <span class="src">📣 ${esc(o.camp)}</span>` : ""}<br><span class="ord-time">${esc(o.time)}${o.invoiceNo ? " • " + esc(o.invoiceNo) : ""}</span></div>${o.status ? `<span class="st ${ST_CLASS[o.status]}">${esc(o.status)}</span>` : `<span class="st">بدون حالة</span>`}</div>
-    <div><span class="ord-name">${esc(o.name)}</span>${hasPhone ? ` <span class="ord-meta">• ${esc(o.phone)}</span>` : ""}</div>
+    <div class="ord-head"><div><span class="ord-id">${esc(o.id)}</span> <span class="src${shop ? " shop" : ""}">${shop ? "🏪 محل" : "🌐 أونلاين"}</span>${o.resv ? ` <span class="src" style="background:#6d28d9;color:#fff">${esc(resvText(o.resv))}</span>` : ""}${o.camp ? ` <span class="src">📣 ${esc(o.camp)}</span>` : ""}<br><span class="ord-time">${esc(o.time)}${o.invoiceNo ? " • " + esc(o.invoiceNo) : ""}</span></div>${o.status ? `<span class="st ${ST_CLASS[o.status]}">${esc(stageLabel(o.status) === o.status ? o.status : o.status)}</span>` : `<span class="st">بدون حالة</span>`}</div>
+    <div><span class="ord-name">${esc(o.name)}</span>${hasPhone ? ` <span class="ord-meta">• ${esc(o.phone)}</span>` : ""} ${apprBadge(o)}${needsContact ? ' <span class="st" style="background:#b45309">📵 لسه ما اتواصلش</span>' : (o.contactedAt && !shop ? ' <span class="ord-meta">✓ تم التواصل ' + esc(fmtTime(o.contactedAt)) + "</span>" : "")}</div>
     <div class="ord-meta">${shop ? `👤 الكاشير: ${esc(o.cashier || "—")}${o.discount > 0 ? " • خصم " + money(o.discount) : ""}` : o.type === "pickup" ? "🏬 استلام من الفرع" : `🛵 توصيل • ${esc(o.zone)}${o.address ? "<br>🏠 " + esc(o.address) : ""}`}</div>
     <div class="ord-items">${o.items.map(x => esc(x)).join("\n")}</div>
-    <div class="ord-tot"><span>الأصناف: <b>${money(o.subtotal)}</b></span><span>التوصيل: <b>${o.fee > 0 ? money(o.fee) : "—"}</b></span><span>التقديري: <b>${money(o.total)}</b></span>${o.final ? `<span>✅ النهائي: <b>${moneyP(o.final)}</b></span>` : ""}<span>💳 ${esc(o.payment)}</span></div>
-    ${shop ? "" : `<div class="ord-final"><input class="input" type="number" inputmode="decimal" min="0" step="any" data-final placeholder="المبلغ النهائي بعد الوزن (شامل التوصيل)" value="${o.final || ""}" aria-label="المبلغ النهائي"><button type="button" class="btn-sm save" data-act="ofinal">حفظ</button></div>`}
+    <div class="ord-tot"><span>الأصناف: <b>${money(o.subtotal)}</b></span><span>التوصيل: <b>${o.fee > 0 ? money(o.fee) : "—"}</b></span><span>${o.approval === "na" ? "السعر" : "التقديري"}: <b>${o.range && !o.final ? rangeStr(o.range.lo, o.range.hi) : money(o.total)}</b></span>${o.final ? `<span>✅ النهائي: <b>${moneyP(o.final)}</b></span>` : ""}<span>💳 ${esc(o.payment)}</span>${o.cancelCharge > 0 ? `<span>💸 محاسبة الإلغاء: <b>${money(o.cancelCharge)}</b></span>` : ""}</div>
     <div class="ord-act">
+      <button type="button" class="btn-sm save" data-act="oopen">📝 فتح الطلب</button>
       ${hasPhone ? `<a class="btn-sm" href="tel:${esc(String(o.phone).replace(/\D/g, ""))}">📞 اتصال</a>
-      <a class="btn-sm" href="https://wa.me/${esc(phoneIntl(o.phone))}?text=${waMsg}" target="_blank" rel="noopener">💬 ابعت ${shop ? "الفاتورة" : "الحالة"}</a>` : ""}
+      <a class="btn-sm" href="https://wa.me/${esc(phoneIntl(o.phone))}?text=${waMsg}" target="_blank" rel="noopener">💬 ${shop ? "الفاتورة" : "الحالة"}</a>` : ""}
       ${o.token ? `<a class="btn-sm" href="${esc(invoiceUrl(o.token))}" target="_blank" rel="noopener">📄 الفاتورة</a>` : ""}
       ${o.gps ? `<a class="btn-sm" href="${esc(o.gps)}" target="_blank" rel="noopener">🗺️ الموقع</a>` : ""}
       ${o.receipt ? `<a class="btn-sm" href="${esc(o.receipt)}" target="_blank" rel="noopener">🧾 الإيصال</a>` : ""}
       ${o.token ? `<button type="button" class="btn-sm" data-act="ocopy">🔗 رابط التتبّع</button>` : ""}
-    </div>
-    ${locked ? "" : `<div class="ord-step">${next ? `<button type="button" class="next" data-act="onext" data-st="${esc(next)}">➡️ ${esc(next)}</button>` : ""}<select data-act="ostsel" aria-label="تغيير الحالة">${opts}</select></div>`}</div>`;
+    </div></div>`;
 }
 function renderOrders() {
   const list = S.orders.filter(ordMatch);
@@ -1697,36 +2048,349 @@ function renderOrders() {
   $("ord-more").classList.toggle("hidden", !S.ordMore);
   document.querySelectorAll("#ord-filters .chip").forEach(c => c.setAttribute("aria-pressed", String(c.dataset.f === S.ordF)));
 }
-async function setOrderStatus(id, status) {
-  const o = S.orders.find(x => x.id === id); if (!o || o.status === status) return;
-  if (status === "ملغي" && !confirm(`إلغاء الطلب ${id}؟ (بيتعلّم "ملغي" بس، ومش بيتحذف)`)) return;
-  try {
-    const r = await post({ action: "set_order_status", pin: S.pin, id, status });
-    if (!r.ok) return adminErr(r);
-    if (o.status === "جديد") S.ordNew = Math.max(0, S.ordNew - 1);
-    if (status === "جديد") S.ordNew++;
-    o.status = status; renderOrders(); updateOrdBadge(); toast(`تم: ${status} ✅`);
-  } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); renderOrders(); }
-}
-// المبلغ النهائي بعد الوزن (بيظهر للزبون في صفحة التتبّع). فاضي = مسح
-async function saveFinal(id, raw) {
-  const o = S.orders.find(x => x.id === id); if (!o) return;
-  const v = String(raw).trim(), amount = v === "" ? null : Number(v);
-  if (amount !== null && !(amount > 0)) return toast("اكتب مبلغ صحيح (أو سيبه فاضي للمسح)", "err");
-  try {
-    const r = await post({ action: "set_order_final", pin: S.pin, id, amount });
-    if (!r.ok) return adminErr(r);
-    o.final = r.final; renderOrders(); toast(r.final ? "تم حفظ المبلغ النهائي ✅" : "تم مسح المبلغ النهائي");
-  } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
-}
 async function copyTrackLink(id) {
   const o = S.orders.find(x => x.id === id); if (!o || !o.token) return;
   const url = trackUrl(o.token);
   try { await navigator.clipboard.writeText(url); toast("تم نسخ رابط التتبّع ✅"); } catch (e) { toast("انسخ الرابط: " + url, "warn"); }
 }
 
+/* ===== شاشة الطلب عند المدير: الوزن ← الموافقة ← الحالة ← الإلغاء ===== */
+const osOrder = () => S.orders.find(x => x.id === (S.os || {}).id);
+function openOrderScreen(id) {
+  const o = S.orders.find(x => x.id === id); if (!o) return;
+  S.os = { id, q: {}, cancelOpen: false };
+  (o.lines || []).forEach((l, i) => { const w = (o.weighed || [])[i]; S.os.q[i] = String(w ? w.q : l.q); });
+  $("order-screen").classList.remove("hidden"); renderOrderScreen();
+  document.querySelector("#order-screen .screen-body").scrollTop = 0;
+}
+function closeOrderScreen() { $("order-screen").classList.add("hidden"); S.os = null; renderOrders(); }
+// حساب الوزن الفعلي: السطر الثابت بيفضل زي ما هو، والمتغيّر = الوزن × سعر الكيلو
+function osCalc(o) {
+  let sub = 0, bad = false; const rows = [];
+  (o.lines || []).forEach((l, i) => {
+    const fixed = isFixedLn(l), p = Number(l.p) || (l.q > 0 ? l.t / l.q : 0);
+    let q = l.q, t = l.t, err = "";
+    if (!fixed) { const r = parseQty(S.os.q[i], "كيلو"); if (r.err) { err = r.err; bad = true; } else { q = r.q; t = Math.round(q * p * 100) / 100; } }
+    rows.push({ l, i, fixed, p, q, t, err }); sub += t;
+  });
+  const final = Math.round((sub + (o.fee || 0) - (o.discount || 0)) * 100) / 100;
+  return { rows, sub, final, diff: Math.round((final - o.total) * 100) / 100, bad };
+}
+function allowedNext(o) {
+  const cur = o.status || "جديد", ci = stageIdx(cur);
+  if (isTerminal(cur)) return { list: [], why: cur === "ملغي" ? "الطلب ملغي" : "الطلب اتسلّم" };
+  if (ci < SL_IDX && !apprOk(o.approval)) return { list: [], why: o.approval === "pending" ? "في انتظار موافقة العميل على الوزن والسعر" : o.approval === "rejected" ? "العميل رفض الوزن: عدّل الوزن أو كلّمه" : "اعمل الوزن واحفظه (أو «موافقة بدون وزن») قبل الذبح" };
+  const other = o.type === "pickup" ? "خرج للتوصيل" : "جاهز للاستلام";
+  return { list: ALL_STAGES.filter((s, i) => i >= SL_IDX && s !== "ملغي" && s !== other && i > ci), why: "" };
+}
+function renderOrderScreen() {
+  const o = osOrder(); if (!o) return;
+  const shop = o.source === "محل", cur = o.status || "جديد", ci = stageIdx(cur), pre = ci < SL_IDX && !isTerminal(cur), hasPhone = /\d{6,}/.test(String(o.phone));
+  $("os-title").textContent = "📝 " + o.id;
+  const flow = flowFor(o.type, o.approval);
+  const stepper = `<div class="os-steps">${flow.map(s => `<span class="os-st${s === cur ? " now" : (stageIdx(s) < ci ? " done" : "")}">${esc(stageLabel(s))}</span>`).join("")}${cur === "ملغي" ? '<span class="os-st now" style="background:#64748b">ملغي</span>' : ""}</div>`;
+  const head = `<div class="box">
+    ${o.resv ? `<div class="notice" style="background:#ede9fe;color:#4c1d95;border-color:#c4b5fd;margin-bottom:8px"><b>${esc(resvText(o.resv))}</b></div>` : ""}
+    <div class="ord-head"><div><span class="ord-name">${esc(o.name)}</span>${hasPhone ? ` <span class="ord-meta">• ${esc(o.phone)}</span>` : ""}<br><span class="ord-time">${esc(o.time)} • ${shop ? "🏪 محل" : "🌐 أونلاين"} • ${o.type === "pickup" ? "🏬 استلام" : "🛵 توصيل " + esc(o.zone)}</span></div><span class="st ${ST_CLASS[cur]}">${esc(cur)}</span></div>
+    ${o.address ? `<p class="hint">🏠 ${esc(o.address)}</p>` : ""}
+    ${stepper}
+    <div class="ord-act" style="margin-top:8px">${hasPhone ? `<a class="btn-sm" href="tel:${esc(String(o.phone).replace(/\D/g, ""))}">📞 اتصال</a><a class="btn-sm" href="https://wa.me/${esc(phoneIntl(o.phone))}?text=${encodeURIComponent(statusMsg(o))}" target="_blank" rel="noopener" data-act="owa">💬 ابعت الحالة</a>` : ""}${o.token ? `<a class="btn-sm" href="${esc(invoiceUrl(o.token))}" target="_blank" rel="noopener">📄 الفاتورة</a>` : ""}${!shop ? `<button type="button" class="btn-sm" data-act="contact">${o.contactedAt ? "✓ تم التواصل " + esc(fmtTime(o.contactedAt)) + " (إلغاء)" : "✓ علّم: تم التواصل"}</button>` : ""}</div></div>`;
+  let weigh = "";
+  if (!shop) {
+    const c = osCalc(o), hasLines = (o.lines || []).length > 0;
+    if (!hasLines) weigh = `<div class="box"><h4>⚖️ الوزن والفاتورة</h4><p class="hint">الطلب ده قديم ومالوش تفاصيل للوزن. تقدر تسجّل موافقة بدون وزن.</p></div>`;
+    else weigh = `<div class="box"><h4>⚖️ الوزن الفعلي والفاتورة</h4>
+      ${c.rows.map(r => `<div class="os-line">
+        <div class="nm">${esc(r.l.n)}${r.l.w ? ` <span class="bs">وزن ${esc(r.l.w)}</span>` : ""}${r.fixed ? ' <span class="bs" style="background:#e0f2fe;color:#075985">🔒 سعر نهائي</span>' : ""}</div>
+        <div class="hint" style="margin:0">اتطلب: ${r.l.c ? r.l.c + " فرخة • " : ""}${num(r.l.q)} ${esc(r.l.u)} ≈ ${money(r.l.t)}</div>
+        ${r.fixed || !pre ? `<div class="os-fixed">${r.fixed ? num(r.q) + " " + esc(r.l.u) : f3(r.q) + " كجم"} × ${num(r.p)} = <b>${money(r.t)}</b></div>`
+          : `<div class="os-in"><input class="input" data-wq="${r.i}" inputmode="decimal" value="${esc(S.os.q[r.i])}" aria-label="الوزن الفعلي" placeholder="الوزن: 2.2 أو 850 جم"><span>كجم × ${num(r.p)} = <b data-lt="${r.i}">${r.err ? "—" : money(r.t)}</b></span></div>${r.err ? `<small class="err" data-le="${r.i}">${esc(r.err)}</small>` : `<small class="err" data-le="${r.i}"></small>`}`}
+      </div>`).join("")}
+      <div class="inv-sum" style="color:inherit;margin-top:8px">
+        <div><span>أصناف</span><b data-os="sub">${moneyP(c.sub)}</b></div>
+        ${o.fee > 0 ? `<div><span>التوصيل</span><b>${moneyP(o.fee)}</b></div>` : ""}
+        <div class="g"><span>الإجمالي النهائي</span><b data-os="final">${moneyP(c.final)}</b></div>
+        <div><span>التقديري عند الطلب</span><b>${moneyP(o.total)}</b></div>
+        <div><span>الفرق</span><b data-os="diff" style="color:${c.diff > 0 ? "#dc2626" : c.diff < 0 ? "#059669" : "inherit"}">${c.diff > 0 ? "+" : c.diff < 0 ? "−" : ""}${moneyP(Math.abs(c.diff))}</b></div>
+      </div>
+      ${pre ? `<button class="btn primary" type="button" data-act="wsave" style="margin-top:10px">💾 حفظ الوزن والفاتورة</button><p class="hint">لو الفرق جوه الحد المسموح أو العميل موثوق، الطلب بيكمل من غير موافقة. غير كده بيتطلب موافقة العميل.</p>` : '<p class="hint">🔒 بعد الذبح الوزن اتقفل.</p>'}
+    </div>`;
+  }
+  let appr = "";
+  if (!shop) {
+    const a = o.approval, who = { customer: "العميل", manager: "المدير", auto: "تلقائي (الفرق في الحد المسموح)", trusted: "عميل موثوق" }[o.approvedBy] || "";
+    const wl = (o.weighed || []);
+    let body = "";
+    if (a === "na") body = "طلب بسعر ثابت: مفيش وزن ولا موافقة، السعر نهائي.";
+    else if (a === "todo" || a === "") body = pre ? "لسه ما اتوزنش. اعمل الوزن واحفظه فوق، أو سجّل موافقة بدون وزن." : "";
+    else if (a === "pending") body = `⏳ في انتظار موافقة العميل (من ${esc(fmtTime(o.approvalAt))})${isLate(o) ? ` — <b style="color:#dc2626">⏰ تأخر الرد ${Math.round((Date.now() - o.approvalAt) / 60000)} دقيقة</b>` : ""}`;
+    else if (a === "rejected") body = "❌ العميل رفض الوزن/السعر. عدّل الوزن واحفظه تاني، أو كلّمه.";
+    else body = `✅ تمت الموافقة${who ? " (" + who + ")" : ""}`;
+    const btns = [];
+    if (pre && hasPhone && a === "pending") btns.push(`<a class="btn wa" data-act="appwa" href="https://wa.me/${esc(phoneIntl(o.phone))}?text=${encodeURIComponent(approvalMsg(o, wl, o.final || o.total, false))}" target="_blank" rel="noopener">📲 ابعت طلب الموافقة على واتساب</a>`);
+    if (pre && hasPhone && isLate(o)) btns.push(`<a class="btn dark" data-act="appwa" href="https://wa.me/${esc(phoneIntl(o.phone))}?text=${encodeURIComponent(approvalMsg(o, wl, o.final || o.total, true))}" target="_blank" rel="noopener">⏰ ابعت تذكير على واتساب</a>`);
+    if (pre && ["pending", "rejected", "todo", ""].includes(a)) btns.push(`<button class="btn dark" type="button" data-act="apphone">${a === "todo" || a === "" ? "✅ موافقة بدون وزن (نيابةً عن العميل)" : "✅ العميل وافق (بالتليفون)"}</button>`);
+    appr = `<div class="box"><h4>🤝 موافقة العميل</h4><p style="margin:0 0 8px">${body}</p><div style="display:grid;gap:8px">${btns.join("")}</div></div>`;
+  }
+  const nx = allowedNext(o);
+  const status = `<div class="box"><h4>🚦 حالة الطلب</h4>
+    ${nx.list.length ? `<select class="input" id="os-status" aria-label="الحالة الجاية">${nx.list.map((s, i) => `<option value="${esc(s)}"${i === 0 ? " selected" : ""}>${esc(s)}</option>`).join("")}</select>
+      <button class="btn blue" type="button" data-act="stsave" style="margin-top:8px">💾 حفظ الحالة</button><p class="hint">بعد الذبح مفيش رجوع لمرحلة قبلها.</p>` : `<p class="hint" style="margin:0">${esc(nx.why)}</p>`}</div>`;
+  let cancel = "";
+  if (isAdmin() && !isTerminal(cur) || (isAdmin() && shop && cur !== "ملغي")) {
+    const after = !shop && ci >= SL_IDX && cur !== "تم التسليم";
+    cancel = `<div class="box"><h4>❌ إلغاء الطلب</h4>${S.os.cancelOpen ? `
+      ${after ? `<p class="hint" style="color:#b91c1c">الطلب اتذبح. العميل بيتحمّل الثمن (كله أو جزء) وانت بتحدد المبلغ:</p>
+      <div class="field"><label for="os-charge">مبلغ المحاسبة (ج) — صفر لو هتسقطه</label><input class="input" id="os-charge" type="number" inputmode="decimal" min="0" step="any" value="${o.final || o.total}"></div>
+      <div class="field"><label for="os-why">سبب الإلغاء *</label><input class="input" id="os-why" maxlength="200" placeholder="مثال: العميل رفض الاستلام"></div>` : `<p class="hint">${shop ? "بيتعلّم «ملغي» (الفاتورة بتتشال من المبيعات)." : "الطلب لسه قبل الذبح، بيتلغي من غير محاسبة."}</p>`}
+      <div class="two" style="margin:0"><button class="btn dark" type="button" data-act="cancelclose">رجوع</button><button class="btn dark" type="button" data-act="cancelgo" style="color:#b91c1c">تأكيد الإلغاء</button></div>`
+      : `<button class="btn dark" type="button" data-act="cancelopen" style="color:#b91c1c">❌ إلغاء الطلب</button>`}</div>`;
+  } else if (cur === "ملغي") cancel = `<div class="box"><p class="hint" style="margin:0">الطلب ملغي${o.cancelCharge > 0 ? " • محاسبة العميل: " + money(o.cancelCharge) : ""}${o.cancelReason ? " • " + esc(o.cancelReason) : ""}</p></div>`;
+  $("os-body").innerHTML = head + weigh + appr + status + cancel;
+}
+function osRecalc() {
+  const o = osOrder(); if (!o) return; const c = osCalc(o);
+  c.rows.forEach(r => { const lt = document.querySelector(`[data-lt="${r.i}"]`), le = document.querySelector(`[data-le="${r.i}"]`); if (lt) lt.textContent = r.err ? "—" : money(r.t); if (le) le.textContent = r.err; });
+  const set = (k, txt, col) => { const el = document.querySelector(`[data-os="${k}"]`); if (el) { el.textContent = txt; if (col !== undefined) el.style.color = col; } };
+  set("sub", moneyP(c.sub)); set("final", moneyP(c.final));
+  set("diff", (c.diff > 0 ? "+" : c.diff < 0 ? "−" : "") + moneyP(Math.abs(c.diff)), c.diff > 0 ? "#dc2626" : c.diff < 0 ? "#059669" : "inherit");
+}
+async function osAfter(msg) { await loadOrders(true); toast(msg); if (S.os) renderOrderScreen(); }
+async function osSaveWeigh() {
+  const o = osOrder(); if (!o) return; const c = osCalc(o);
+  if (c.bad) return toast("راجع الأوزان: فيه خانة غلط", "err");
+  const lines = c.rows.filter(r => !r.fixed).map(r => ({ i: r.i, q: r.q }));
+  try {
+    const r = await post({ action: "weigh_order", pin: S.pin, id: o.id, lines });
+    if (!r.ok) return adminErr(r);
+    await osAfter(r.approval === "pending" ? "تم حفظ الوزن ⏳ في انتظار موافقة العميل" : "تم حفظ الوزن ✅ والطلب موافَق عليه");
+  } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
+}
+async function osApprove() {
+  const o = osOrder(); if (!o) return;
+  if (!confirm((o.approval === "todo" || !o.approval) ? "تسجيل موافقة بدون وزن؟ (السعر هيفضل التقديري)" : "تسجيل موافقة العميل نيابةً عنه؟")) return;
+  try {
+    const r = await post({ action: "approve_order", pin: S.pin, id: o.id });
+    if (!r.ok) return adminErr(r);
+    await osAfter("تم تسجيل الموافقة ✅");
+  } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
+}
+async function osSaveStatus() {
+  const o = osOrder(), sel = $("os-status"); if (!o || !sel) return;
+  const st = sel.value;
+  try {
+    const r = await post({ action: "set_order_status", pin: S.pin, id: o.id, status: st });
+    if (!r.ok) return adminErr(r);
+    const ph = o.phone, msgFor = Object.assign({}, o, { status: st });
+    await osAfter("تم حفظ الحالة: " + st + " ✅");
+    if (/\d{6,}/.test(String(ph)) && confirm("ابعت الحالة للعميل على واتساب؟")) window.open("https://wa.me/" + phoneIntl(ph) + "?text=" + encodeURIComponent(statusMsg(msgFor)), "_blank", "noopener");
+  } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
+}
+async function osCancel() {
+  const o = osOrder(); if (!o) return;
+  const body = { action: "set_order_status", pin: S.pin, id: o.id, status: "ملغي" };
+  if (o.source !== "محل" && stageIdx(o.status) >= SL_IDX && o.status !== "تم التسليم") {
+    const ch = $("os-charge").value.trim(), why = $("os-why").value.trim();
+    if (ch === "" || isNaN(Number(ch)) || Number(ch) < 0) return toast("اكتب مبلغ المحاسبة (صفر لو هتسقطه)", "err");
+    if (!why) return toast("اكتب سبب الإلغاء", "err");
+    body.charge = Number(ch); body.reason = why;
+    if (!confirm(`إلغاء الطلب ومحاسبة العميل بـ ${money(body.charge)}؟`)) return;
+  } else if (!confirm(`إلغاء الطلب ${o.id}؟`)) return;
+  try {
+    const r = await post(body);
+    if (!r.ok) return adminErr(r);
+    S.os.cancelOpen = false; await osAfter("تم إلغاء الطلب");
+  } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
+}
+async function osContact() {
+  const o = osOrder(); if (!o) return;
+  try { const r = await post({ action: "set_contacted", pin: S.pin, id: o.id, clear: !!o.contactedAt }); if (!r.ok) return adminErr(r); await osAfter(o.contactedAt ? "اتشال علامة التواصل" : "تم تعليم: تم التواصل ✅"); }
+  catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
+}
+/* ===== الأصوات والتنبيهات: المدير بيسمع صوت مع كل طلب جديد (بيختاره من الإعدادات أو يرفع صوته)، والزبون بيسمع لما حالة طلبه تتغيّر ===== */
+let AC = null;
+function audioCtx() {
+  if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+  if (AC && AC.state === "suspended") AC.resume();
+  return AC;
+}
+document.addEventListener("pointerdown", () => audioCtx(), { once: true });          // المتصفح مش بيسمح بالصوت قبل أول لمسة
+const SOUNDS = { bell: "🔔 جرس", rooster: "🐓 ديك", hen: "🐔 فرخة", siren: "🚨 تنبيه عالي", soft: "🎵 هادي" };
+function synthSound(name, vol) {
+  const ctx = audioCtx(); if (!ctx) return;
+  const t0 = ctx.currentTime + 0.02, g = ctx.createGain(); g.gain.value = Math.max(0.03, Math.min(1, vol)); g.connect(ctx.destination);
+  const tone = (type, f1, f2, start, dur, amp, filt) => {
+    const o = ctx.createOscillator(), e = ctx.createGain(); o.type = type;
+    o.frequency.setValueAtTime(f1, t0 + start); o.frequency.exponentialRampToValueAtTime(Math.max(20, f2), t0 + start + dur);
+    e.gain.setValueAtTime(0.0001, t0 + start); e.gain.exponentialRampToValueAtTime(amp, t0 + start + 0.02); e.gain.exponentialRampToValueAtTime(0.0001, t0 + start + dur);
+    if (filt) { const f = ctx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = filt; f.Q.value = 1.1; o.connect(f); f.connect(e); } else o.connect(e);
+    e.connect(g); o.start(t0 + start); o.stop(t0 + start + dur + 0.05);
+  };
+  if (name === "rooster") { tone("sawtooth", 420, 760, 0, 0.28, 0.5, 1400); tone("sawtooth", 740, 560, 0.3, 0.22, 0.5, 1400); tone("sawtooth", 620, 980, 0.58, 0.3, 0.55, 1600); tone("sawtooth", 960, 480, 0.9, 0.8, 0.55, 1500); }
+  else if (name === "hen") { for (let i = 0; i < 6; i++) tone("sawtooth", 360 - i * 8, 200, i * 0.11, 0.09, 0.5, 900); tone("sawtooth", 300, 180, 0.8, 0.25, 0.45, 800); }
+  else if (name === "siren") { for (let i = 0; i < 4; i++) tone("square", i % 2 ? 1000 : 700, i % 2 ? 700 : 1000, i * 0.25, 0.25, 0.35); }
+  else if (name === "soft") { tone("triangle", 523, 523, 0, 0.18, 0.5); tone("triangle", 659, 659, 0.18, 0.18, 0.5); tone("triangle", 784, 784, 0.36, 0.4, 0.5); }
+  else { [0, 0.9].forEach(s => { tone("sine", 880, 870, s, 0.9, 0.6); tone("sine", 1320, 1300, s, 0.7, 0.3); }); }
+}
+// صوت مرفوع من موبايل المدير: بيتخزّن على الجهاز نفسه (IndexedDB) مش على السيرفر
+function idb() { return new Promise((res, rej) => { const r = indexedDB.open("tahona", 1); r.onupgradeneeded = () => r.result.createObjectStore("kv"); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+async function idbGet(k) { try { const db = await idb(); return await new Promise(res => { const q = db.transaction("kv").objectStore("kv").get(k); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); }); } catch (e) { return null; } }
+async function idbSet(k, v) { try { const db = await idb(); await new Promise((res, rej) => { const tx = db.transaction("kv", "readwrite"); tx.objectStore("kv").put(v, k); tx.oncomplete = res; tx.onerror = rej; }); return true; } catch (e) { return false; } }
+async function idbDel(k) { try { const db = await idb(); await new Promise(res => { const tx = db.transaction("kv", "readwrite"); tx.objectStore("kv").delete(k); tx.oncomplete = res; tx.onerror = res; }); } catch (e) {} }
+const sndCfg = () => { const d = { on: true, sound: "bell", vol: 0.8, wake: false }; try { return Object.assign(d, JSON.parse(lsGet("tahona_snd") || "{}")); } catch (e) { return d; } };
+const sndSave = c => lsSet("tahona_snd", JSON.stringify(c));
+async function playSound(name, vol) {
+  if (name === "custom") {
+    const blob = await idbGet("orderSound");
+    if (blob) { try { if (S.customUrl) URL.revokeObjectURL(S.customUrl); S.customUrl = URL.createObjectURL(blob); const a = new Audio(S.customUrl); a.volume = Math.max(0.05, Math.min(1, vol)); await a.play(); return; } catch (e) {} }
+    name = "bell";
+  }
+  synthSound(name, vol);
+}
+async function sysNotify(title, body) {
+  try {
+    if (!("Notification" in window) || Notification.permission !== "granted" || !("serviceWorker" in navigator)) return;
+    const reg = await navigator.serviceWorker.getRegistration(); if (!reg) return;
+    reg.showNotification(title, { body, icon: "icon-192.png", tag: "tahona-" + Date.now(), vibrate: [200, 100, 200] });
+  } catch (e) {}
+}
+async function enableNotif() {
+  if (!("Notification" in window)) return toast("المتصفح ده مش بيدعم الإشعارات", "warn");
+  const p = await Notification.requestPermission();
+  toast(p === "granted" ? "تم تفعيل الإشعارات ✅" : "الإشعارات مقفولة، افتحها من إعدادات الموقع في المتصفح", p === "granted" ? "" : "warn");
+  if ($("tr-notif")) $("tr-notif").classList.add("hidden");
+}
+// المدير: طلب جديد أو رد العميل على الموافقة ← صوت + اهتزاز + شريط + إشعار لو الصفحة في الخلفية
+function ownerAlert(msg) {
+  const c = sndCfg();
+  if (c.on) playSound(c.sound, c.vol);
+  try { navigator.vibrate && navigator.vibrate([250, 120, 250]); } catch (e) {}
+  toast(msg, "warn");
+  if (document.hidden) sysNotify("طلب جديد", msg);
+  S.alertN = (S.alertN || 0) + 1; document.title = "(" + S.alertN + ") " + document.title.replace(/^\(\d+\)\s*/, "");
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) { S.alertN = 0; document.title = document.title.replace(/^\(\d+\)\s*/, ""); if (S.role) applyWake(sndCfg().wake); } });
+function ownerDetect(fresh) {
+  if (!S.ordSeen) { S.ordSeen = new Map(fresh.map(o => [o.id, o.approval])); return; }          // أول تحميل: من غير صوت
+  const msgs = [];
+  fresh.forEach(o => {
+    const had = S.ordSeen.has(o.id), prev = S.ordSeen.get(o.id);
+    if (!had && o.source !== "محل" && (o.status || "جديد") === "جديد") msgs.push((o.source === "حجز" ? "📅 حجز جديد من " : "🔔 طلب جديد من ") + o.name);
+    else if (had && prev === "pending" && o.approvedBy === "customer" && (o.approval === "approved" || o.approval === "rejected")) msgs.push((o.approval === "approved" ? "✅ " + o.name + " وافق على الوزن" : "❌ " + o.name + " رفض الوزن"));
+    S.ordSeen.set(o.id, o.approval);
+  });
+  if (msgs.length) ownerAlert(msgs.slice(0, 3).join(" • "));
+}
+async function applyWake(on) {                      // خلّي الشاشة صاحية عشان الطلبات تسمع
+  try {
+    if (on && "wakeLock" in navigator) { if (!S.wake) { S.wake = await navigator.wakeLock.request("screen"); S.wake.addEventListener("release", () => { S.wake = null; }); } }
+    else if (S.wake) { await S.wake.release(); S.wake = null; }
+  } catch (e) {}
+}
+function fillSound() {
+  const c = sndCfg();
+  $("sn-on").checked = c.on; $("sn-vol").value = Math.round(c.vol * 100); $("sn-wake").checked = c.wake;
+  $("sn-sel").innerHTML = Object.keys(SOUNDS).map(k => `<option value="${k}">${SOUNDS[k]}</option>`).join("") + '<option value="custom">📁 صوت من موبايلي</option>';
+  $("sn-sel").value = c.sound; $("sn-state").textContent = "";
+  idbGet("orderSound").then(b => { $("sn-state").textContent = b ? "✅ فيه صوت مرفوع على الجهاز ده (" + Math.round(b.size / 1024) + " ك.ب)" : ""; $("sn-clear").classList.toggle("hidden", !b); });
+  $("sn-notif").classList.toggle("hidden", !("Notification" in window) || Notification.permission !== "default");
+}
+function readSound() { return { on: $("sn-on").checked, sound: $("sn-sel").value, vol: Number($("sn-vol").value) / 100, wake: $("sn-wake").checked }; }
+function customerDetect(old, o) {                   // الزبون: تغيّرت حالة طلبه أو محتاجين موافقته
+  if (!old) return;
+  const approvalNew = o.approval === "pending" && old.approval !== "pending";
+  if (!approvalNew && old.status === o.status && !(o.final && !old.final)) return;
+  const msg = approvalNew ? "⚖️ تم وزن طلبك — محتاجين موافقتك" : `طلبك ${o.id}: ${stageLabel(o.status)}${o.final && o.final !== old.final ? " • المبلغ النهائي " + moneyP(o.final) : ""}`;
+  playSound(approvalNew ? "bell" : "soft", 0.7);
+  try { navigator.vibrate && navigator.vibrate(approvalNew ? [300, 150, 300, 150, 300] : [200]); } catch (e) {}
+  toast(msg, approvalNew ? "warn" : ""); sysNotify("دواجن الطاحونة", msg);
+}
+// بعد تأكيد الطلب: الطلب اتسجّل في النظام الأول، وبعد ثانيتين بنفتح واتساب للتأكيد (والزبون يقدر يلغي)
+let waTimer = null;
+function startWaCountdown() {
+  clearInterval(waTimer); let n = 2; const el = $("wa-count"); el.classList.remove("hidden");
+  const tick = () => { el.innerHTML = `📲 هنفتحلك واتساب بعد ${n} ثانية عشان تبعت التأكيد… <button type="button" class="link" id="wa-count-x">إلغاء</button>`; };
+  tick();
+  waTimer = setInterval(() => { n--; if (n <= 0) { clearInterval(waTimer); el.classList.add("hidden"); location.href = $("done-wa").href; } else tick(); }, 1000);
+}
+
+
+/* ===== مواعيد العمل والحجز (نفس حساب السيرفر بتوقيت القاهرة) ===== */
+const DAY_AR = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+const hmMin = t => Number(String(t).slice(0, 2)) * 60 + Number(String(t).slice(3, 5));
+const t12 = t => new Date(2000, 0, 1, Number(t.slice(0, 2)), Number(t.slice(3, 5))).toLocaleTimeString("ar-EG", { hour: "numeric", minute: "2-digit" });
+function hoursCfg() {
+  const h = (S.settings && S.settings.hours) || {};
+  return { mode: h.mode || "open", days: Array.isArray(h.days) && h.days.length === 7 ? h.days : DAY_AR.map(() => ({ on: true, from: "09:00", to: "23:00" })), resv: !!h.resv, maxDays: h.maxDays || 7 };
+}
+function cairoParts(ms) {
+  const p = {};
+  new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Cairo", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(new Date(ms)).forEach(x => { p[x.type] = x.value; });
+  return { date: p.year + "-" + p.month + "-" + p.day, min: Number(p.hour) * 60 + Number(p.minute), wd: new Date(Date.UTC(+p.year, +p.month - 1, +p.day)).getUTCDay() };
+}
+function shopState() {
+  const h = hoursCfg();
+  if (h.mode === "open") return { open: true, resv: h.resv };
+  if (h.mode === "closed") return { open: false, manual: true, next: "", resv: h.resv };
+  const c = cairoParts(nowMs()), td = h.days[c.wd], pv = h.days[(c.wd + 6) % 7];
+  let open = false;
+  if (td.on) { const f = hmMin(td.from), t = hmMin(td.to); open = f <= t ? (c.min >= f && c.min < t) : c.min >= f; }
+  if (!open && pv.on && hmMin(pv.from) > hmMin(pv.to) && c.min < hmMin(pv.to)) open = true;
+  if (open) return { open: true, resv: h.resv };
+  let next = "";
+  for (let k = 0; k < 8; k++) {
+    const wd = (c.wd + k) % 7, d = h.days[wd]; if (!d.on) continue;
+    if (k === 0 && c.min >= hmMin(d.from)) continue;
+    next = (k === 0 ? "النهارده" : k === 1 ? "بكرة" : "يوم " + DAY_AR[wd]) + " الساعة " + t12(d.from); break;
+  }
+  return { open: false, manual: false, next, resv: h.resv };
+}
+function renderClosed() {
+  const st = shopState(), bar = $("closed-bar");
+  const txt = st.open ? "" : "🔒 " + (st.manual ? "المحل مقفول حالياً" : "المحل مغلق الآن") + (st.next ? "، بنفتح " + st.next : "") + (st.resv ? " — تقدر تكمّل وتحجز طلبك لموعد لاحق." : ".");
+  if (bar) { bar.textContent = txt; bar.classList.toggle("hidden", !txt || APP_MODE === "admin"); }
+  const cn = $("co-closed"), rb = $("resv-box"), sub = $("co-submit");
+  if (!cn) return;
+  cn.textContent = txt; cn.classList.toggle("hidden", !txt);
+  const want = st.resv && (!st.open || $("rv-on").checked);
+  $("rv-on-row").classList.toggle("hidden", !(st.open && st.resv));
+  rb.classList.toggle("hidden", !want); $("rv-hint").textContent = slotHint();
+  if (want) {
+    const h = hoursCfg(), c = cairoParts(nowMs()), mx = cairoParts(nowMs() + h.maxDays * 86400000).date, di = $("rv-date");
+    di.min = c.date; di.max = mx; if (!di.value || di.value < c.date || di.value > mx) di.value = cairoParts(nowMs() + 86400000).date;
+  }
+  if (sub && $("co-view") && !$("co-view").classList.contains("hidden")) {
+    sub.disabled = (!st.open && !st.resv) || cartCount() === 0;
+    sub.textContent = want ? "📅 تأكيد الحجز" : (st.open ? "✅ تأكيد الطلب" : "🔒 المحل مقفول");
+  }
+}
+function slotErr(d, t) {
+  const h = hoursCfg(); if (h.mode !== "auto") return "";
+  const wd = new Date(d + "T00:00:00Z").getUTCDay(), day = h.days[wd];
+  if (!day.on) return "المحل مش بيشتغل يوم " + DAY_AR[wd] + "، اختار يوم تاني";
+  if (!t) return "اختار ساعة الحجز";
+  const m = hmMin(t), f = hmMin(day.from), to = hmMin(day.to);
+  return (f <= to ? (m >= f && m < to) : (m >= f || m < to)) ? "" : "اختار ساعة بين " + t12(day.from) + " و " + t12(day.to);
+}
+function slotHint() {
+  const h = hoursCfg(); if (h.mode !== "auto") return "السعر والوزن بيتأكدوا يوم التنفيذ، وهنتواصل معاك لتأكيد الحجز.";
+  return "أيام وساعات الحجز: " + h.days.map((d, i) => d.on ? DAY_AR[i] + " " + t12(d.from) + "–" + t12(d.to) : "").filter(Boolean).join(" • ") + ". السعر والوزن بيتأكدوا يوم التنفيذ.";
+}
+const resvText = r => r ? "📅 حجز ليوم " + r.d + (r.t ? " الساعة " + t12(r.t) : "") : "";
+const HOURS_DEF = () => ({ mode: "open", resv: false, maxDays: 7, days: DAY_AR.map(() => ({ on: true, from: "09:00", to: "23:00" })) });
+function fillHours() {
+  const h = Object.assign(HOURS_DEF(), (S.settings && S.settings.hours) || {});
+  $("hr-mode").value = h.mode; $("hr-resv").checked = !!h.resv; $("hr-max").value = h.maxDays || 7;
+  $("hr-days").innerHTML = DAY_AR.map((n, i) => { const d = h.days[i] || {}; return `<div style="display:flex;gap:6px;align-items:center;margin:4px 0" data-d="${i}"><label class="chk" style="flex:1;margin:0"><input type="checkbox" data-k="on"${d.on === false ? "" : " checked"}> ${n}</label><input class="input" type="time" data-k="from" value="${esc(d.from || "09:00")}" style="width:110px"><span>→</span><input class="input" type="time" data-k="to" value="${esc(d.to || "23:00")}" style="width:110px"></div>`; }).join("");
+}
+function readHours() {
+  return { mode: $("hr-mode").value, resv: $("hr-resv").checked, maxDays: Number($("hr-max").value) || 0,
+    days: [...$("hr-days").querySelectorAll("[data-d]")].map(r => ({ on: r.querySelector('[data-k="on"]').checked, from: r.querySelector('[data-k="from"]').value, to: r.querySelector('[data-k="to"]').value })) };
+}
+setInterval(() => { try { renderClosed(); } catch (e) {} }, 60000);
+
 /* ===== QR المنيو ===== */
-const menuUrl = () => location.href.split("#")[0].split("?")[0];
+const menuUrl = () => custBase();
 function qrCanvas(text, size, logo) {
   const qr = qrcode(0, "H"); qr.addData(text); qr.make();
   const n = qr.getModuleCount(), quiet = 4, cell = Math.max(2, Math.floor(size / (n + quiet * 2))), px = cell * (n + quiet * 2);
@@ -1772,12 +2436,32 @@ async function downloadPoster() {
 
 /* ===== تثبيت التطبيق على الشاشة الرئيسية (PWA) ===== */
 let deferredInstall = null;
+// ورقة التثبيت الكبيرة: أول زيارة بس. بعدها (لو ما ثبّتش) يفضل الشريط الصغير فوق
+function maybeInstallSheet(kind) {
+  if (!kind || lsGet("tahona_install_big") === "1") return;
+  if (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone) return;
+  if (!$("splash").classList.contains("out") || document.querySelector(".screen:not(.hidden)")) return setTimeout(() => maybeInstallSheet(kind), 2000);
+  const steps = { prompt: "", ios: "اضغط زرار المشاركة ⬆️ في سفاري، ثم «إضافة إلى الشاشة الرئيسية».", inapp: "افتح الصفحة من متصفح موبايلك: اضغط ⋮ ثم «فتح في المتصفح»، وبعدها ثبّت التطبيق." }[kind];
+  $("is-steps").textContent = steps; $("is-steps").classList.toggle("hidden", !steps);
+  $("is-install").classList.toggle("hidden", kind !== "prompt");
+  $("install-sheet").classList.remove("hidden"); lsSet("tahona_install_big", "1");
+}
 function initInstall() {
   try { if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) navigator.serviceWorker.register("sw.js").catch(() => {}); } catch (e) {}
   const standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
   if (standalone || lsGet("tahona_install_x") === "1") return;
-  window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferredInstall = e; $("install-bar").classList.remove("hidden"); });
-  window.addEventListener("appinstalled", () => { deferredInstall = null; $("install-bar").classList.add("hidden"); toast("تم تثبيت التطبيق ✅"); });
+  window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferredInstall = e; $("install-bar").classList.remove("hidden"); setTimeout(() => maybeInstallSheet("prompt"), 1800); });
+  window.addEventListener("appinstalled", () => { deferredInstall = null; $("install-bar").classList.add("hidden"); $("install-sheet").classList.add("hidden"); lsSet("tahona_install_big", "1"); toast("تم تثبيت التطبيق ✅"); });
+  // مفيش زرار تثبيت تلقائي على الآيفون ولا جوه متصفح واتساب/فيسبوك: ورقة بالخطوات (أول مرة بس)
+  setTimeout(() => { if (!deferredInstall) { const ua = navigator.userAgent; maybeInstallSheet(/FBAN|FBAV|Instagram|WhatsApp|Line\//i.test(ua) ? "inapp" : (/iPhone|iPad|iPod/i.test(ua) ? "ios" : "")); } }, 4500);
+  $("is-later").addEventListener("click", () => $("install-sheet").classList.add("hidden"));
+  $("is-install").addEventListener("click", async () => {
+    $("install-sheet").classList.add("hidden");
+    if (!deferredInstall) return;
+    deferredInstall.prompt();
+    try { await deferredInstall.userChoice; } catch (e) {}
+    deferredInstall = null; $("install-bar").classList.add("hidden");
+  });
   $("install-btn").addEventListener("click", async () => {
     if (!deferredInstall) return;
     deferredInstall.prompt();
@@ -1800,7 +2484,7 @@ function currentSrc() {                       // آخر مصدر دخل منه �
 
 /* ===== الكاشير: بيع من المحل ===== */
 function renderSell() {
-  const cats = [{ id: "all", label: "الكل" }].concat(S.cats);
+  const cats = [{ id: "all", label: "الكل" }].concat(S.cats.filter(c => c.visible !== false));
   if (activeBundles().length) cats.push({ id: "__b", label: "🎁 الباقات" });
   if (!cats.some(c => c.id === S.sCat)) S.sCat = "all";
   $("s-chips").innerHTML = cats.map(c => `<button class="chip" type="button" data-c="${esc(c.id)}" aria-pressed="${S.sCat === c.id}">${esc(c.label)}</button>`).join("");
@@ -1810,18 +2494,51 @@ function renderSell() {
 }
 function renderPick() {
   const q = $("s-search").value.trim().toLowerCase();
-  const items = S.sCat === "__b" ? [] : S.menu.filter(m => (S.sCat === "all" || m.cat === S.sCat) && (!q || m.name.toLowerCase().includes(q)));
+  const items = S.sCat === "__b" ? [] : S.menu.filter(m => itemVisible(m) && (S.sCat === "all" || m.cat === S.sCat) && (!q || m.name.toLowerCase().includes(q)));
   const bs = (S.sCat === "all" || S.sCat === "__b") ? activeBundles().filter(b => !q || b.name.toLowerCase().includes(q)) : [];
   $("s-pick").innerHTML = items.map(m => `<button type="button" class="pk${S.bill.items[m.id] ? " inbill" : ""}" data-k="i" data-id="${esc(m.id)}"><b>${esc(m.name)}</b><small>${money(m.price)} / ${esc(m.unit)}${offerActive(m) ? " 🔥" : ""}</small></button>`).join("")
     + bs.map(b => `<button type="button" class="pk bn${S.bill.bundles[b.id] ? " inbill" : ""}" data-k="b" data-id="${esc(b.id)}"><b>🎁 ${esc(b.name)}</b><small>${money(b.price)} / باقة</small></button>`).join("")
     || '<div class="empty" style="grid-column:1/-1">ما فيش أصناف مطابقة</div>';
 }
 function billQty(k, id) { return (k === "b" ? S.bill.bundles : S.bill.items)[id]; }
-function addToBill(k, id) {
-  if (k === "b") { S.bill.bundles[id] = Math.min(99, (S.bill.bundles[id] || 0) + 1); }
-  else { const m = findItem(id); if (!m) return; S.bill.items[id] = Math.round(((S.bill.items[id] || 0) + (Number(m.step) || 1)) * 100) / 100; }
-  renderPick(); renderBill();
+// ضغطة واحدة على الصنف بتفتح نافذة بصندوق كتابة للكمية (كأنها جاية من الميزان): 1.5 أو 850 جم أو 1.85 كجم
+const AR_DIGITS = { "٠": "0", "١": "1", "٢": "2", "٣": "3", "٤": "4", "٥": "5", "٦": "6", "٧": "7", "٨": "8", "٩": "9", "٫": ".", "،": "." };
+function parseQty(text, unit) {
+  let t = String(text || "").trim().replace(/[٠-٩٫،]/g, c => AR_DIGITS[c]).replace(",", ".").toLowerCase();
+  const m = /^(\d+(?:\.\d+)?)\s*(جم|جرام|غرام|جرامات|g|gr|gm|كجم|كيلو|كيلوجرام|kg)?$/.exec(t.replace(/\s+/g, " "));
+  if (!m) return { err: "اكتب رقم صحيح، مثال: 1.5 أو 850 جم" };
+  let n = Number(m[1]), u = m[2] || "", grams = /^(جم|جرام|غرام|جرامات|g|gr|gm)$/.test(u);
+  if (unit === "كيلو") {
+    if (!u && n >= 30) grams = true;                       // 850 من غير وحدة = 850 جرام (مفيش طلب 850 كيلو)
+    if (grams) n = n / 1000;
+    n = Math.round(n * 1000) / 1000;
+    if (!(n > 0) || n > 100) return { err: "الكمية لازم تكون أكبر من صفر وأقل من 100 كيلو" };
+    return { q: n, label: grams ? `${Math.round(n * 1000)} جم = ${n.toFixed(3)} كجم` : `${n} كجم` };
+  }
+  if (grams || u) return { err: "الصنف ده بالـ" + unit + "، اكتب عدد صحيح" };
+  if (!(Number.isInteger(n) && n >= 1 && n <= 100)) return { err: "اكتب عدد صحيح من 1 لـ 100" };
+  return { q: n, label: n + " " + unit };
 }
+function openQtyDialog(k, id) {
+  const m = k === "b" ? S.bundles.find(x => x.id === id) : findItem(id); if (!m) return;
+  const unit = k === "b" ? "باقة" : m.unit, cur = k === "b" ? S.bill.bundles[id] : S.bill.items[id];
+  S.qd = { k, id, unit };
+  $("qd-title").textContent = (k === "b" ? "🎁 " : "") + m.name;
+  $("qd-hint").textContent = unit === "كيلو" ? "اكتب الوزن بالكيلو (1.5) أو بالجرام (850 جم) — الوحدة كيلو" : `اكتب العدد (${unit})`;
+  const chips = unit === "كيلو" ? ["0.25", "0.5", "1", "1.5", "2", "3"] : ["1", "2", "3", "5"];
+  $("qd-chips").innerHTML = chips.map(c => `<button type="button" class="btn primary" data-v="${c}">${c}</button>`).join("");
+  $("qd-input").value = cur ? String(cur) : ""; $("qd-preview").textContent = ""; $("qd-ok").textContent = cur ? "تحديث الكمية" : "إضافة للفاتورة";
+  $("qty-dialog").classList.remove("hidden"); setTimeout(() => { $("qd-input").focus(); $("qd-input").select(); }, 50);
+}
+function qdPreview() {
+  const r = parseQty($("qd-input").value, S.qd.unit); $("qd-preview").textContent = $("qd-input").value.trim() ? (r.err || ("✅ " + r.label)) : "";
+}
+function qdSubmit() {
+  const r = parseQty($("qd-input").value, S.qd.unit); if (r.err) return toast(r.err, "err");
+  if (S.qd.k === "b") S.bill.bundles[S.qd.id] = r.q; else S.bill.items[S.qd.id] = r.q;
+  $("qty-dialog").classList.add("hidden"); renderPick(); renderBill();
+}
+function addToBill(k, id) { openQtyDialog(k, id); }
 function billRows() {
   const out = [];
   Object.keys(S.bill.items).forEach(id => {
@@ -1918,17 +2635,18 @@ function openInvoice(token) {
 }
 function renderInvoice(v) {
   const sh = Object.assign({}, shopOf(), v.shop || {});
-  const rows = (v.lines || []).map(l => `<tr><td>${esc(l.n)}</td><td class="n">${num(l.q)} ${esc(l.u)}</td><td class="n">${moneyP(l.t)}</td></tr>`).join("");
+  const rows = (v.lines || []).map(l => `<tr><td>${invName(l)}</td><td class="n">${invQty(l, v)}</td><td class="n">${l.p ? num(l.p) + " ج" : "—"}</td><td class="n">${moneyP(l.t)}</td></tr>`).join("");
   $("inv-body").innerHTML = `<div class="inv">
     ${v.voided ? '<div class="inv-void">❌ فاتورة ملغاة</div>' : ""}
     <div class="inv-head"><img src="${esc(logoOf(sh))}" alt=""><h2>${esc(sh.name)}</h2>${sh.slogan ? `<p><b>${esc(sh.slogan)}</b></p>` : ""}<p>${esc(sh.address)}</p><p>${phonesOf(sh).map(p => `<span style="white-space:nowrap">📞 ${esc(p)}</span>`).join(" &nbsp; ")}</p></div>
     <div class="inv-meta"><span>رقم الفاتورة: <b>${esc(v.no)}</b></span><span>التاريخ: ${esc(v.time)}</span>${v.cashier ? `<span>الكاشير: ${esc(v.cashier)}</span>` : ""}${v.customer ? `<span>العميل: ${esc(v.customer)}</span>` : ""}<span>الدفع: ${esc(v.payment)}</span></div>
-    <table><thead><tr><th>الصنف</th><th class="n">الكمية</th><th class="n">المبلغ</th></tr></thead><tbody>${rows}</tbody></table>
+    <table><thead><tr><th>الصنف</th><th class="n">الكمية</th><th class="n">سعر الوحدة</th><th class="n">المبلغ</th></tr></thead><tbody>${rows}</tbody></table>
     <div class="inv-sum">
       <div><span>مجموع الأصناف</span><b>${moneyP(v.subtotal)}</b></div>
       ${v.discount > 0 ? `<div><span>الخصم</span><b>- ${moneyP(v.discount)}</b></div>` : ""}
       ${v.fee > 0 ? `<div><span>التوصيل</span><b>${moneyP(v.fee)}</b></div>` : ""}
       <div class="g"><span>${v.estimated ? "الإجمالي (تقديري)" : "الإجمالي"}</span><b>${moneyP(v.total)}</b></div>
+      ${v.diff ? `<div style="font-size:.8rem;color:#555"><span>الإجمالي التقديري عند الطلب</span><span>${moneyP(v.estimatedTotal)}</span></div><div style="font-size:.8rem"><span>الفرق بعد الوزن</span><b style="color:${v.diff > 0 ? "#b91c1c" : "#047857"}">${v.diff > 0 ? "+" : "−"}${moneyP(Math.abs(v.diff))}</b></div>` : ""}
     </div>
     <div class="inv-foot">${v.estimated ? "المبلغ تقديري وبيتحدد بدقة بعد الوزن.<br>" : ""}${esc(sh.footer)}<br><small>إيصال بيع — ليس فاتورة ضريبية</small><br><img src="${qrCanvas(withSrc(baseMenuUrl(), "receipt"), 300, null).toDataURL()}" alt="QR" style="width:110px;height:110px;margin:8px auto 0"><br><small>امسح الكود واطلب أونلاين</small></div></div>`;
 }
@@ -1967,12 +2685,13 @@ async function invoiceCanvas(v) {
   if (v.customer) text("العميل: " + v.customer, 22, "400", "r");
   text("الدفع: " + v.payment, 22, "400", "r");
   dash();
-  (v.lines || []).forEach(l => { text(l.n, 24, "700", "r"); row(num(l.q) + " " + l.u, moneyP(l.t), 22, "400"); y += 4; });
+  (v.lines || []).forEach(l => { text(l.w ? l.n + " (وزن " + l.w + ")" : l.n, 24, "700", "r"); if (l.c) text("🐔 " + l.c + " فرخة (من " + f3(l.a) + " إلى " + f3(l.z) + " كجم للفرخة)", 18, "400", "r"); row((l.u === "كيلو" && v.hasWeighed ? f3(l.q) + " كجم" : num(l.q) + " " + l.u) + (l.p ? " × " + num(l.p) : ""), moneyP(l.t), 22, "400"); y += 4; });
   dash();
   row("مجموع الأصناف", moneyP(v.subtotal), 24, "400");
   if (v.discount > 0) row("الخصم", "- " + moneyP(v.discount), 24, "400");
   if (v.fee > 0) row("التوصيل", moneyP(v.fee), 24, "400");
   row(v.estimated ? "الإجمالي (تقديري)" : "الإجمالي", moneyP(v.total), 32, "700");
+  if (v.diff) { row("التقديري عند الطلب", moneyP(v.estimatedTotal), 20, "400"); row("الفرق بعد الوزن", (v.diff > 0 ? "+ " : "- ") + moneyP(Math.abs(v.diff)), 20, "700"); }
   dash();
   if (v.estimated) text("المبلغ تقديري وبيتحدد بدقة بعد الوزن", 20, "400", "c");
   if (sh.footer) text(sh.footer, 22, "400", "c");
@@ -2196,6 +2915,11 @@ function fillShop() {
   $("sh-logo").value = sh.logo || ""; $("sh-prev").src = logoOf(sh); $("sh-upload-state").textContent = "";
   const pct = Number(S.settings.maxDiscountPct); $("sh-disc").value = isNaN(pct) ? 10 : pct;
   if (!$("qr-url").value) $("qr-url").value = lsGet("tahona_qr_url") || menuUrl();
+  $("poll-sec").value = lsGet("tahona_poll_sec") === null ? "60" : lsGet("tahona_poll_sec");
+  fillSound(); fillHours();
+  const fl = (S.settings && S.settings.flow) || {};
+  $("fl-pct").value = fl.tolPct || 0; $("fl-egp").value = fl.tolEgp || 0; $("fl-display").value = fl.display || "exact";
+  $("fl-cancel").checked = !!fl.allowCancel; $("fl-trusted").value = (S.trusted || []).join("\n");
   drawQrPreview();
 }
 /* ===== محرر الصور: قص بنسبة اختيارية + تكبير + تدوير + ألوان، وبيرجّع صورة جاهزة للرفع ===== */
@@ -2329,7 +3053,7 @@ function campTag() {
 const campLink = () => baseMenuUrl() + "?src=" + encodeURIComponent(campTag());
 function campChosen() {
   const sel = S.camp.sel || new Set();
-  return { items: S.menu.filter(m => sel.has("i:" + m.id)), bundles: activeBundles().filter(b => sel.has("b:" + b.id)) };
+  return { items: S.menu.filter(m => itemVisible(m) && sel.has("i:" + m.id)), bundles: activeBundles().filter(b => sel.has("b:" + b.id)) };
 }
 function campInit() {
   if (!S.camp.sel) {                      // أول مرة: اللي عليه عرض الأول وبعدين باقي الأصناف لحد ما المساحة تخلص
@@ -2344,7 +3068,7 @@ function campRenderCtl() {
   $("cp-src").innerHTML = CP_SRC.map(x => `<button class="chip" type="button" data-s="${x[0]}" aria-pressed="${S.camp.src === x[0]}">${x[1]}</button>`).join("");
   $("cp-src-custom-w").classList.toggle("hidden", S.camp.src !== "__custom");
   const sel = S.camp.sel;
-  $("cp-items").innerHTML = S.menu.map(m => `<label class="chk"><input type="checkbox" data-k="i:${esc(m.id)}"${sel.has("i:" + m.id) ? " checked" : ""}> ${esc(m.name)} <span class="off-tag">${money(m.price)}/${esc(m.unit)}${offerActive(m) ? " 🔥" : ""}</span></label>`).join("")
+  $("cp-items").innerHTML = S.menu.filter(itemVisible).map(m => `<label class="chk"><input type="checkbox" data-k="i:${esc(m.id)}"${sel.has("i:" + m.id) ? " checked" : ""}> ${esc(m.name)} <span class="off-tag">${money(m.price)}/${esc(m.unit)}${offerActive(m) ? " 🔥" : ""}</span></label>`).join("")
     + activeBundles().map(b => `<label class="chk"><input type="checkbox" data-k="b:${esc(b.id)}"${sel.has("b:" + b.id) ? " checked" : ""}> 🎁 ${esc(b.name)} <span class="off-tag">${money(b.price)}</span></label>`).join("");
   campCount();
 }
@@ -2488,8 +3212,8 @@ function updateMyBadge() {
 // أي رد من السيرفر عن طلب بيحدّث نسخة الجهاز (الحالة والمبلغ النهائي)
 function rememberTracked(o) {
   const a = loadMyOrders(), i = a.findIndex(x => x.token === o.token);
-  const patch = { token: o.token, id: o.id, time: o.time, total: o.total, final: o.final, status: o.status, type: o.type };
-  if (i >= 0) a[i] = { ...a[i], ...patch }; else a.unshift({ ...patch, lines: o.items.slice(0, 4), t: 0 });
+  const patch = { token: o.token, id: o.id, time: o.time, total: o.total, final: o.final, status: o.status, type: o.type, approval: o.approval };
+  if (i >= 0) { customerDetect(a[i], o); a[i] = { ...a[i], ...patch }; } else a.unshift({ ...patch, lines: o.items.slice(0, 4), t: 0 });
   saveMyOrders(a); updateMyBadge();
 }
 function openTrack(token) {
@@ -2497,7 +3221,7 @@ function openTrack(token) {
   $("track").classList.remove("hidden"); document.body.classList.add("lock"); renderTrack();
   loadTrack(true);
   clearInterval(S.trackTimer);
-  S.trackTimer = setInterval(() => { if (!document.hidden && !$("track").classList.contains("hidden")) loadTrack(false); }, 30000);
+  S.trackTimer = setInterval(() => { if (!document.hidden && !$("track").classList.contains("hidden")) loadTrack(false); }, 60000);
 }
 function closeTrack() {
   $("track").classList.add("hidden"); clearInterval(S.trackTimer);
@@ -2516,11 +3240,20 @@ async function loadTrack(first) {
     if (first || !S.trackOrder) { S.trackErr = "تعذر الاتصال، تأكد من النت وحاول تاني"; renderTrack(); }
   }
 }
+// نص الفرق المسموح (من إعدادات المدير): الرقم الدقيق أو عبارة عامة أو إخفاء
+function toleranceText(fl) {
+  fl = fl || {}; const pct = Number(fl.tolPct) || 0, egp = Number(fl.tolEgp) || 0;
+  if (fl.display === "hide") return "";
+  if (fl.display === "generic") return "الإجمالي تقديري وممكن يتغير بعد الوزن، وهنطلب موافقتك على السعر النهائي قبل الذبح.";
+  const parts = []; if (pct > 0) parts.push("±" + num(pct) + "%"); if (egp > 0) parts.push("±" + num(egp) + " ج");
+  return parts.length ? `الإجمالي تقديري وممكن يتغير بعد الوزن في حدود ${parts.join(" أو ")} (بنكمّل من غير ما نسألك)، وأي فرق أكبر هنطلب موافقتك قبل الذبح.`
+    : "الإجمالي تقديري، وبعد الوزن هنطلب موافقتك على السعر النهائي قبل الذبح.";
+}
 function renderTrack() {
   const body = $("track-body"), o = S.trackOrder;
   if (S.trackErr) { body.innerHTML = `<div class="state">⚠️ ${esc(S.trackErr)}<br><button class="retry" id="track-retry" type="button">إعادة المحاولة</button></div>`; return; }
   if (!o) { body.innerHTML = '<div class="skel"></div><div class="skel"></div>'; return; }
-  const flow = flowFor(o.type), cancelled = o.status === "ملغي";
+  const flow = flowFor(o.type, o.approval), cancelled = o.status === "ملغي";
   let idx = flow.indexOf(o.status);
   if (idx === -1) idx = o.status === "تم التسليم" ? flow.length - 1 : (o.status === "جاهز للاستلام" || o.status === "خرج للتوصيل" ? flow.length - 2 : 0);
   const upd = o.updated ? new Date(o.updated).toLocaleString("ar-EG", { weekday: "short", hour: "2-digit", minute: "2-digit" }) : "";
@@ -2530,19 +3263,57 @@ function renderTrack() {
     return `<li class="${cls}"><span class="dot">${mark}</span><div><b>${esc(stageLabel(s))}</b>${cls === "now" && upd ? `<small>الحالة الحالية • آخر تحديث ${esc(upd)}</small>` : ""}</div></li>`;
   }).join("");
   const waText = encodeURIComponent(`بخصوص طلبي رقم ${o.id}`);
+  const wl = o.weighed || [], hasW = wl.length > 0, fixedOnly = o.approval === "na";
+  const diff = o.final ? Math.round((o.final - o.total) * 100) / 100 : 0;
+  const lineTxt = l => `${esc(l.n)}${l.w ? ` (وزن ${esc(l.w)})` : ""} — ${l.f ? num(l.q) + " " + esc(l.u) : f3(l.q) + " كجم"} × ${num(l.p)} = <b>${moneyP(l.t)}</b>`;
+  const approveBox = (o.approval === "pending" && o.status === "تم الوزن") ? `
+    <div class="box" style="border:2px solid #f59e0b">
+      <h4>⚖️ تم وزن طلبك — محتاجين موافقتك</h4>
+      <div class="ord-items" style="white-space:normal;line-height:1.9">${wl.map(lineTxt).join("<br>")}${o.fee > 0 ? `<br>🛵 التوصيل: <b>${moneyP(o.fee)}</b>` : ""}</div>
+      <div class="sum total" style="margin-top:8px"><span>الإجمالي النهائي</span><b>${moneyP(o.final || o.total)}</b></div>
+      <p class="hint">التقديري كان ${moneyP(o.total)}${diff ? ` • الفرق <b style="color:${diff > 0 ? "#dc2626" : "#059669"}">${diff > 0 ? "+" : "−"}${moneyP(Math.abs(diff))}</b>` : ""}</p>
+      <div class="two"><button class="btn primary" id="tr-ok" type="button">✅ موافق</button><button class="btn dark" id="tr-no" type="button">❌ مش موافق</button></div>
+      <p class="hint">لو مش موافق هنتواصل معاك قبل ما نكمّل. ولسه مفيش حاجة اتذبحت.</p>
+    </div>` : "";
+  const apprNote = o.approval === "rejected" ? '<div class="tr-cancel" style="background:#fffbeb;border-color:#fde68a;color:#92400e">اتسجّل إنك مش موافق على الوزن/السعر. المحل هيتواصل معاك، أو كلّمنا على واتساب.</div>'
+    : (hasW && (o.approval === "approved" || o.approval === "auto") ? `<div class="hint" style="margin:0 0 8px">✅ تمت الموافقة على الوزن والسعر${o.approvedBy === "customer" ? " (من عندك)" : o.approvedBy === "manager" ? " (بالتليفون)" : ""}</div>` : "");
+  let totals;
+  if (o.final) totals = `<div class="sum"><span>التقديري عند الطلب</span><b${diff ? ' style="text-decoration:line-through;color:var(--muted)"' : ""}>${moneyP(o.total)}</b></div>
+      <div class="sum total"><span>✅ المبلغ النهائي</span><b>${moneyP(o.final)}</b></div>${diff ? `<p class="hint">الفرق ${diff > 0 ? "+" : "−"}${moneyP(Math.abs(diff))} بعد الوزن الفعلي (شامل التوصيل).</p>` : '<p class="hint">اتحسب بعد الوزن الفعلي، شامل التوصيل.</p>'}`;
+  else if (fixedOnly) totals = `<div class="sum total"><span>✅ السعر نهائي (ثابت)</span><b>${moneyP(o.total)}</b></div>`;
+  else totals = `<div class="sum"><span>المبلغ التقديري</span><b>${o.range ? rangeStr(o.range.lo, o.range.hi) : moneyP(o.total)}</b></div>
+      <p class="hint">⚖️ المبلغ النهائي بيتحدد بدقة بعد الوزن، وبيظهر هنا أول ما يتجهّز.${toleranceText(o.flow) ? "<br>" + esc(toleranceText(o.flow)) : ""}</p>`;
   body.innerHTML = `
     <div class="box"><div class="ord-head"><div><span class="ord-id">${esc(o.id)}</span><br><span class="ord-time">${esc(o.time)}</span></div><span class="st ${ST_CLASS[o.status] || ""}">${esc(stageLabel(o.status))}</span></div>
       <p class="hint" style="margin-top:6px">${o.type === "pickup" ? "🏬 استلام من الفرع" : "🛵 توصيل"}</p></div>
-    ${cancelled ? '<div class="tr-cancel">⚠️ الطلب ده اتلغى. لو ده غلط كلّمنا على واتساب.</div>' : ""}
+    ${cancelled ? `<div class="tr-cancel">⚠️ الطلب ده اتلغى.${o.cancelCharge > 0 ? ` محاسبة الطلب: ${moneyP(o.cancelCharge)}.` : ""} لو ده غلط كلّمنا على واتساب.</div>` : ""}
+    ${o.resv ? `<div class="notice" style="background:#ede9fe;color:#4c1d95;border-color:#c4b5fd"><b>${esc(resvText(o.resv))}</b><br><small>الأسعار والوزن بيتأكدوا يوم التنفيذ، وهنتواصل معاك لتأكيد الحجز.</small></div>` : ""}
+    ${approveBox}${apprNote}
     <div class="box"><h4>مراحل طلبك</h4><ol class="steps">${steps}</ol></div>
-    <div class="box">
-      <div class="sum"><span>المبلغ التقديري</span><b>${moneyP(o.total)}</b></div>
-      ${o.final ? `<div class="sum total"><span>✅ المبلغ النهائي</span><b>${moneyP(o.final)}</b></div><p class="hint">اتحسب بعد الوزن الفعلي، شامل التوصيل.</p>`
-                : '<p class="hint">⚖️ المبلغ النهائي بيتحدد بدقة بعد الوزن، وبيظهر هنا أول ما يتجهّز.</p>'}
-    </div>
-    <div class="box"><h4>📦 طلبك</h4><div class="ord-items">${o.items.map(x => esc(x)).join("\n")}</div></div>
+    <div class="box">${totals}</div>
+    <div class="box"><h4>📦 طلبك</h4><div class="ord-items">${hasW ? wl.map(lineTxt).join("<br>").replace(/<b>|<\/b>/g, "") : o.items.map(x => esc(x)).join("\n")}</div></div>
+    ${("Notification" in window && Notification.permission === "default") ? '<button class="btn dark" id="tr-notif" type="button" style="margin-bottom:8px">🔔 فعّل إشعارات طلبك (تنبيه لما حالته تتغيّر)</button>' : ""}
+    ${o.allowCancel ? '<button class="btn dark" id="tr-cancel" type="button" style="margin-bottom:8px;color:#b91c1c">❌ إلغاء الطلب</button>' : ""}
     <div class="two"><button class="btn dark" id="track-refresh" type="button">🔄 تحديث</button><a class="btn wa" href="https://wa.me/${WA}?text=${waText}" target="_blank" rel="noopener">💬 واتساب المحل</a></div>
-    <p class="hint" style="margin-top:10px;text-align:center">بتتحدّث لوحدها كل 30 ثانية.</p>`;
+    <p class="hint" style="margin-top:10px;text-align:center">بتتحدّث لوحدها كل دقيقة.</p>`;
+}
+async function trackDecide(d) {
+  const tk = S.trackToken; if (!tk) return;
+  if (d === "reject" && !confirm("مش موافق على الوزن والسعر؟ هنتواصل معاك قبل ما نكمّل.")) return;
+  try {
+    const r = await post({ action: "order_decision", token: tk, decision: d });
+    if (!r.ok) return toast(r.error || "تعذر تسجيل قرارك", "err");
+    S.trackOrder = r.order; rememberTracked(r.order); renderTrack();
+    toast(d === "approve" ? "تم تسجيل موافقتك ✅ شكراً" : "اتسجّل إنك مش موافق، هنتواصل معاك");
+  } catch (e) { toast("تعذر الاتصال، حاول تاني", "err"); }
+}
+async function trackCancel() {
+  const tk = S.trackToken; if (!tk || !confirm("إلغاء طلبك؟")) return;
+  try {
+    const r = await post({ action: "cancel_order", token: tk });
+    if (!r.ok) return toast(r.error || "تعذر إلغاء الطلب", "err");
+    S.trackOrder = r.order; rememberTracked(r.order); renderTrack(); toast("تم إلغاء طلبك");
+  } catch (e) { toast("تعذر الاتصال، حاول تاني", "err"); }
 }
 const stLabelEntry = s => stageLabel(s || "جديد");
 function renderMyOrders() {
@@ -2569,7 +3340,13 @@ function reorder(token) {
   (e.cart.items || []).forEach(x => {
     const m = findItem(x.id); if (!m) { skipped++; return; }
     const opts = prepOpts(m);
-    S.cart[x.id] = { qty: Math.min(Number(x.qty) || m.step, 100), prep: opts.includes(x.prep) ? x.prep : (opts[0] || x.prep), note: x.note || "" };
+    const line = { qty: Math.min(Number(x.qty) || m.step, 100), prep: opts.includes(x.prep) ? x.prep : (opts[0] || x.prep), note: x.note || "" };
+    if (x.count && m.count_mode && x.wmin >= m.piece_min - 0.001 && x.wmax <= m.piece_max + 0.001) { line.count = x.count; line.wmin = x.wmin; line.wmax = x.wmax; line.qty = Math.round(x.count * (x.wmin + x.wmax) / 2 * 100) / 100; }
+    if (x.tiers && activeTiers(m).length) {
+      const keep = {}; Object.keys(x.tiers).forEach(w => { if (tierOf(m, w)) keep[w] = x.tiers[w]; });
+      if (Object.keys(keep).length) { line.tiers = keep; line.qty = tierKg(keep); delete line.count; }
+    }
+    S.cart[x.id] = line;
     added++;
   });
   (e.cart.bundles || []).forEach(x => {
@@ -2587,9 +3364,11 @@ async function lookupMine() {
   if (!code || last4.length !== 4) return toast("اكتب رقم الطلب وآخر 4 أرقام من الموبايل", "err");
   const btn = $("lk-btn"); btn.disabled = true;
   try {
-    const r = await post({ action: "lookup_order", code, last4 });
+    const r = await post({ action: "lookup_order", code, last4, all: true });
     if (!r.ok) return toast(r.error || "مفيش طلب بالبيانات دي", "err");
-    rememberTracked(r.order); $("lk-code").value = ""; $("lk-last4").value = ""; renderMyOrders(); openTrack(r.order.token);
+    (r.orders && r.orders.length ? r.orders : [r.order]).forEach(rememberTracked);       // كل طلبات نفس الرقم تظهر على الجهاز ده
+    if (r.profile && !loadCust().phone) { saveCust({ name: r.profile.name, phone: r.profile.phone, address: r.profile.address, dtype: r.profile.type, zone: r.profile.zone, pay: loadCust().pay || "" }); restoreCust(); }
+    $("lk-code").value = ""; $("lk-last4").value = ""; renderMyOrders(); toast("اتضافت طلباتك على الجهاز ده ✅"); openTrack(r.order.token);
   } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
   finally { btn.disabled = false; }
 }
@@ -2725,6 +3504,8 @@ function openForm(id) {
   $("f-name").value = m ? m.name : "";
   $("f-price").value = m ? m.price : ""; $("f-unit").value = m ? m.unit : "كيلو";
   $("f-step").value = m ? m.step : 0.5; $("f-prep").value = m ? prepOpts(m).join("\n") : "";
+  $("f-basis").value = m ? (m.weight_basis || "") : ""; $("f-count").checked = !!(m && m.count_mode);
+  $("f-pmin").value = m && m.count_mode ? m.piece_min : ""; $("f-pmax").value = m && m.count_mode ? m.piece_max : ""; syncCountBox();
   $("f-img").value = m ? m.img : ""; $("f-desc").value = m ? m.desc : "";
   $("f-offer-qty").value = m && m.offer_qty ? m.offer_qty : ""; $("f-offer-total").value = m && m.offer_total ? m.offer_total : "";
   updateOfferFormHint();
@@ -2736,7 +3517,9 @@ function readForm() {
     unit: $("f-unit").value, step: Number($("f-step").value),
     prep_list: $("f-prep").value.split("\n").map(s => s.trim()).filter(Boolean),
     img: $("f-img").value.trim(), desc: $("f-desc").value.trim(),
-    offer_qty: Number($("f-offer-qty").value) || 0, offer_total: Number($("f-offer-total").value) || 0 };
+    offer_qty: Number($("f-offer-qty").value) || 0, offer_total: Number($("f-offer-total").value) || 0,
+    weight_basis: $("f-basis").value, count_mode: $("f-unit").value === "كيلو" && $("f-count").checked,
+    piece_min: Number($("f-pmin").value) || 0, piece_max: Number($("f-pmax").value) || 0 };
 }
 function clientItemError(it) {
   if (!it.name) return "اكتب اسم الصنف";
@@ -2745,6 +3528,7 @@ function clientItemError(it) {
   if (!it.prep_list.length) return "اكتب خيار تجهيز واحد على الأقل (كل خيار في سطر)";
   if (it.prep_list.some(s => /[,،]/.test(s))) return "خيار التجهيز ما ينفعش فيه فاصلة";
   if (it.img && !/^https:\/\//.test(it.img)) return "رابط الصورة لازم يبدأ بـ https://";
+  if (it.count_mode && !(it.piece_min > 0 && it.piece_max >= it.piece_min && it.piece_max <= 20)) return "اكتب أقل وأكبر وزن للفرخة (الأقل أصغر من أو يساوي الأكبر، وحتى 20 كيلو)";
   if (it.offer_qty || it.offer_total) {
     if (!(it.offer_qty > 0 && it.offer_total > 0)) return "اكتب كمية العرض وسعره الإجمالي معاً";
     if (!(it.offer_total / it.offer_qty < it.price)) return "سعر العرض لازم يكون أقل من السعر العادي (" + num(it.offer_qty * it.price) + " ج لـ " + num(it.offer_qty) + ")";
@@ -2848,10 +3632,22 @@ function renderAdminCats() {
       <div class="row-tools">
         <input class="input" data-clabel value="${esc(c.label)}" maxlength="30" aria-label="اسم التصنيف">
         <button type="button" class="btn-sm save" data-act="csave">حفظ</button>
+        <button type="button" class="btn-sm vis${c.visible === false ? "" : " on"}" data-act="cvis">${c.visible === false ? "🚫 مخفي" : "👁 ظاهر"}</button>
         <button type="button" class="btn-sm danger" data-act="cdel" aria-label="حذف التصنيف">🗑</button>
       </div>
       <small class="hint" style="margin:0">${counts[c.id] || 0} صنف</small></div>`).join("")
     || '<div class="empty">ما فيش تصنيفات</div>';
+}
+const catHiddenId = id => { const c = S.cats.find(x => x.id === id); return !!c && c.visible === false; };
+const itemVisible = m => m.visible !== false && !catHiddenId(m.cat);
+// إخفاء/إظهار صنف أو تصنيف من غير حذف (زي العروض: بيتقفل ويتفتح)
+async function toggleVisible(type, id, show) {
+  try {
+    const r = await post({ action: "set_visibility", pin: S.pin, type, id, visible: !!show });
+    if (!r.ok) return adminErr(r);
+    toast(show ? "اتفعّل وبقى ظاهر للزبائن ✅" : "اتخفى عن الزبائن (لسه موجود عندك) 🚫");
+    await loadMenu(false);
+  } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
 }
 async function saveCategory(id, label) {
   label = String(label || "").trim();
@@ -2904,6 +3700,10 @@ function cardClick(e) {
     }
     ni.focus(); return;
   }
+  const a0 = b.dataset.act;
+  if (a0 === "mode") { S.cmode[id] = b.dataset.m; renderGrid(); return; }
+  if (a0 === "cinc" || a0 === "cdec" || a0 === "cadd") return countAct(id, m, card, a0);
+  if (a0 === "tinc" || a0 === "tdec") { const w = Number(b.closest("[data-w]").dataset.w); const n0 = ((S.cart[id] || {}).tiers || {})[String(w)] || 0; return setTierCount(id, w, n0 + (a0 === "tinc" ? 1 : -1)); }
   const inp = card.querySelector('[data-act="set"]');
   const cur = normQty(m, inp ? inp.value : m.step), act = b.dataset.act;
   if (act === "pick") setPending(id, b.dataset.v, card);
@@ -2919,10 +3719,14 @@ function qtyClick(e) {
     const bid = bl.dataset.bid, cq = S.bcart[bid] ? S.bcart[bid].qty : 0;
     if (b.dataset.act === "binc") setBQty(bid, cq + 1);
     if (b.dataset.act === "bdec") setBQty(bid, cq - 1);
+    if (b.dataset.act === "bdel") { delete S.bcart[bid]; delete S.bpend[bid]; commit(); toast("تم حذف الباقة من الطلب"); }
     return;
   }
   const card = b.closest("[data-id]"); if (!card) return;
   const id = card.dataset.id, m = findItem(id); if (!m) return;
+  if (b.dataset.act === "tinc" || b.dataset.act === "tdec") { const w = Number(b.closest("[data-w]").dataset.w); const n0 = ((S.cart[id] || {}).tiers || {})[String(w)] || 0; return setTierCount(id, w, n0 + (b.dataset.act === "tinc" ? 1 : -1)); }
+  if (b.dataset.act === "del") { delete S.pend[id]; setQty(id, 0); toast("تم حذف الصنف من الطلب"); return; }
+  if (S.cart[id] && S.cart[id].count && (b.dataset.act === "inc" || b.dataset.act === "dec")) { setCartCount(id, S.cart[id].count + (b.dataset.act === "inc" ? 1 : -1)); return; }
   const cur = S.cart[id] ? S.cart[id].qty : 0;
   if (b.dataset.act === "add") setQty(id, m.step);
   if (b.dataset.act === "inc") setQty(id, cur + m.step);
@@ -2937,7 +3741,7 @@ function init() {
   $("pay-number").textContent = PAY_NUMBER;
   restoreCust();
 
-  $("logo").addEventListener("click", onLogoTap);
+  // دخول الإدارة بقى من صفحة الإدارة المنفصلة بس (admin.html)، مفيش طريق ليها من صفحة الزبائن
   $("theme-btn").addEventListener("click", () => applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
   $("font-btn").addEventListener("click", () => { applyFont(FONT_SIZES[(FONT_SIZES.indexOf(curFont) + 1) % FONT_SIZES.length]); });
   $("refresh-btn").addEventListener("click", () => loadMenu(true));
@@ -2959,6 +3763,12 @@ function init() {
   $("offers-banner").addEventListener("click", () => { S.cat = "__offers"; renderChips(); renderGrid(); renderOffersBanner(); window.scrollTo({ top: 0, behavior: "smooth" }); });
   $("grid").addEventListener("change", e => {
     const el = e.target, bcard = el.closest("[data-bid]");
+    if (el.dataset.act === "cmin" || el.dataset.act === "cmax") {          // نطاق وزن الفرخة (جوه حدود البائع)
+      const ccard = el.closest("[data-id]"), cm = ccard && findItem(ccard.dataset.id); if (!cm) return;
+      const cp = { ...cpOf(cm) }, v = Number(el.value);
+      if (el.dataset.act === "cmin") { cp.wmin = v; if (cp.wmax < v) cp.wmax = v; } else { cp.wmax = v; if (cp.wmin > v) cp.wmin = v; }
+      S.cpend[cm.id] = cp; refreshCount(ccard, cm); return;
+    }
     if (bcard) {
       const bid = bcard.dataset.bid;
       if (el.dataset.act === "bset") setBPending(bid, el.value, bcard);
@@ -2986,9 +3796,10 @@ function init() {
     try { await navigator.clipboard.writeText(PAY_NUMBER); toast("تم نسخ الرقم: " + PAY_NUMBER); } catch (e) { toast("انسخ الرقم يدوياً: " + PAY_NUMBER, "warn"); }
   });
   $("co-submit").addEventListener("click", submitOrder);
+  $("rv-on").addEventListener("change", renderClosed);
 
   $("pin-ok").addEventListener("click", verifyPin);
-  $("pin-cancel").addEventListener("click", () => $("pin-dialog").classList.add("hidden"));
+  $("pin-cancel").addEventListener("click", () => { if (APP_MODE !== "admin") $("pin-dialog").classList.add("hidden"); });
   $("pin-input").addEventListener("keydown", e => { if (e.key === "Enter") verifyPin(); });
   $("admin-close").addEventListener("click", closeAdmin);
   document.querySelector(".tabs").addEventListener("click", e => {
@@ -3003,6 +3814,8 @@ function init() {
     if (b.dataset.act === "offer") toggleOffer(id);
     if (b.dataset.act === "price") quickPrice(id, b);
     if (b.dataset.act === "edit") openForm(id);
+    if (b.dataset.act === "vis") toggleVisible("item", id, (findItem(id) || {}).visible === false);
+    if (b.dataset.act === "tiers") openTiers(id);
     if (b.dataset.act === "del") deleteItem(id);
   });
   $("f-img").addEventListener("input", () => { $("f-preview").src = safeImg($("f-img").value.trim()); });
@@ -3022,13 +3835,20 @@ function init() {
   $("ord-list").addEventListener("click", e => {
     const b = e.target.closest("button[data-act]"); if (!b) return;
     const card = b.closest("[data-oid]"), id = card.dataset.oid, act = b.dataset.act;
-    if (act === "onext") setOrderStatus(id, b.dataset.st);
-    if (act === "ofinal") saveFinal(id, card.querySelector("[data-final]").value);
+    if (act === "oopen") openOrderScreen(id);
     if (act === "ocopy") copyTrackLink(id);
   });
-  $("ord-list").addEventListener("change", e => {
-    if (e.target.dataset.act !== "ostsel") return;
-    setOrderStatus(e.target.closest("[data-oid]").dataset.oid, e.target.value);
+  $("os-close").addEventListener("click", closeOrderScreen);
+  $("os-body").addEventListener("input", e => { const i = e.target.dataset.wq; if (i === undefined || !S.os) return; S.os.q[i] = e.target.value; osRecalc(); });
+  $("os-body").addEventListener("click", e => {
+    const b = e.target.closest("[data-act]"); if (!b || !S.os) return; const a = b.dataset.act;
+    if (a === "wsave") osSaveWeigh();
+    if (a === "apphone") osApprove();
+    if (a === "stsave") osSaveStatus();
+    if (a === "cancelopen") { S.os.cancelOpen = true; renderOrderScreen(); }
+    if (a === "cancelclose") { S.os.cancelOpen = false; renderOrderScreen(); }
+    if (a === "cancelgo") osCancel();
+    if (a === "contact") osContact();
   });
   // تتبّع الزبون + طلباتي
   $("orders-btn").addEventListener("click", openMyOrders);
@@ -3049,6 +3869,10 @@ function init() {
   });
   $("track-body").addEventListener("click", e => {
     if (e.target.closest("#track-refresh") || e.target.closest("#track-retry")) { S.trackErr = ""; if (!S.trackOrder) renderTrack(); loadTrack(true); }
+    if (e.target.closest("#tr-ok")) trackDecide("approve");
+    if (e.target.closest("#tr-no")) trackDecide("reject");
+    if (e.target.closest("#tr-cancel")) trackCancel();
+    if (e.target.closest("#tr-notif")) enableNotif();
   });
   $("done-track").addEventListener("click", () => { if (S.doneToken) { closeSheet(); openTrack(S.doneToken); } });
   $("o-countdown").addEventListener("change", async e => {
@@ -3100,6 +3924,7 @@ function init() {
   });
   ["f-offer-qty", "f-offer-total", "f-price", "f-unit"].forEach(id => $(id).addEventListener("input", updateOfferFormHint));
   $("f-pick").addEventListener("click", () => $("f-file").click());
+  $("f-unit").addEventListener("change", syncCountBox); $("f-count").addEventListener("change", syncCountBox);
   $("f-file").addEventListener("change", handleImagePick);
   $("cat-add").addEventListener("click", () => saveCategory("", $("cat-new").value));
   $("cat-new").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); saveCategory("", $("cat-new").value); } });
@@ -3108,6 +3933,7 @@ function init() {
     const row = b.closest("[data-cid]"), id = row.dataset.cid;
     if (b.dataset.act === "csave") saveCategory(id, row.querySelector("[data-clabel]").value);
     if (b.dataset.act === "cdel") deleteCategory(id);
+    if (b.dataset.act === "cvis") toggleVisible("cat", id, (S.cats.find(x => x.id === id) || {}).visible === false);
   });
   $("d-zones").addEventListener("input", e => {
     const row = e.target.closest("[data-i]"); if (!row) return;
@@ -3122,7 +3948,7 @@ function init() {
   $("d-save").addEventListener("click", saveDelivery);
   document.addEventListener("keydown", e => {
     if (e.key !== "Escape") return;
-    if (!$("pin-dialog").classList.contains("hidden")) $("pin-dialog").classList.add("hidden");
+    if (APP_MODE !== "admin" && !$("pin-dialog").classList.contains("hidden")) $("pin-dialog").classList.add("hidden");
     else if ($("sheet").classList.contains("show")) closeSheet();
   });
 
@@ -3130,6 +3956,15 @@ function init() {
   $("s-search").addEventListener("input", renderPick);
   $("s-chips").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (!b) return; S.sCat = b.dataset.c; renderSell(); });
   $("s-pick").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (b) addToBill(b.dataset.k, b.dataset.id); });
+  $("td-text").addEventListener("input", tdPreview);
+  $("td-save").addEventListener("click", () => tdSave(false));
+  $("td-clear").addEventListener("click", () => { if (confirm("مسح كل أوزان الصنف ده؟")) tdSave(true); });
+  $("td-cancel").addEventListener("click", () => $("tiers-dialog").classList.add("hidden"));
+  $("qd-input").addEventListener("input", qdPreview);
+  $("qd-input").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); qdSubmit(); } });
+  $("qd-ok").addEventListener("click", qdSubmit);
+  $("qd-cancel").addEventListener("click", () => $("qty-dialog").classList.add("hidden"));
+  $("qd-chips").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (!b) return; $("qd-input").value = b.dataset.v; qdPreview(); qdSubmit(); });
   $("s-bill").addEventListener("click", e => {
     const b = e.target.closest("[data-a]"); if (!b || b.tagName === "INPUT") return;
     const row = b.closest(".bill-row"), k = row.dataset.k, id = row.dataset.id, store = k === "b" ? S.bill.bundles : S.bill.items;
@@ -3191,6 +4026,37 @@ function init() {
   $("sh-file").addEventListener("change", handleShopLogo);
   $("sh-logo").addEventListener("input", () => { $("sh-prev").src = logoOf({ logo: $("sh-logo").value.trim() }); });
   $("sh-save").addEventListener("click", saveShop);
+  $("poll-sec").addEventListener("change", e => { lsSet("tahona_poll_sec", e.target.value); toast("تم حفظ سرعة التحديث ✅"); });
+  ["sn-on", "sn-sel", "sn-vol", "sn-wake"].forEach(id => $(id).addEventListener("change", () => { sndSave(readSound()); applyWake(sndCfg().wake); }));
+  $("sn-test").addEventListener("click", () => { const c = readSound(); playSound(c.sound, c.vol); });
+  $("sn-pick").addEventListener("click", () => $("sn-file").click());
+  $("sn-file").addEventListener("change", async e => {
+    const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+    if (!/^audio\//.test(f.type)) return toast("اختار ملف صوت بس", "err");
+    if (f.size > 1.5 * 1024 * 1024) return toast("الملف أكبر من 1.5 ميجا، اختار صوت أقصر", "err");
+    if (!(await idbSet("orderSound", f))) return toast("تعذر حفظ الصوت على الجهاز", "err");
+    $("sn-sel").value = "custom"; sndSave(readSound()); fillSound(); $("sn-sel").value = "custom"; toast("تم حفظ الصوت ✅"); const c = readSound(); playSound("custom", c.vol);
+  });
+  $("sn-clear").addEventListener("click", async () => { await idbDel("orderSound"); if ($("sn-sel").value === "custom") $("sn-sel").value = "bell"; sndSave(readSound()); fillSound(); toast("تم مسح الصوت"); });
+  $("sn-notif").addEventListener("click", enableNotif);
+  $("hr-save").addEventListener("click", async () => {
+    const btn = $("hr-save"); btn.disabled = true;
+    try {
+      const r = await post({ action: "save_hours", pin: S.pin, hours: readHours() });
+      if (!r.ok) return adminErr(r);
+      toast("تم حفظ المواعيد ✅"); await loadMenu(false);
+    } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); } finally { btn.disabled = false; }
+  });
+  $("wa-count").addEventListener("click", e => { if (e.target.id === "wa-count-x") { clearInterval(waTimer); $("wa-count").classList.add("hidden"); } });
+  $("fl-save").addEventListener("click", async () => {
+    const trusted = $("fl-trusted").value.split(/[\n,\s]+/).map(x => x.trim()).filter(Boolean);
+    const btn = $("fl-save"); btn.disabled = true;
+    try {
+      const r = await post({ action: "save_flow", pin: S.pin, tolPct: Number($("fl-pct").value) || 0, tolEgp: Number($("fl-egp").value) || 0, display: $("fl-display").value, allowCancel: $("fl-cancel").checked, trusted });
+      if (!r.ok) return adminErr(r);
+      S.trusted = trusted; toast("تم حفظ القواعد ✅"); await loadMenu(false);
+    } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); } finally { btn.disabled = false; }
+  });
   $("cp-fmt").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (!b) return; S.camp.fmt = b.dataset.f; campRenderCtl(); campRefresh(true); });
   $("cp-src").addEventListener("click", e => { const b = e.target.closest("[data-s]"); if (!b) return; S.camp.src = b.dataset.s; campRenderCtl(); campRefresh(true); });
   $("cp-src-custom").addEventListener("input", () => campRefresh());
@@ -3212,6 +4078,7 @@ function init() {
 
   captureSrc();
   applyShop();
+  $("is-logo").src = LOGO_URI;
   initInstall();
   updateMyBadge();
   const tm = /[?&]track=([0-9a-fA-F]{16})(?![0-9a-fA-F])/.exec(location.search);
@@ -3221,13 +4088,19 @@ function init() {
   const hideSplash = () => { const s = $("splash"); if (s) s.classList.add("out"); };
   if (paintFromCache()) hideSplash();    // لو الزبون زار قبل كده: المنيو يظهر فوراً من غير شاشة تحميل
   loadMenu(false).then(hideSplash, hideSplash);   // وبعدين نجيب أحدث نسخة في الخلفية
+  if (APP_MODE === "admin") adminBoot();
+  else setInterval(() => { if (loadMyOrders().some(o => !isTerminal(o.status))) refreshMyStatuses(); }, 90000);   // الزبون: متابعة هادية لطلباته الشغّالة عشان التنبيه يوصله
   setInterval(offersTick, 15000);   // لو عرض خلص وقته، الأسعار بتتحدّث لوحدها
   setInterval(tickTimers, 1000);    // العداد التنازلي
-  setInterval(() => {               // الطلبات الجديدة: تحديث هادي كل 45 ثانية وتبويب الطلبات مفتوح
+  let lastPoll = 0;
+  setInterval(() => {               // الطلبات الجديدة: تحديث هادي بالسرعة اللي المدير اختارها، وبيقف لو الصفحة مخفية
+    const v = lsGet("tahona_poll_sec"), ms = (v === null ? 60 : Number(v)) * 1000;
+    if (!(ms > 0) || document.hidden || Date.now() - lastPoll < ms) return;
     if ($("admin").classList.contains("hidden") || $("tab-orders").classList.contains("hidden")) return;
     if (document.activeElement === $("ord-search")) return;
-    loadOrders(true);
-  }, 45000);
+    if (!$("order-screen").classList.contains("hidden")) return;            // مش بنحدّث والمدير شغّال جوه شاشة طلب
+    lastPoll = Date.now(); loadOrders(true);
+  }, 5000);
   setInterval(() => {   // تحديث تلقائي هادي كل دقيقتين
     if (document.hidden || $("sheet").classList.contains("show") || !$("admin").classList.contains("hidden")) return;
     const a = document.activeElement;
