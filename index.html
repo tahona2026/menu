@@ -134,6 +134,12 @@ main{padding:6px 16px 16px;max-width:1200px;margin:0 auto}
 .st.s-new{background:#dc2626}.st.s-ready{background:#d97706}.st.s-done{background:#059669}.st.s-cancel{background:#64748b}
 .ord-name{font-weight:800}
 .ord-meta{font-size:.8rem;color:var(--muted)}
+.ord-items.oi-list{white-space:normal;padding:4px 10px}
+.oi{padding:7px 0;border-bottom:1px dashed var(--border,#ddd)}.oi:last-child{border-bottom:0}
+.oi-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.oi-n{font-weight:900}.oi-p{font-weight:900;color:#7f1d1d;white-space:nowrap}
+.oi-sub{display:flex;flex-wrap:wrap;gap:6px;margin-top:3px;font-size:.78rem;opacity:.85}
+.oi-q{background:#fde68a;color:#7f1d1d;border-radius:8px;padding:1px 8px;font-weight:800}
 .ord-items{white-space:pre-wrap;font-size:.82rem;background:var(--surface-2);border-radius:10px;padding:8px 10px;line-height:1.6}
 .ord-tot{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.82rem}
 .ord-tot b{color:var(--brand)}
@@ -312,6 +318,7 @@ textarea.input{height:auto;padding:10px 12px;resize:vertical;min-height:72px}
 .zone-row button{width:46px;flex:none;border-radius:12px;background:var(--surface-2);border:1px solid var(--border);font-weight:800}
 .preview{width:100%;height:150px;object-fit:cover;border-radius:12px;background:var(--surface-2);margin-top:6px}
 .dialog{position:fixed;inset:0;z-index:70;background:rgba(2,6,23,.6);display:grid;place-items:center;padding:16px}
+#pin-dialog{place-items:start center;padding-top:10vh;overflow-y:auto}   /* فوق الشاشة عشان كيبورد الموبايل ما يغطّيش زرار الدخول */
 .dialog-box{background:var(--surface);border-radius:18px;padding:18px;width:100%;max-width:340px}
 .dialog-box h3{margin-bottom:12px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
@@ -2018,6 +2025,14 @@ function apprBadge(o) {
   if (o.approval === "approved" || o.approval === "auto") return `<span class="st s-done">✅ موافقة</span>`;
   return "";
 }
+// سطر صنف واحد في كارت الطلب: الاسم والسعر فوق، والكمية والتجهيز تحت (بدل سطر طويل متداخل)
+function itemRowHtml(x) {
+  const s = String(x), eq = s.lastIndexOf(" = "), mul = s.indexOf(" × ");
+  if (eq < 0 || mul < 0 || mul > eq) return `<div class="oi"><span class="oi-n">${esc(s)}</span></div>`;
+  const name = s.slice(0, mul), price = s.slice(eq + 3), mid = s.slice(mul + 3, eq), dash = mid.indexOf(" - ");
+  const qty = dash < 0 ? mid : mid.slice(0, dash), rest = dash < 0 ? "" : mid.slice(dash + 3);
+  return `<div class="oi"><div class="oi-top"><span class="oi-n"><bdi>${esc(name)}</bdi></span><span class="oi-p"><bdi>${esc(price)}</bdi></span></div><div class="oi-sub"><span class="oi-q"><bdi>${esc(qty)}</bdi></span>${rest ? `<span class="oi-r"><bdi>${esc(rest)}</bdi></span>` : ""}</div></div>`;
+}
 function orderCardHtml(o) {
   const waMsg = encodeURIComponent(statusMsg(o));
   const shop = o.source === "محل", hasPhone = /\d{6,}/.test(String(o.phone));
@@ -2026,7 +2041,7 @@ function orderCardHtml(o) {
     <div class="ord-head"><div><span class="ord-id">${esc(o.id)}</span> <span class="src${shop ? " shop" : ""}">${shop ? "🏪 محل" : "🌐 أونلاين"}</span>${o.resv ? ` <span class="src" style="background:#6d28d9;color:#fff">${esc(resvText(o.resv))}</span>` : ""}${o.camp ? ` <span class="src">📣 ${esc(o.camp)}</span>` : ""}<br><span class="ord-time">${esc(o.time)}${o.invoiceNo ? " • " + esc(o.invoiceNo) : ""}</span></div>${o.status ? `<span class="st ${ST_CLASS[o.status]}">${esc(stageLabel(o.status) === o.status ? o.status : o.status)}</span>` : `<span class="st">بدون حالة</span>`}</div>
     <div><span class="ord-name">${esc(o.name)}</span>${hasPhone ? ` <span class="ord-meta">• ${esc(o.phone)}</span>` : ""} ${apprBadge(o)}${needsContact ? ' <span class="st" style="background:#b45309">📵 لسه ما اتواصلش</span>' : (o.contactedAt && !shop ? ' <span class="ord-meta">✓ تم التواصل ' + esc(fmtTime(o.contactedAt)) + "</span>" : "")}</div>
     <div class="ord-meta">${shop ? `👤 الكاشير: ${esc(o.cashier || "—")}${o.discount > 0 ? " • خصم " + money(o.discount) : ""}` : o.type === "pickup" ? "🏬 استلام من الفرع" : `🛵 توصيل • ${esc(o.zone)}${o.address ? "<br>🏠 " + esc(o.address) : ""}`}</div>
-    <div class="ord-items">${o.items.map(x => esc(x)).join("\n")}</div>
+    <div class="ord-items oi-list">${o.items.map(itemRowHtml).join("")}</div>
     <div class="ord-tot"><span>الأصناف: <b>${money(o.subtotal)}</b></span><span>التوصيل: <b>${o.fee > 0 ? money(o.fee) : "—"}</b></span><span>${o.approval === "na" ? "السعر" : "التقديري"}: <b>${o.range && !o.final ? rangeStr(o.range.lo, o.range.hi) : money(o.total)}</b></span>${o.final ? `<span>✅ النهائي: <b>${moneyP(o.final)}</b></span>` : ""}<span>💳 ${esc(o.payment)}</span>${o.cancelCharge > 0 ? `<span>💸 محاسبة الإلغاء: <b>${money(o.cancelCharge)}</b></span>` : ""}</div>
     <div class="ord-act">
       <button type="button" class="btn-sm save" data-act="oopen">📝 فتح الطلب</button>
@@ -2441,7 +2456,7 @@ function maybeInstallSheet(kind) {
   if (!kind || lsGet("tahona_install_big") === "1") return;
   if (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone) return;
   if (!$("splash").classList.contains("out") || document.querySelector(".screen:not(.hidden)")) return setTimeout(() => maybeInstallSheet(kind), 2000);
-  const steps = { prompt: "", ios: "اضغط زرار المشاركة ⬆️ في سفاري، ثم «إضافة إلى الشاشة الرئيسية».", inapp: "افتح الصفحة من متصفح موبايلك: اضغط ⋮ ثم «فتح في المتصفح»، وبعدها ثبّت التطبيق." }[kind];
+  const steps = { prompt: "", manual: "افتح قايمة المتصفح (⋮ أو ☰) واختار «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية». (في هواوي: قايمة متصفح هواوي ثم «إضافة إلى الشاشة الرئيسية»). ولو مش ظاهرة، جرّب متصفح تاني.", ios: "اضغط زرار المشاركة ⬆️ في سفاري، ثم «إضافة إلى الشاشة الرئيسية».", inapp: "افتح الصفحة من متصفح موبايلك: اضغط ⋮ ثم «فتح في المتصفح»، وبعدها ثبّت التطبيق." }[kind];
   $("is-steps").textContent = steps; $("is-steps").classList.toggle("hidden", !steps);
   $("is-install").classList.toggle("hidden", kind !== "prompt");
   $("install-sheet").classList.remove("hidden"); lsSet("tahona_install_big", "1");
@@ -2449,11 +2464,11 @@ function maybeInstallSheet(kind) {
 function initInstall() {
   try { if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) navigator.serviceWorker.register("sw.js").catch(() => {}); } catch (e) {}
   const standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
-  if (standalone || lsGet("tahona_install_x") === "1") return;
-  window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferredInstall = e; $("install-bar").classList.remove("hidden"); setTimeout(() => maybeInstallSheet("prompt"), 1800); });
+  if (standalone || Number(lsGet("tahona_install_x")) > Date.now() - 2 * 864e5) return;   // ✕ بتخفي الشريط يومين بس (الإخفاء القديم "1" مش بيمنع)
+  window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferredInstall = e; $("install-bar").classList.remove("hidden"); $("install-sheet").classList.add("hidden"); });   // التثبيت ظهر: الشريط بس. الورقة للحالات اللي ما ظهرش فيها
   window.addEventListener("appinstalled", () => { deferredInstall = null; $("install-bar").classList.add("hidden"); $("install-sheet").classList.add("hidden"); lsSet("tahona_install_big", "1"); toast("تم تثبيت التطبيق ✅"); });
   // مفيش زرار تثبيت تلقائي على الآيفون ولا جوه متصفح واتساب/فيسبوك: ورقة بالخطوات (أول مرة بس)
-  setTimeout(() => { if (!deferredInstall) { const ua = navigator.userAgent; maybeInstallSheet(/FBAN|FBAV|Instagram|WhatsApp|Line\//i.test(ua) ? "inapp" : (/iPhone|iPad|iPod/i.test(ua) ? "ios" : "")); } }, 4500);
+  setTimeout(() => { if (!deferredInstall) { const ua = navigator.userAgent; maybeInstallSheet(/FBAN|FBAV|Instagram|WhatsApp|Line\//i.test(ua) ? "inapp" : (/iPhone|iPad|iPod/i.test(ua) ? "ios" : (/Android/i.test(ua) ? "manual" : ""))); } }, 4500);
   $("is-later").addEventListener("click", () => $("install-sheet").classList.add("hidden"));
   $("is-install").addEventListener("click", async () => {
     $("install-sheet").classList.add("hidden");
@@ -2468,7 +2483,7 @@ function initInstall() {
     try { await deferredInstall.userChoice; } catch (e) {}
     deferredInstall = null; $("install-bar").classList.add("hidden");
   });
-  $("install-x").addEventListener("click", () => { lsSet("tahona_install_x", "1"); $("install-bar").classList.add("hidden"); });
+  $("install-x").addEventListener("click", () => { lsSet("tahona_install_x", String(Date.now())); $("install-bar").classList.add("hidden"); });
 }
 
 /* ===== مصدر الطلب (من رابط الحملة ?src=...) ===== */
