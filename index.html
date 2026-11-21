@@ -134,6 +134,21 @@ main{padding:6px 16px 16px;max-width:1200px;margin:0 auto}
 .st.s-new{background:#dc2626}.st.s-ready{background:#d97706}.st.s-done{background:#059669}.st.s-cancel{background:#64748b}
 .ord-name{font-weight:800}
 .ord-meta{font-size:.8rem;color:var(--muted)}
+.late-bar{background:#fee2e2;color:#7f1d1d;border:1px solid #fca5a5;border-radius:12px;padding:10px 12px;font-weight:900;margin-bottom:8px;cursor:pointer}
+[data-theme="dark"] .late-bar{background:#3b1212;color:#fca5a5;border-color:#7f1d1d}
+.og-h{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;margin:10px 0 6px;padding:8px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--border);font-weight:900;font-size:.86rem}
+.og-h small{background:var(--brand);color:#fff;border-radius:99px;padding:1px 9px;font-weight:900}
+.orow{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:6px;overflow:hidden}
+.orow.open{border-color:var(--brand)}.orow.late{border-inline-start:5px solid #dc2626}
+.orow-line{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer}
+.orow-line .odot{width:12px;height:12px;border-radius:50%;background:#94a3b8;flex:none}
+.orow-line .odot.s-new{background:#dc2626}.orow-line .odot.s-prep{background:#f59e0b}.orow-line .odot.s-out{background:#2563eb}.orow-line .odot.s-done{background:#16a34a}.orow-line .odot.s-cancel{background:#cbd5e1}
+.orow-line .on{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}.orow-line .on b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.orow-line .on small{color:var(--muted);font-size:.7rem}
+.orow-line .oa{font-size:.72rem;color:var(--muted);white-space:nowrap}.orow-line .ot{white-space:nowrap;color:var(--brand)}.orow-line .oc{color:var(--muted)}
+.orow-badges{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 8px}
+.orb{font-size:.72rem;font-weight:800;border-radius:99px;padding:2px 9px;background:var(--surface-2);border:1px solid var(--border);text-decoration:none;color:inherit}
+.orb.late{background:#dc2626;color:#fff;border-color:#dc2626}.orb.warn{background:#fef3c7;color:#92400e;border-color:#fcd34d}.orb.act{background:var(--brand);color:#fff;border-color:var(--brand);min-width:36px;text-align:center}
+.orow .row.ord{border:0;border-top:1px dashed var(--border);border-radius:0;margin:0}
 .pn-prev{margin-top:10px;border:1px solid var(--border);border-radius:16px;background:var(--surface);overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.12)}
 .pn-prev .pn-h{display:flex;gap:8px;align-items:center;padding:10px 12px}
 .pn-prev .pn-h img{width:36px;height:36px;border-radius:10px;flex:none}
@@ -752,6 +767,12 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
     </div>
     <div id="tab-shop" class="hidden">
       <div class="box"><h4>🔐 أجهزة الدخول بالبصمة</h4><p class="hint">الأجهزة اللي بتفتح الإدارة بالبصمة من غير كلمة السر. لو موبايل ضاع الغي تسجيله من هنا.</p><div id="dev-list"></div></div>
+      <div class="box"><h4>⏰ تنبيه تأخر الطلبات</h4><p class="hint">الطلب بيتعدّ متأخر لو عدّى عدد الدقايق ده من غير ما حاجة تتحدّث فيه. بيظهر شريط أحمر فوق الطلبات وعلامة ⏰ على الطلب. حجوزات اليوم الجاي وبيع المحل مش بيتعدّوا.</p>
+        <div class="field"><label for="lt-new">🆕 جديد (محدش اتعامل معاه)</label><input class="input" id="lt-new" type="number" min="1" max="1440"></div>
+        <div class="field"><label for="lt-appr">⏳ بانتظار موافقة العميل</label><input class="input" id="lt-appr" type="number" min="1" max="1440"></div>
+        <div class="field"><label for="lt-prep">🔧 قيد التجهيز</label><input class="input" id="lt-prep" type="number" min="1" max="1440"></div>
+        <div class="field"><label for="lt-out">🚚 في الطريق / جاهز للاستلام</label><input class="input" id="lt-out" type="number" min="1" max="1440"></div>
+        <button class="btn primary" id="lt-save" type="button">💾 حفظ المدد</button></div>
       <div class="box">
         <h4>🏪 بيانات المحل (بتظهر على الفاتورة)</h4>
         <div class="field"><label for="sh-name">اسم المحل *</label><input class="input" id="sh-name" maxlength="60"></div>
@@ -833,7 +854,13 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
         <button class="chip" type="button" data-f="cancel" aria-pressed="false">⚪ ملغي</button>
         <button class="chip" type="button" data-f="shop" aria-pressed="false">🏪 مبيعات المحل</button>
         <button class="chip" type="button" data-f="online" aria-pressed="false">🌐 أونلاين</button>
+        <button class="chip" type="button" data-f="late" aria-pressed="false">⏰ متأخر</button>
+        <button class="chip" type="button" data-f="weigh" aria-pressed="false">⚖️ محتاج وزن</button>
+        <button class="chip" type="button" data-f="nocontact" aria-pressed="false">📵 لسه ما اتواصلش</button>
+        <button class="chip" type="button" data-f="resv" aria-pressed="false">📅 حجوزات</button>
       </div>
+      <div class="late-bar hidden" id="late-bar" role="button" tabindex="0"></div>
+      <div class="inline" style="margin-bottom:6px"><select class="input" id="ord-sort" aria-label="ترتيب الطلبات"><option value="old">⬆️ الأقدم أولاً</option><option value="new">⬇️ الأحدث أولاً</option><option value="total">💰 الأكبر إجمالي</option></select></div>
       <p class="hint" id="ord-summary" style="margin-bottom:8px"></p>
       <div id="ord-list"></div>
       <button class="btn dark hidden" id="ord-more" type="button" style="margin-top:4px">⬇️ عرض طلبات أقدم</button>
@@ -2010,7 +2037,7 @@ function closeAdmin() {
   $("admin").classList.add("hidden"); document.body.classList.remove("lock");
   $("order-screen").classList.add("hidden"); S.os = null; pushLogoutAdmin();
   if (APP_MODE === "admin") setTimeout(openPin, 50);
-  S.pin = ""; S.role = ""; S.userName = ""; S.perms = {}; S.orders = []; S.users = []; S.rLast = null;
+  S.pin = ""; S.role = ""; S.userName = ""; S.perms = {}; S.orders = []; S.lateInit = false; S.lateSeen = null; S.lateCount = 0; S.ordOpen = ""; S.users = []; S.rLast = null;
   S.bill = { items: {}, bundles: {} }; $("s-disc").value = ""; $("s-cname").value = ""; $("s-cphone").value = ""; $("s-note").value = "";
   $("r-out").innerHTML = ""; $("s-summary").innerHTML = "";
 }
@@ -2025,7 +2052,7 @@ function showAdminTab(t) {
   if (t === "reports") initReports();
   if (t === "campaign") campInit();
   if (t === "users") showUserList();
-  if (t === "shop") { fillShop(); loadDevices(); }
+  if (t === "shop") { fillShop(); loadDevices(); fillLate(); }
   if (t === "push") pnInit();
   if (t === "design") loadDesigner();
   if (t === "orders") { renderOrders(); loadOrders(true); }
@@ -2174,12 +2201,57 @@ async function loadOrders(reset) {
     if (reset) ownerDetect(fresh);
     S.orders = reset ? fresh : S.orders.concat(fresh);
     S.ordNext = r.nextOffset; S.ordMore = r.hasMore; S.ordTotal = r.total; S.ordNew = r.newCount; S.ordToday = r.today;
-    renderOrders(); updateOrdBadge();
+    renderOrders(); updateOrdBadge(); lateTick();
   } catch (e) { toast("تعذر تحميل الطلبات", "err"); }
   finally { btn.disabled = false; }
 }
+/* ===== قايمة الطلبات: سطر مطوي + تجميع بالمراحل + ترتيب + تنبيه التأخر ===== */
+const LATE_DEF = { new: 10, appr: 15, prep: 45, out: 60 };
+const lateCfg = () => Object.assign({}, LATE_DEF, (S.settings && S.settings.late) || {});
+const OG = [["new", "🆕 جديد"], ["wait", "⏳ بانتظار موافقة العميل"], ["prep", "🔧 قيد التجهيز"], ["out", "🚚 في الطريق / جاهز للاستلام"], ["done", "✅ اتسلّم"], ["cancel", "🚫 ملغي"]];
+function orderGroup(o) {
+  const s = o.status || "جديد";
+  if (s === "ملغي") return "cancel"; if (s === "تم التسليم") return "done";
+  if (s === "خرج للتوصيل" || s === "جاهز للاستلام") return "out";
+  if (o.approval === "pending" && s === "تم الوزن") return "wait";
+  return s === "جديد" ? "new" : "prep";
+}
+const orderMs = o => { const m = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})/.exec(String(o.time)); return m ? Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]) : (o.updated || 0); };
+const durText = m => m < 60 ? m + " د" : Math.floor(m / 60) + " س" + (m % 60 ? " " + (m % 60) + " د" : "");
+function lateInfo(o) {
+  if (o.source === "محل" || isTerminal(o.status)) return null;
+  if (o.resv && /^\d{4}-\d{2}-\d{2}$/.test(o.resv.d || "")) { const t = o.resv.t || "00:00"; if (Date.UTC(+o.resv.d.slice(0, 4), +o.resv.d.slice(5, 7) - 1, +o.resv.d.slice(8, 10), +t.slice(0, 2) - 2, +t.slice(3, 5)) > nowMs()) return null; }
+  const g = orderGroup(o), lim = lateCfg()[g === "wait" ? "appr" : g]; if (!lim) return null;
+  const base = g === "wait" && o.approvalAt ? o.approvalAt : (o.updated || 0); if (!base) return null;
+  const mins = Math.floor((nowMs() - base) / 60000);
+  return mins >= lim ? { mins, lim } : null;
+}
+const needsContactO = o => o.source !== "محل" && !o.contactedAt && !isTerminal(o.status) && ["جديد", "تم الوزن"].includes(o.status || "جديد");
+const ordClosed = () => { try { return JSON.parse(lsGet("tahona_ord_groups") || '{"done":1,"cancel":1}'); } catch (e) { return { done: 1, cancel: 1 }; } };
+function orderRowHtml(o) {
+  const L = lateInfo(o), open = S.ordOpen === o.id, shop = o.source === "محل", hasPhone = /\d{6,}/.test(String(o.phone)), g = orderGroup(o);
+  const badges = [L ? `<span class="orb late">⏰ متأخر ${durText(L.mins)}</span>` : "", needsContactO(o) ? '<span class="orb warn">📵 لسه ما اتواصلش</span>' : "",
+    (!shop && o.approval === "todo" && (o.status || "جديد") === "جديد") ? '<span class="orb">⚖️ محتاج وزن</span>' : "", g === "wait" ? '<span class="orb">⏳ بانتظار العميل</span>' : "",
+    o.resv ? '<span class="orb">📅 حجز</span>' : "", shop ? '<span class="orb">🏪 محل</span>' : "",
+    hasPhone ? `<a class="orb act" href="tel:${esc(String(o.phone).replace(/\D/g, ""))}" aria-label="اتصال">📞</a><a class="orb act" href="https://wa.me/${esc(phoneIntl(o.phone))}" target="_blank" rel="noopener" aria-label="واتساب">💬</a>` : ""].join("");
+  const age = Math.max(0, Math.floor((nowMs() - (o.updated || 0)) / 60000));
+  return `<div class="orow${open ? " open" : ""}${L ? " late" : ""}" data-orow="${esc(o.id)}"><div class="orow-line" data-tog="${esc(o.id)}"><span class="odot ${ST_CLASS[o.status || "جديد"] || ""}"></span><span class="on"><b>${esc(o.name)}</b><small>${esc(String(o.id).slice(-6))} • ${esc(String(o.time).slice(11))}</small></span><span class="oa">${o.updated ? "من " + durText(age) : ""}</span><b class="ot">${money(o.total)}</b><span class="oc">${open ? "▴" : "▾"}</span></div><div class="orow-badges">${badges}</div>${open ? orderCardHtml(o) : ""}</div>`;
+}
+function lateTick() {
+  if (!S.pin || !S.orders.length) return;
+  const late = S.orders.filter(o => lateInfo(o)); S.lateCount = late.length;
+  const seen = S.lateSeen || (S.lateSeen = new Set()), fresh = late.filter(o => !seen.has(o.id)); fresh.forEach(o => seen.add(o.id));
+  if (S.lateInit && fresh.length) ownerAlert("⏰ " + (fresh.length === 1 ? "طلب متأخر: " + fresh[0].name : fresh.length + " طلبات اتأخرت"));
+  S.lateInit = true;
+  if ($("tab-orders") && !$("tab-orders").classList.contains("hidden")) renderOrders();
+  adminNavRender();
+}
 function ordMatch(o) {
   const f = S.ordF, q = S.ordQ.trim().toLowerCase();
+  if (f === "late" && !lateInfo(o)) return false;
+  if (f === "weigh" && !(o.source !== "محل" && o.approval === "todo" && (o.status || "جديد") === "جديد")) return false;
+  if (f === "nocontact" && !needsContactO(o)) return false;
+  if (f === "resv" && !o.resv) return false;
   if (f === "today" && !String(o.time).startsWith(S.ordToday)) return false;
   if (f === "new" && o.status !== "جديد") return false;
   if (f === "wait" && o.approval !== "pending") return false;
@@ -2237,16 +2309,24 @@ function orderCardHtml(o) {
     </div></div>`;
 }
 function renderOrders() {
-  const list = S.orders.filter(ordMatch);
+  const list = S.orders.filter(ordMatch), closed = ordClosed(), q = S.ordQ.trim();
   const sum = list.filter(o => o.status !== "ملغي").reduce((a, o) => a + o.total, 0);
   $("ord-summary").textContent = S.orders.length
     ? `${list.length} طلب • إجمالي ${money(sum)} (من غير الملغي) • محمّل ${S.orders.length} من ${S.ordTotal}`
     : "ما فيش طلبات لسه.";
-  $("ord-list").innerHTML = list.map(orderCardHtml).join("") || (S.orders.length ? '<div class="empty">ما فيش طلبات مطابقة</div>' : "");
-  $("ord-more").classList.toggle("hidden", !S.ordMore);
+  const sortFn = S.ordSort === "new" ? (a, b) => orderMs(b) - orderMs(a) || (b.id < a.id ? -1 : 1) : S.ordSort === "total" ? (a, b) => b.total - a.total : (a, b) => orderMs(a) - orderMs(b) || (a.id < b.id ? -1 : 1);
+  let html = "";
+  OG.forEach(([g, label]) => {
+    const items = list.filter(o => orderGroup(o) === g).sort(sortFn); if (!items.length) return;
+    const shut = closed[g] && !q && S.ordF === "all";
+    html += `<button type="button" class="og-h" data-gh="${g}"><span>${shut ? "▸" : "▾"} ${label}</span><small>${items.length}</small></button>` + (shut ? "" : items.map(orderRowHtml).join(""));
+  });
+  $("ord-list").innerHTML = html || (S.orders.length ? '<div class="empty">ما فيش طلبات مطابقة</div>' : "");
+  const nl = S.orders.filter(o => lateInfo(o)).length, lb = $("late-bar");
+  lb.classList.toggle("hidden", !nl || S.ordF === "late"); lb.textContent = "⏰ " + nl + (nl === 1 ? " طلب متأخر" : " طلبات متأخرة") + " — اضغط لعرضهم";
+  $("ord-sort").value = S.ordSort; $("ord-more").classList.toggle("hidden", !S.ordMore);
   document.querySelectorAll("#ord-filters .chip").forEach(c => c.setAttribute("aria-pressed", String(c.dataset.f === S.ordF)));
 }
-// الزرار بيفتح صفحة التتبّع للعميل فعلاً (عشان المدير يشوف اللي العميل شايفه) وبينسخ الرابط كمان
 async function copyTrackLink(id) {
   const o = S.orders.find(x => x.id === id); if (!o || !o.token) return;
   const url = trackUrl(o.token);
@@ -2474,17 +2554,25 @@ async function sysNotify(title, body) {
 const OS_APP_ID = "71878b83-123a-4ba0-ab65-c69e01435ef8";
 let osReady = null;
 function osLoad() {
+  if (window.__osInst) return Promise.resolve(window.__osInst);          // اتهيّأ فعلاً (حتى لو اتأخر عن المهلة)
   if (osReady) return osReady;
   const p = new Promise(res => {
     if (location.hostname !== "tahona2026.github.io") { S.osErr = "الإشعارات بتشتغل بس على الموقع الحقيقي"; return res(null); }
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) { S.osErr = "المتصفح ده مش بيدعم الإشعارات"; return res(null); }
+    if (window.__osTried) return res(null);            // المحاولة التانية على نفس الصفحة بتديك «already initialized» وبتخبي السبب الحقيقي، فمش بنعيدها
+    window.__osTried = true;
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async OneSignal => {
-      try { await OneSignal.init({ appId: OS_APP_ID, serviceWorkerPath: "menu/sw.js", serviceWorkerParam: { scope: "/menu/" } }); S.osErr = ""; res(OneSignal); } catch (e) { S.osErr = "تعذر تشغيل خدمة الإشعارات: " + String((e && e.message) || e).slice(0, 80); res(null); }
+      try { await OneSignal.init({ appId: OS_APP_ID, safari_web_id: "web.onesignal.auto.0c90051e-4735-447d-b203-75e3767d91b9", serviceWorkerPath: "menu/sw.js", serviceWorkerParam: { scope: "/menu/" } }); S.osErr = ""; window.__osInst = OneSignal; res(OneSignal); }
+      catch (e) {
+        const m = String((e && e.message) || e);
+        S.osErr = /not configured for web push/i.test(m) ? "إعدادات الويب لسه ما اتكملتش في لوحة OneSignal (Settings ثم Push & In-App ثم Web)" : "تعذر تشغيل خدمة الإشعارات: " + m.slice(0, 80);
+        res(null);
+      }
     });
     const sc = document.createElement("script"); sc.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"; sc.defer = true; sc.onerror = () => { S.osErr = "تعذر تحميل خدمة الإشعارات (النت أو حاجب)"; res(null); };
     document.head.appendChild(sc);
-    setTimeout(() => { if (!S.osErr) S.osErr = "خدمة الإشعارات اتأخرت في التحميل"; res(null); }, 15000);
+    setTimeout(() => { if (!S.osErr) S.osErr = "خدمة الإشعارات اتأخرت في التحميل"; res(null); }, 30000);
   });
   osReady = p; p.then(v => { if (!v) osReady = null; });       // لو فشل نسيب المحاولة الجاية تتجرّب من الأول
   return p;
@@ -2500,6 +2588,9 @@ async function pushId() {
 const pushOff = () => lsGet("tahona_push_off") === "1";          // الافتراضي: مفعّلة. الزبون/المدير بيقفلها من الإعدادات
 // حالة الإشعارات بالنص (بتظهر تحت زرار التفعيل): مفعّلة / محجوبة / مش مسجّلة
 async function pushDiag() {
+  const t = await pushDiag0(); S.pushOk = t.startsWith("✅") ? true : (t.startsWith("⚠️") ? false : undefined); return t;
+}
+async function pushDiag0() {
   if (!("Notification" in window)) return "المتصفح ده مش بيدعم الإشعارات.";
   const perm = Notification.permission;
   if (perm === "denied") return "🚫 الإشعارات محجوبة من إعدادات المتصفح للموقع ده (افتحها من قفل 🔒 جنب العنوان ثم الإشعارات).";
@@ -2877,12 +2968,12 @@ async function installNow() {
   $("install-sheet").classList.remove("hidden");
 }
 function smItems() {
-  const dark = document.documentElement.dataset.theme === "dark", pushOn = "Notification" in window && Notification.permission === "granted" && !pushOff();
+  const dark = document.documentElement.dataset.theme === "dark", pushOn = "Notification" in window && Notification.permission === "granted" && !pushOff() && S.pushOk !== false;
   const common = [
     ["theme", dark ? "☀️ الوضع النهاري" : "🌙 الوضع الليلي"],
     ...(isStandalone() ? [] : [["install", "📲 تثبيت التطبيق"]]),
     ...(APP_MODE === "admin" ? [["bio", devGet() ? "🔐 البصمة مفعّلة (اضغط للإلغاء)" : "🔐 تفعيل الدخول بالبصمة"]] : []),
-    ...("Notification" in window ? [["push", pushOn ? "🔔 الإشعارات مفعّلة ✓ (اضغط لإيقافها)" : (Notification.permission === "denied" ? "🚫 الإشعارات محجوبة (اضغط للشرح)" : "🔔 تفعيل الإشعارات")]] : [])
+    ...("Notification" in window ? [["push", Notification.permission === "granted" && !pushOff() && S.pushOk === false ? "⚠️ الإشعارات: الاشتراك ما اتسجلش (اضغط للتفاصيل)" : pushOn ? "🔔 الإشعارات مفعّلة ✓ (اضغط لإيقافها)" : (Notification.permission === "denied" ? "🚫 الإشعارات محجوبة (اضغط للشرح)" : "🔔 تفعيل الإشعارات")]] : [])
   ];
   if (APP_MODE === "admin") {
     const tabs = [...document.querySelectorAll("#admin .tabs button[data-tab]")].filter(b => !b.classList.contains("hidden") && !["sell", "orders", "items"].includes(b.dataset.tab)).map(b => ["tab:" + b.dataset.tab, b.textContent.trim()]);
@@ -2892,8 +2983,9 @@ function smItems() {
 }
 function openSideMenu() {
   $("sm-title").textContent = APP_MODE === "admin" ? "☰ باقي الأقسام والإعدادات" : "☰ المزيد";
-  $("sm-grid").innerHTML = smItems().map(([k, l]) => `<button type="button" data-k="${esc(k)}">${esc(l)}</button>`).join("");
-  $("side-menu").classList.remove("hidden");
+  const draw = () => { $("sm-grid").innerHTML = smItems().map(([k, l]) => `<button type="button" data-k="${esc(k)}">${esc(l)}</button>`).join(""); };
+  draw(); $("side-menu").classList.remove("hidden");
+  pushDiag().then(() => { if (!$("side-menu").classList.contains("hidden")) draw(); }).catch(() => {});     // الحالة الحقيقية للاشتراك (مش بس إذن المتصفح)
 }
 function smAction(k) {
   $("side-menu").classList.add("hidden");
@@ -2901,6 +2993,7 @@ function smAction(k) {
   if (k === "theme") return applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
   if (k === "install") return installNow();
   if (k === "bio") return devGet() ? bioDisable() : bioEnroll();
+  if (k === "push" && "Notification" in window && Notification.permission === "granted" && !pushOff() && S.pushOk === false) { pushDiag().then(t => alert("حالة الإشعارات:\n\n" + t)); return; }
   if (k === "push") return pushToggle(!("Notification" in window && Notification.permission === "granted" && !pushOff()));
   if (k === "refresh") return $("refresh-btn").click();
   if (k === "font") return $("font-btn").click();
@@ -2915,13 +3008,14 @@ function openMenuPreview(url, title) {
   $("menu-preview").classList.remove("hidden");
 }
 function closeMenuPreview() { $("menu-preview").classList.add("hidden"); $("mp-frame").src = "about:blank"; }
+function fillLate() { const l = lateCfg(); $("lt-new").value = l.new; $("lt-appr").value = l.appr; $("lt-prep").value = l.prep; $("lt-out").value = l.out; }
 function adminNavRender() {
   const nav = $("admin-nav"); if (!nav) return;
   const items = [["sell", "🧾", "كاشير", "sell"], ["orders", "📦", "الطلبات", "orders"], ["items", "📋", "الأصناف", "admin"]]
     .filter(([, , , need]) => need === "admin" ? isAdmin() : need === "orders" ? canOrders() : true);
   const on = (document.querySelector("#admin .tabs button.on") || {}).dataset;
   const ob = document.querySelector('#admin .tabs button[data-tab="orders"]'), m = ob && /\((\d+)\)/.exec(ob.textContent);
-  nav.innerHTML = items.map(([t, i, l]) => `<button type="button" data-t="${t}" class="${on && on.tab === t ? "on" : ""}"><span class="bi">${i}</span>${l}${t === "orders" && m ? `<span class="bdg">${m[1]}</span>` : ""}</button>`).join("")
+  nav.innerHTML = items.map(([t, i, l]) => `<button type="button" data-t="${t}" class="${on && on.tab === t ? "on" : ""}"><span class="bi">${i}</span>${l}${t === "orders" && m ? `<span class="bdg">${m[1]}</span>` : ""}${t === "orders" && S.lateCount ? `<span class="bdg" style="background:#b45309;left:calc(50% - 26px)">⏰${S.lateCount}</span>` : ""}</button>`).join("")
     + '<button type="button" data-t="__more"><span class="bi">☰</span>المزيد</button>';
 }
 function bnavRender() {
@@ -4372,8 +4466,18 @@ function init() {
   $("ord-search").addEventListener("input", e => { S.ordQ = e.target.value; renderOrders(); });
   $("ord-refresh").addEventListener("click", () => loadOrders(true));
   $("ord-more").addEventListener("click", () => loadOrders(false));
+  $("ord-sort").addEventListener("change", () => { S.ordSort = $("ord-sort").value; lsSet("tahona_ord_sort", S.ordSort); renderOrders(); });
+  $("late-bar").addEventListener("click", () => { S.ordF = "late"; renderOrders(); });
+  $("lt-save").addEventListener("click", async () => {
+    const late = { new: Number($("lt-new").value), appr: Number($("lt-appr").value), prep: Number($("lt-prep").value), out: Number($("lt-out").value) };
+    try { const r = await post({ action: "save_late", pin: S.pin, late }); if (!r.ok) return adminErr(r); S.settings.late = late; toast("تم حفظ مدد التأخير ✅"); lateTick(); } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
+  });
   $("ord-filters").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (!b) return; S.ordF = b.dataset.f; renderOrders(); });
   $("ord-list").addEventListener("click", e => {
+    const gh = e.target.closest("[data-gh]");
+    if (gh) { const c = ordClosed(); c[gh.dataset.gh] = c[gh.dataset.gh] ? 0 : 1; lsSet("tahona_ord_groups", JSON.stringify(c)); return renderOrders(); }
+    const tg = e.target.closest("[data-tog]");
+    if (tg) { const id = tg.dataset.tog; S.ordOpen = S.ordOpen === id ? "" : id; renderOrders(); const r = S.ordOpen && document.querySelector(`[data-orow="${CSS.escape(S.ordOpen)}"]`); if (r) r.scrollIntoView({ block: "nearest", behavior: "smooth" }); return; }
     const b = e.target.closest("button[data-act]"); if (!b) return;
     const card = b.closest("[data-oid]"), id = card.dataset.oid, act = b.dataset.act;
     if (act === "oopen") openOrderScreen(id);
@@ -4637,6 +4741,8 @@ function init() {
   $("qr-dl").addEventListener("click", downloadQr);
   $("qr-poster").addEventListener("click", downloadPoster);
 
+  S.ordSort = ["old", "new", "total"].includes(lsGet("tahona_ord_sort")) ? lsGet("tahona_ord_sort") : "old";      // الافتراضي: الأقدم أولاً
+  setInterval(lateTick, 60000);
   initNav();
   captureSrc();
   applyShop();
