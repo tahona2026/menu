@@ -2600,7 +2600,10 @@ async function pushDiag0() {
   if (!OS) return "⚠️ الإذن موجود لكن " + (S.osErr || "خدمة الإشعارات مش شغّالة دلوقتي") + ".";
   try {
     const sub = OS.User.PushSubscription, ext = OS.User.externalId;
+    let sws = []; try { sws = (await navigator.serviceWorker.getRegistrations()).map(r => r.scope.replace(location.origin, "") + (r.active ? "(شغّال)" : r.installing ? "(بيتثبّت)" : "(مش شغّال)")); } catch (e) {}
+    S.pushDetail = "الإذن: " + Notification.permission + "\nمسجّل في OneSignal: " + (sub.optedIn ? "نعم" : "لا") + "\nرقم الاشتراك: " + (sub.id ? String(sub.id).slice(0, 8) + "…" : "مفيش") + "\nتوكن الإشعارات: " + (sub.token ? "موجود" : "مفقود") + "\nService Worker: " + (sws.join("، ") || "مفيش") + "\nالمتصفح: " + (navigator.userAgent.match(/(SamsungBrowser|Chrome|Firefox|Edg)\/[\d.]+/) || ["مش معروف"])[0];
     if (!sub.optedIn) return "⚠️ الإذن موجود لكن الاشتراك لسه ما اتسجلش. اقفل التطبيق وافتحه تاني.";
+    if (!sub.token) return "⚠️ الاشتراك اتسجّل لكن المتصفح ما أعطاش «توكن» للإشعارات (غالباً المتصفح مش بيدعم الإشعارات، أو خدمات جوجل مش شغّالة على الموبايل).";
     return "✅ مفعّلة وجهازك مسجّل" + (ext ? " ومربوط " + (APP_MODE === "admin" ? "بطلبات المحل." : "بطلباتك.") : (APP_MODE === "admin" ? "." : " (هيتربط برقمك لما تعمل أول طلب)."));
   } catch (e) { return "⚠️ تعذر قراءة حالة الإشعارات."; }
 }
@@ -2972,6 +2975,7 @@ function smItems() {
   const common = [
     ["theme", dark ? "☀️ الوضع النهاري" : "🌙 الوضع الليلي"],
     ...(isStandalone() ? [] : [["install", "📲 تثبيت التطبيق"]]),
+    ...("Notification" in window ? [["pushdiag", "🔍 فحص الإشعارات"]] : []),
     ...(APP_MODE === "admin" ? [["bio", devGet() ? "🔐 البصمة مفعّلة (اضغط للإلغاء)" : "🔐 تفعيل الدخول بالبصمة"]] : []),
     ...("Notification" in window ? [["push", Notification.permission === "granted" && !pushOff() && S.pushOk === false ? "⚠️ الإشعارات: الاشتراك ما اتسجلش (اضغط للتفاصيل)" : pushOn ? "🔔 الإشعارات مفعّلة ✓ (اضغط لإيقافها)" : (Notification.permission === "denied" ? "🚫 الإشعارات محجوبة (اضغط للشرح)" : "🔔 تفعيل الإشعارات")]] : [])
   ];
@@ -2993,7 +2997,8 @@ function smAction(k) {
   if (k === "theme") return applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
   if (k === "install") return installNow();
   if (k === "bio") return devGet() ? bioDisable() : bioEnroll();
-  if (k === "push" && "Notification" in window && Notification.permission === "granted" && !pushOff() && S.pushOk === false) { pushDiag().then(t => alert("حالة الإشعارات:\n\n" + t)); return; }
+  if (k === "pushdiag") { pushDiag().then(t => alert("فحص الإشعارات:\n\n" + t + "\n\n" + (S.pushDetail || "(مفيش تفاصيل: خدمة الإشعارات ما اشتغلتش) " + (S.osErr || "")))); return; }
+  if (k === "push" && "Notification" in window && Notification.permission === "granted" && !pushOff() && S.pushOk === false) { pushDiag().then(t => alert("حالة الإشعارات:\n\n" + t + "\n\n" + (S.pushDetail || ""))); return; }
   if (k === "push") return pushToggle(!("Notification" in window && Notification.permission === "granted" && !pushOff()));
   if (k === "refresh") return $("refresh-btn").click();
   if (k === "font") return $("font-btn").click();
