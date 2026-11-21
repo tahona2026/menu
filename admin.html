@@ -742,6 +742,7 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
       </div>
     </div>
     <div id="tab-shop" class="hidden">
+      <div class="box"><h4>🔐 أجهزة الدخول بالبصمة</h4><p class="hint">الأجهزة اللي بتفتح الإدارة بالبصمة من غير كلمة السر. لو موبايل ضاع الغي تسجيله من هنا.</p><div id="dev-list"></div></div>
       <div class="box">
         <h4>🏪 بيانات المحل (بتظهر على الفاتورة)</h4>
         <div class="field"><label for="sh-name">اسم المحل *</label><input class="input" id="sh-name" maxlength="60"></div>
@@ -1077,6 +1078,7 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
   <div class="dialog-box">
     <h3>🔒 الرقم السري (مدير أو كاشير)</h3>
     <input class="input" id="pin-input" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="64" aria-label="الرقم السري">
+    <button class="btn soft hidden" id="pin-bio" type="button" style="margin-bottom:8px;width:100%;min-height:48px">👆 دخول بالبصمة</button>
     <div class="two"><button class="btn dark" id="pin-cancel" type="button">إلغاء</button><button class="btn primary" id="pin-ok" type="button">دخول</button></div>
   </div>
 </div>
@@ -1908,18 +1910,72 @@ function adminBoot() {
   $("pin-dialog").querySelector("h3").textContent = "🔒 دخول الإدارة (مدير أو كاشير)";
   openPin();
 }
-function openPin() { $("pin-dialog").classList.remove("hidden"); $("pin-input").value = ""; setTimeout(() => $("pin-input").focus(), 50); }
-async function verifyPin() {
-  const pin = $("pin-input").value.trim(); if (!pin) return;
+function openPin() {
+  $("pin-dialog").classList.remove("hidden"); $("pin-input").value = ""; setTimeout(() => $("pin-input").focus(), 50);
+  const has = APP_MODE === "admin" && !!devGet(), bb = $("pin-bio"); if (bb) bb.classList.toggle("hidden", !has);
+  if (has && !S.bioTried) { S.bioTried = true; setTimeout(bioLogin, 600); }          // أول فتحة: بنطلب البصمة لوحدها. بعد الخروج بنسيب الزرار بس
+}
+async function verifyPin(tokArg) {
+  const tok = typeof tokArg === "string" ? tokArg : "", pin = tok || $("pin-input").value.trim(); if (!pin) return;
   $("pin-ok").disabled = true;
   try {
     const r = await post({ action: "verify_pin", pin });
     if (r.ok) {
       S.pin = pin; S.role = r.role || "admin"; S.userName = r.name || ""; S.perms = r.perms || {};
       $("pin-dialog").classList.add("hidden"); openAdmin(); adminPushCheck();
-    } else toast(r.error ? "الرقم السري: " + r.error : "الرقم السري غير صحيح", "err");
+      if (!tok) setTimeout(bioOffer, 2500);
+    } else if (tok) { lsSet("tahona_dev", ""); $("pin-bio").classList.add("hidden"); toast("تسجيل الجهاز ده اتلغى. اكتب كلمة السر", "warn"); }
+    else toast(r.error ? "الرقم السري: " + r.error : "الرقم السري غير صحيح", "err");
   } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
   finally { $("pin-ok").disabled = false; }
+}
+/* ===== الدخول بالبصمة (الإدارة): توكن جهاز على السيرفر (بيتلغي من لوحة الإدارة) + بصمة أو قفل الموبايل (WebAuthn) بتتحقق على الموبايل ===== */
+const b64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const unb64u = s => Uint8Array.from(atob(String(s).replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
+const rndBytes = n => crypto.getRandomValues(new Uint8Array(n));
+const devGet = () => { try { return JSON.parse(lsGet("tahona_dev") || "null"); } catch (e) { return null; } };
+async function bioSupported() { try { return !!(window.PublicKeyCredential && navigator.credentials && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()); } catch (e) { return false; } }
+async function bioEnroll() {
+  if (!(await bioSupported())) return toast("الجهاز ده مش بيدعم الدخول بالبصمة، أو مفيش بصمة/قفل مفعّل على الموبايل", "warn");
+  let tok = "";
+  try {
+    const r = await post({ action: "enroll_device", pin: S.pin, label: ((navigator.userAgent.match(/\(([^)]+)\)/) || [, ""])[1] || "جهاز").slice(0, 40) });
+    if (!r.ok) return toast(r.error || "تعذر تسجيل الجهاز", "err");
+    tok = r.token;
+    const name = S.userName || "الإدارة";
+    const cred = await navigator.credentials.create({ publicKey: { challenge: rndBytes(32), rp: { name: "الطاحونة", id: location.hostname }, user: { id: rndBytes(16), name, displayName: name },
+      pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }], authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required", residentKey: "discouraged" }, timeout: 60000, attestation: "none" } });
+    lsSet("tahona_dev", JSON.stringify({ tok, cid: b64u(cred.rawId) })); toast("🔐 اتفعّل الدخول بالبصمة على الجهاز ده ✅");
+  } catch (e) {
+    if (tok) { try { await post({ action: "revoke_self", pin: tok }); } catch (er) {} }
+    toast("اتلغى تفعيل البصمة", "warn");
+  }
+}
+async function bioLogin() {
+  const d = devGet(); if (!d) return;
+  try { await navigator.credentials.get({ publicKey: { challenge: rndBytes(32), allowCredentials: [{ type: "public-key", id: unb64u(d.cid), transports: ["internal"] }], userVerification: "required", timeout: 60000, rpId: location.hostname } }); }
+  catch (e) { return toast("اتلغى التحقق بالبصمة. اكتب كلمة السر", "warn"); }
+  verifyPin(d.tok);
+}
+async function bioOffer() {
+  if (APP_MODE !== "admin" || !S.pin || S.pin.startsWith("DEV-") || devGet()) return;
+  if (Date.now() - Number(lsGet("tahona_bio_ask") || 0) < 14 * 86400000 || !(await bioSupported())) return;
+  lsSet("tahona_bio_ask", String(Date.now()));
+  if (confirm("تفعّل الدخول بالبصمة على الجهاز ده؟\n\nهتفتح الإدارة ببصمتك أو بقفل الموبايل من غير ما تكتب كلمة السر. تقدر تلغيه في أي وقت من ☰ المزيد.")) bioEnroll();
+}
+async function bioDisable() {
+  const d = devGet(); if (!d) return;
+  if (!confirm("تلغي الدخول بالبصمة على الجهاز ده؟ هتحتاج كلمة السر في الدخول.")) return;
+  try { await post({ action: "revoke_self", pin: d.tok }); } catch (e) {}
+  lsSet("tahona_dev", ""); toast("اتلغى الدخول بالبصمة على الجهاز ده");
+}
+async function loadDevices() {
+  const box = $("dev-list"); if (!box || !isAdmin()) return;
+  try {
+    const r = await post({ action: "list_devices", pin: S.pin }); if (!r.ok) return;
+    const R = { admin: "المدير", builder: "المطوّر", cashier: "كاشير" };
+    box.innerHTML = (r.devices || []).length ? r.devices.map(d => `<div class="row" style="flex-direction:row;align-items:center;gap:8px"><div style="flex:1;min-width:0"><b>${esc(d.name)}</b> <small>(${esc(R[d.role] || d.role)})</small><br><small>${esc(d.label)} • آخر دخول ${esc(d.last ? new Date(d.last).toLocaleString("ar-EG", { dateStyle: "medium", timeStyle: "short" }) : "—")}</small></div><button type="button" class="btn-sm danger" data-dv="${esc(d.id)}">إلغاء</button></div>`).join("") : '<p class="hint">مفيش أجهزة مسجّلة بالبصمة.</p>';
+  } catch (e) {}
 }
 function applyRole() {
   document.querySelectorAll(".tabs button[data-need]").forEach(b => {
@@ -1960,7 +2016,7 @@ function showAdminTab(t) {
   if (t === "reports") initReports();
   if (t === "campaign") campInit();
   if (t === "users") showUserList();
-  if (t === "shop") fillShop();
+  if (t === "shop") { fillShop(); loadDevices(); }
   if (t === "push") pnInit();
   if (t === "design") loadDesigner();
   if (t === "orders") { renderOrders(); loadOrders(true); }
@@ -2816,6 +2872,7 @@ function smItems() {
   const common = [
     ["theme", dark ? "☀️ الوضع النهاري" : "🌙 الوضع الليلي"],
     ...(isStandalone() ? [] : [["install", "📲 تثبيت التطبيق"]]),
+    ...(APP_MODE === "admin" ? [["bio", devGet() ? "🔐 البصمة مفعّلة (اضغط للإلغاء)" : "🔐 تفعيل الدخول بالبصمة"]] : []),
     ...("Notification" in window ? [["push", pushOn ? "🔔 الإشعارات مفعّلة ✓ (اضغط لإيقافها)" : (Notification.permission === "denied" ? "🚫 الإشعارات محجوبة (اضغط للشرح)" : "🔔 تفعيل الإشعارات")]] : [])
   ];
   if (APP_MODE === "admin") {
@@ -2834,6 +2891,7 @@ function smAction(k) {
   if (k.startsWith("tab:")) return showAdminTab(k.slice(4));
   if (k === "theme") return applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
   if (k === "install") return installNow();
+  if (k === "bio") return devGet() ? bioDisable() : bioEnroll();
   if (k === "push") return pushToggle(!("Notification" in window && Notification.permission === "granted" && !pushOff()));
   if (k === "refresh") return $("refresh-btn").click();
   if (k === "font") return $("font-btn").click();
@@ -4270,7 +4328,9 @@ function init() {
   $("co-submit").addEventListener("click", submitOrder);
   $("rv-on").addEventListener("change", renderClosed);
 
-  $("pin-ok").addEventListener("click", verifyPin);
+  $("pin-ok").addEventListener("click", () => verifyPin());
+  $("pin-bio").addEventListener("click", bioLogin);
+  $("dev-list").addEventListener("click", async e => { const b = e.target.closest("[data-dv]"); if (!b || !confirm("تلغي تسجيل الجهاز ده؟")) return; try { const r = await post({ action: "revoke_device", pin: S.pin, id: b.dataset.dv }); if (!r.ok) return toast(r.error || "تعذر الإلغاء", "err"); toast("اتلغى تسجيل الجهاز"); loadDevices(); } catch (er) { toast("تعذر الاتصال بالسيرفر", "err"); } });
   $("pin-cancel").addEventListener("click", () => { if (APP_MODE !== "admin") $("pin-dialog").classList.add("hidden"); });
   $("pin-input").addEventListener("keydown", e => { if (e.key === "Enter") verifyPin(); });
   $("admin-close").addEventListener("click", closeAdmin);

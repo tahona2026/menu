@@ -1,5 +1,7 @@
 /* خدمة بسيطة: الصفحة بتتجاب من النت الأول (عشان التحديثات تظهر فوراً) ولو مفيش نت بتفتح آخر نسخة محفوظة.
    طلبات السيرفر (الأسعار والطلبات) بتروح للنت دايماً ومش بتتخزّن هنا. */
+/* إشعارات OneSignal: لازم الـ importScripts يكون في أول الملف. لو CDN مش متاح (بدون نت مثلاً) الباقي بيشتغل عادي */
+try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js"); } catch (e) {}
 const CACHE = "tahona-shell-v1";
 const SHELL = ["./", "manifest.json", "icon-192.png", "icon-512.png"];
 
