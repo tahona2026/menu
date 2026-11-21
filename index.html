@@ -332,6 +332,9 @@ textarea.input{height:auto;padding:10px 12px;resize:vertical;min-height:72px}
 
 /* ---------- لوحة الإدارة ---------- */
 .screen{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;flex-direction:column}
+#track{z-index:62}
+.chrome-bar{position:fixed;top:0;left:0;right:0;z-index:300;background:#1e3a8a;color:#fff;display:flex;align-items:center;gap:8px;padding:8px 10px;font-size:.78rem;line-height:1.35}
+.chrome-bar span{flex:1}.chrome-bar button{min-height:34px;padding:0 12px;border-radius:9px;border:0;background:#fff;color:#1e3a8a;font-weight:900;font-size:.78rem}.chrome-bar button[data-x]{background:transparent;color:#fff;padding:0 6px}          /* شاشة التتبع تتفتح من «طلباتي» فلازم تبقى فوقها (كانت بتتفتح تحتها فيبان إن الزرار مش شغّال) */
 .screen-head{display:flex;justify-content:space-between;align-items:center;padding:0 16px;height:60px;background:var(--brand);color:#fff;border-bottom:3px solid var(--gold);flex:none}
 .screen-head b{font-size:1.05rem}
 .screen-head button{height:40px;padding:0 14px;border-radius:10px;background:rgba(255,255,255,.15);color:#fff;font-weight:700}
@@ -3078,6 +3081,23 @@ function initNav() {
   setInterval(bnavRender, 2000); bnavRender();
 }
 
+/* ===== «افتح من كروم»: متصفحات أندرويد اللي مش بتدّي توكن إشعارات (سامسونج، فيسبوك/واتساب الداخلي) ===== */
+function chromeBanner() {
+  if (PREVIEW || isStandalone()) return;
+  const ua = navigator.userAgent;
+  if (!/Android/i.test(ua) || !/SamsungBrowser|FBAN|FBAV|Instagram|WhatsApp|Line\/|MiuiBrowser|UCBrowser|OPR\//i.test(ua)) return;
+  if (Date.now() - Number(lsGet("tahona_chrome_x") || 0) < 3 * 86400000) return;
+  const bar = document.createElement("div"); bar.id = "chrome-bar"; bar.className = "chrome-bar";
+  bar.innerHTML = '<span>📲 افتح الموقع من <b>كروم</b> عشان تثبّت التطبيق وتوصلك إشعارات الطلبات.</span><button type="button" data-go>افتح في كروم</button><button type="button" data-x aria-label="إخفاء">✕</button>';
+  document.body.appendChild(bar);
+  bar.addEventListener("click", e => {
+    if (e.target.closest("[data-x]")) { lsSet("tahona_chrome_x", String(Date.now())); bar.remove(); return; }
+    if (!e.target.closest("[data-go]")) return;
+    const u = location.href.split("#")[0].replace(/^https?:\/\//, "");
+    location.href = "intent://" + u + "#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=" + encodeURIComponent(location.href) + ";end";
+    setTimeout(() => { try { navigator.clipboard.writeText(location.href); } catch (er) {} toast("لو كروم ما فتحش: الرابط اتنسخ، الصقه في كروم", "warn"); }, 1800);
+  });
+}
 /* ===== مصدر الطلب (من رابط الحملة ?src=...) ===== */
 function captureSrc() {
   const m = /[?&]src=([^&#]+)/.exec(location.search); if (!m) return;
@@ -4748,6 +4768,8 @@ function init() {
 
   S.ordSort = ["old", "new", "total"].includes(lsGet("tahona_ord_sort")) ? lsGet("tahona_ord_sort") : "old";      // الافتراضي: الأقدم أولاً
   setInterval(lateTick, 60000);
+  chromeBanner();
+  if (APP_MODE !== "admin" && !PREVIEW && isStandalone()) setTimeout(() => pushAutoAsk("customer"), 4000);      // أول فتحة للتطبيق المثبّت: ورقة «فعّل الإشعارات» بضغطة واحدة
   initNav();
   captureSrc();
   applyShop();
