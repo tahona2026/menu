@@ -134,6 +134,19 @@ main{padding:6px 16px 16px;max-width:1200px;margin:0 auto}
 .st.s-new{background:#dc2626}.st.s-ready{background:#d97706}.st.s-done{background:#059669}.st.s-cancel{background:#64748b}
 .ord-name{font-weight:800}
 .ord-meta{font-size:.8rem;color:var(--muted)}
+.pn-prev{margin-top:10px;border:1px solid var(--border);border-radius:16px;background:var(--surface);overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.pn-prev .pn-h{display:flex;gap:8px;align-items:center;padding:10px 12px}
+.pn-prev .pn-h img{width:36px;height:36px;border-radius:10px;flex:none}
+.pn-prev .pn-t{font-weight:900;font-size:.92rem}.pn-prev .pn-b{font-size:.82rem;color:var(--muted);white-space:pre-wrap}
+.pn-prev .pn-i{width:100%;max-height:200px;object-fit:cover;display:block}
+.prep-hide{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.prep-hide button{min-height:38px;padding:0 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface-2);font-weight:800;font-size:.8rem}
+.prep-hide button.off{background:#fee2e2;color:#991b1b;border-color:#fca5a5;text-decoration:line-through}
+.td-head,.td-row{display:grid;grid-template-columns:1.1fr .9fr 1.2fr .6fr 34px;gap:6px;align-items:center;margin-bottom:6px}
+.td-head{font-size:.7rem;font-weight:800;color:var(--muted)}
+.td-row input[type=number]{min-width:0;height:42px;border:1px solid var(--border);border-radius:10px;background:var(--surface-2);text-align:center;font-weight:900;width:100%}
+.td-row .del{height:42px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border)}
+.td-row.sold input{opacity:.55}
 .ord-items.oi-list{white-space:normal;padding:4px 10px}
 .oi{padding:7px 0;border-bottom:1px dashed var(--border,#ddd)}.oi:last-child{border-bottom:0}
 .oi-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
@@ -209,6 +222,25 @@ main{padding:6px 16px 16px;max-width:1200px;margin:0 auto}
 @media (min-width:1000px){.grid{grid-template-columns:repeat(3,1fr)}}
 
 /* ---------- شريط السلة ---------- */
+/* الشريط السفلي (موبايل بس) + قايمة ☰ */
+#bnav{position:fixed;left:0;right:0;bottom:0;z-index:30;display:none;background:var(--surface);border-top:1px solid var(--border);padding-bottom:var(--safe-b)}
+#bnav button,#admin-nav button{flex:1 1 0;min-width:0;height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:.68rem;font-weight:800;color:var(--muted);position:relative}
+#bnav button .bi,#admin-nav button .bi{font-size:1.3rem;line-height:1}
+#bnav button.on,#admin-nav button.on{color:var(--brand)}
+[data-theme="dark"] #bnav button.on,[data-theme="dark"] #admin-nav button.on{color:var(--gold)}
+.bdg{position:absolute;top:4px;left:calc(50% + 6px);background:#dc2626;color:#fff;border-radius:99px;font-size:.62rem;min-width:16px;height:16px;line-height:16px;padding:0 4px;font-weight:900}
+#admin-nav{display:none;flex:none;background:var(--surface);border-top:1px solid var(--border);padding-bottom:var(--safe-b)}
+@media(max-width:700px){
+  #bnav,#admin-nav{display:flex}
+  body:not(.admin-app){padding-bottom:calc(150px + var(--safe-b))}
+  body:not(.admin-app) .cartbar{bottom:calc(64px + var(--safe-b))}
+  #admin .tabs{display:none}
+}
+body.admin-app #bnav{display:none!important}
+#side-menu{place-items:end center;padding:0;z-index:71}
+#side-menu .dialog-box{max-width:520px;width:100%;border-radius:24px 24px 0 0;padding:16px 14px calc(16px + var(--safe-b));max-height:86dvh;overflow-y:auto}
+#side-menu .sm-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+#side-menu .sm-grid button{min-height:52px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border);font-weight:800;font-size:.86rem;padding:6px 8px}
 .cartbar{position:fixed;left:12px;right:12px;bottom:calc(12px + var(--safe-b));z-index:25;max-width:560px;margin:0 auto;
   background:var(--brand-dark);color:#fff;border-radius:18px;padding:10px 12px;display:flex;align-items:center;gap:12px;
   box-shadow:0 12px 30px rgba(0,0,0,.4);transform:translateY(160%);transition:transform .3s;border:1px solid rgba(255,255,255,.1)}
@@ -297,7 +329,16 @@ textarea.input{height:auto;padding:10px 12px;resize:vertical;min-height:72px}
 .wrap{max-width:640px;margin:0 auto}
 .row{display:flex;flex-direction:column;gap:10px;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:8px}
 .row-top{display:flex;align-items:center;gap:10px}
-.row-tools{display:flex;align-items:center;gap:8px}
+.row-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.row-tools .qp{flex:1 1 150px;min-width:150px}
+.row-tools .btn-sm{flex:1 1 auto}.row-tools .btn-sm.danger{flex:0 0 48px;padding:0}
+.screen-body{overflow-x:hidden}
+@media(max-width:700px){.tabs{flex-wrap:wrap;overflow-x:visible}.tabs button{flex:1 1 auto;height:38px;padding:0 8px;font-size:.76rem}}
+#qty-dialog{place-items:start center;padding-top:2.5vh;overflow-y:auto}   /* فوق الشاشة عشان الكيبورد ما يغطّيش زرار الإضافة */
+#qty-dialog .dialog-box{padding:12px}#qty-dialog h3{margin-bottom:4px;font-size:1rem}
+#qty-dialog #qd-input{height:44px;font-size:1.15rem!important}
+#qty-dialog #qd-chips button{height:36px;padding:0;font-size:.85rem}
+#qty-dialog .btn{height:42px}
 .row-tools .input{flex:1;min-width:0}
 .qp{display:flex;align-items:center;gap:4px;flex:1;min-width:0;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:0 8px;height:44px}
 .qp input{width:100%;min-width:0;border:0;background:transparent;font-weight:900;height:40px;text-align:center}
@@ -505,6 +546,13 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
   <div class="grid" id="grid"></div>
 </main>
 
+<nav id="bnav" aria-label="اختصارات">
+  <button type="button" data-n="home" class="on"><span class="bi">🏠</span>الرئيسية</button>
+  <button type="button" data-n="cart"><span class="bi">🛒</span>السلة<span class="bdg hidden" id="bn-cart"></span></button>
+  <button type="button" data-n="orders"><span class="bi">📦</span>طلباتي<span class="bdg hidden" id="bn-orders"></span></button>
+  <button type="button" data-n="wa"><span class="bi">💬</span>واتساب</button>
+  <button type="button" data-n="more"><span class="bi">☰</span>المزيد</button>
+</nav>
 <div class="cartbar" id="cartbar" role="button" tabindex="0" aria-label="فتح السلة">
   <div class="cnt" id="cart-count">0</div>
   <div class="meta"><small id="cart-small">سلة الطلبات • الإجمالي تقريبي</small><b id="bar-total">0 ج.م</b></div>
@@ -582,7 +630,7 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
 
 <!-- لوحة الإدارة -->
 <div id="admin" class="screen hidden">
-  <div class="screen-head"><b id="admin-title">⚙️ لوحة الإدارة</b><button id="admin-close" type="button">خروج ✕</button></div>
+  <div class="screen-head"><b id="admin-title">⚙️ لوحة الإدارة</b><span style="flex:1"></span><button id="admin-theme" type="button" aria-label="الوضع الليلي والنهاري" style="margin-inline-end:6px">🌙</button><button id="admin-close" type="button">خروج ✕</button></div>
   <nav class="tabs">
     <button data-tab="sell" data-need="sell">🧾 كاشير</button>
     <button data-tab="orders" data-need="orders">📦 الطلبات</button>
@@ -595,6 +643,7 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
     <button data-tab="bundles" data-need="admin">🎁 الباقات</button>
     <button data-tab="delivery" data-need="admin">🛵 التوصيل</button>
     <button data-tab="users" data-need="admin">👥 المستخدمين</button>
+    <button data-tab="push" data-need="admin">🔔 إشعار للعملاء</button>
     <button data-tab="shop" data-need="admin">🏪 المحل</button>
   </nav>
   <div class="screen-body"><div class="wrap">
@@ -634,7 +683,8 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
         <div class="field"><label for="cp-title">العنوان</label><input class="input" id="cp-title" maxlength="40" value="أسعار وعروض النهاردة"></div>
         <div class="field"><label for="cp-note">سطر إضافي (اختياري)</label><input class="input" id="cp-note" maxlength="60" placeholder="مثال: توصيل مجاني للطلبات فوق 300 ج"></div>
         <img id="cp-prev" alt="معاينة البوستر" style="width:100%;max-width:340px;margin:0 auto 10px;border:1px solid var(--border);border-radius:12px;background:#fff">
-        <div class="two" style="margin:0 0 8px"><button class="btn dark" id="cp-dl" type="button">⬇️ تنزيل الصورة</button><button class="btn primary" id="cp-share" type="button" style="min-height:46px">📤 مشاركة</button></div>
+        <div class="two" style="margin:0 0 8px"><button class="btn dark" id="cp-dl" type="button">⬇️ تنزيل الصورة</button><button class="btn primary" id="cp-share" type="button" style="min-height:46px">📤 مشاركة مع النص</button></div>
+        <button class="btn primary" id="cp-share-img" type="button" style="min-height:46px;margin:0 0 8px;width:100%">🖼️ مشاركة الصورة فقط (من غير نص)</button>
         <div class="two" style="margin:0"><button class="btn dark" id="cp-copy" type="button">📋 انسخ نص الرسالة</button><button class="btn wa" id="cp-wa" type="button" style="min-height:46px">💬 واتساب بالنص</button></div>
         <p class="hint" id="cp-link" dir="ltr" style="text-align:left"></p>
       </div>
@@ -679,6 +729,25 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
       </div>
     </div>
 
+    <div id="tab-push" class="hidden">
+      <div class="box">
+        <h4>🔔 إشعار للعملاء</h4>
+        <p class="hint">بيوصل لكل المشتركين في الإشعارات على موبايلاتهم، حتى والتطبيق مقفول. ممكن تبعته دلوقتي أو تحدد وقت.</p>
+        <div class="field"><label for="pn-offer">اربطه بعرض (اختياري)</label><select class="input" id="pn-offer"></select></div>
+        <div class="field"><label for="pn-title">العنوان *</label><input class="input" id="pn-title" maxlength="60" placeholder="🔥 عرض اليوم"></div>
+        <div class="field"><label for="pn-body">النص *</label><textarea class="input" id="pn-body" rows="3" maxlength="200" placeholder="فراخ بيضاء بسعر خاص النهارده بس"></textarea></div>
+        <div class="field"><label>صورة (اختياري)</label>
+          <div class="two" style="margin:0 0 6px"><button class="btn dark" id="pn-pick" type="button">📷 اختيار صورة من الموبايل</button><button class="btn dark" id="pn-noimg" type="button">✖ من غير صورة</button></div>
+          <input class="input" id="pn-img" placeholder="أو الصق رابط صورة https://…" dir="ltr"><input type="file" id="pn-file" accept="image/*" class="hidden"><span class="hint" id="pn-up"></span></div>
+        <div class="field"><label for="pn-url">يفتح على (اختياري)</label><input class="input" id="pn-url" dir="ltr" placeholder="سيبه فاضي = المنيو"></div>
+        <div class="field"><label for="pn-when">موعد الإرسال</label>
+          <select class="input" id="pn-when"><option value="now">دلوقتي</option><option value="later">في وقت لاحق</option></select>
+          <input class="input hidden" type="datetime-local" id="pn-at" style="margin-top:6px"></div>
+        <div class="pn-prev" id="pn-prev"></div>
+        <button class="btn primary" id="pn-send" type="button" style="margin-top:10px">📤 إرسال الإشعار</button>
+        <p class="hint">الحد الأقصى 3 إشعارات في اليوم. الإشعار المجدول مش بيتلغي من هنا، لو عايز تلغيه ادخل على لوحة OneSignal.</p>
+      </div>
+    </div>
     <div id="tab-shop" class="hidden">
       <div class="box">
         <h4>🏪 بيانات المحل (بتظهر على الفاتورة)</h4>
@@ -707,6 +776,8 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
         <h4>🕒 مواعيد العمل والحجز</h4>
         <div class="field"><label for="hr-mode">وضع المحل</label><select class="input" id="hr-mode"><option value="open">مفتوح دايماً (من غير جدول)</option><option value="auto">حسب الجدول الأسبوعي</option><option value="closed">مقفول دلوقتي (يدوي)</option></select></div>
         <div id="hr-days"></div>
+        <div class="field" style="margin-top:12px"><label for="hr-dmode">🛵 مواعيد التوصيل</label><select class="input" id="hr-dmode"><option value="open">زي مواعيد المحل (من غير جدول للتوصيل)</option><option value="auto">جدول خاص بالتوصيل (مثلاً يبدأ 12 الضهر)</option></select></div>
+        <div id="hr-ddays" class="hidden"></div>
         <label class="chk"><input type="checkbox" id="hr-resv"> السماح بالحجز لما المحل يكون مقفول (الزبون يختار يوم وساعة)</label>
         <div class="field"><label for="hr-max">أقصى مدة للحجز (بالأيام)</label><input class="input" type="number" id="hr-max" min="1" max="30" value="7"></div>
         <button class="btn primary" id="hr-save" type="button">💾 حفظ المواعيد</button>
@@ -719,6 +790,7 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
         <div class="field"><label for="sn-vol">مستوى الصوت</label><input type="range" id="sn-vol" min="10" max="100" step="5" style="width:100%"></div>
         <div class="field"><label>صوت من موبايلك (ملف mp3 أو m4a أو wav، حتى 1.5 ميجا)</label><input type="file" id="sn-file" accept="audio/*" class="hidden"><button class="btn soft" id="sn-pick" type="button">📁 اختيار صوت من الموبايل</button><p class="hint" id="sn-state"></p><button class="btn dark hidden" id="sn-clear" type="button">🗑 مسح الصوت المرفوع</button></div>
         <label class="chk"><input type="checkbox" id="sn-wake"> خلّي الشاشة صاحية (عشان الصوت يشتغل طول وقت الشغل)</label>
+        <label class="chk"><input type="checkbox" id="sn-push"> 🔔 إشعارات الطلبات على الموبايل (بتوصل حتى والتطبيق مقفول)</label>
         <div class="two" style="margin:8px 0 0"><button class="btn dark" id="sn-test" type="button">▶️ تجربة الصوت</button><button class="btn dark hidden" id="sn-notif" type="button">🔔 إشعارات النظام</button></div>
         <p class="hint">الصوت بيشتغل والصفحة مفتوحة (حتى لو الشاشة في الخلفية). ولو الصفحة اتقفلت خالص محتاجين خدمة إشعارات إضافية.</p>
       </div>
@@ -744,6 +816,7 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
     </div>
 
     <div id="tab-orders" class="hidden">
+      <button class="btn primary hidden" id="push-bar" type="button" style="margin-bottom:8px">🔔 فعّل إشعارات الطلبات (بتوصلك والشاشة مقفولة)</button>
       <div class="inline" style="margin-bottom:8px"><input class="input" id="ord-search" type="search" placeholder="🔍 ابحث بالاسم أو الموبايل أو رقم الطلب"><button type="button" class="btn-sm" id="ord-refresh" aria-label="تحديث الطلبات">🔄</button></div>
       <div class="chips" id="ord-filters" style="padding:0 0 8px;margin:0">
         <button class="chip" type="button" data-f="all" aria-pressed="true">الكل</button>
@@ -784,7 +857,8 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
         <p class="hint">الزبون هيختار عدد الفراخ ونطاق الوزن، وبيفضل جوه الحدود دي. السعر النهائي بالوزن الفعلي.</p>
       </div>
       <div class="field"><label for="f-step">أقل كمية / خطوة الزيادة *</label><input class="input" id="f-step" type="number" inputmode="decimal" min="0.05" step="any" value="0.5"></div>
-      <div class="field"><label for="f-prep">خيارات التجهيز * (كل خيار في سطر)</label><textarea class="input" id="f-prep" rows="4" placeholder="تقطيع 4 قطع&#10;تقطيع 8 قطع&#10;سليمة"></textarea><span class="hint">ممنوع استخدام الفاصلة (, أو ،) جوه الخيار الواحد.</span></div>
+      <div class="field"><label for="f-prep">خيارات التجهيز * (كل خيار في سطر)</label><textarea class="input" id="f-prep" rows="4" placeholder="تقطيع 4 قطع&#10;تقطيع 8 قطع&#10;سليمة"></textarea><span class="hint">ممنوع استخدام الفاصلة (, أو ،) جوه الخيار الواحد.</span>
+        <div class="prep-hide" id="f-prep-hide"></div><span class="hint" id="f-prep-hint"></span></div>
       <div class="box" id="f-offer-box">
         <h4>🎁 عرض كمية (اختياري)</h4>
         <div class="two" style="margin:0 0 8px">
@@ -869,6 +943,15 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
       <button class="btn primary" id="d-save" type="button">💾 حفظ التوصيل</button>
     </div>
   </div></div>
+  <nav id="admin-nav" aria-label="اختصارات الإدارة"></nav>
+</div>
+
+<div id="side-menu" class="dialog hidden" role="dialog" aria-label="القايمة">
+  <div class="dialog-box">
+    <h3 id="sm-title" style="margin-bottom:0">☰ القايمة</h3>
+    <div class="sm-grid" id="sm-grid"></div>
+    <button class="btn dark" id="sm-close" type="button" style="margin-top:12px">إغلاق</button>
+  </div>
 </div>
 
 <!-- تتبّع طلب الزبون -->
@@ -881,6 +964,7 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
 <div id="myorders" class="screen hidden" role="dialog" aria-label="طلباتي">
   <div class="screen-head"><b>🧾 طلباتي</b><button id="my-close" type="button">رجوع للمنيو ✕</button></div>
   <div class="screen-body"><div class="wrap">
+    <label class="chk" style="margin-bottom:8px"><input type="checkbox" id="my-push"> 🔔 إشعارات طلباتي (لما حالة الطلب تتغيّر)</label>
     <div id="my-list"></div>
     <div class="box" style="margin-top:12px">
       <h4>🔎 طلبك مش ظاهر هنا؟ ابحث عنه</h4>
@@ -924,6 +1008,17 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
   </div>
 </div>
 
+<div id="push-ask" class="dialog hidden" role="dialog" aria-label="تفعيل الإشعارات" style="place-items:end center;padding:0">
+  <div class="dialog-box" style="max-width:520px;width:100%;border-radius:24px 24px 0 0;padding:22px 18px calc(18px + var(--safe-b));text-align:center">
+    <h3 style="font-size:1.25rem;margin-bottom:6px">🔔 فعّل الإشعارات</h3>
+    <p class="hint" id="pa-text" style="font-size:.92rem;margin:0 0 6px"></p>
+    <p class="hint" style="font-size:.78rem;margin:0 0 4px">تقدر تقفلها في أي وقت من الإعدادات.</p>
+    <div style="display:grid;gap:8px;margin-top:12px">
+      <button class="btn primary" id="pa-on" type="button" style="min-height:52px;font-size:1.05rem">🔔 تفعيل الإشعارات</button>
+      <button class="btn dark" id="pa-later" type="button">مش دلوقتي</button>
+    </div>
+  </div>
+</div>
 <div id="install-sheet" class="dialog hidden" role="dialog" aria-label="تثبيت التطبيق" style="place-items:end center;padding:0">
   <div class="dialog-box" style="max-width:520px;width:100%;border-radius:24px 24px 0 0;padding:24px 18px calc(20px + var(--safe-b));text-align:center">
     <img id="is-logo" alt="" style="width:96px;height:96px;margin:0 auto 8px;border-radius:20px;border:2px solid var(--gold)">
@@ -939,8 +1034,10 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
 <div id="tiers-dialog" class="dialog hidden">
   <div class="dialog-box" style="max-width:430px">
     <h3 id="td-title" style="font-size:1.05rem"></h3>
-    <p class="hint" style="margin-bottom:6px">اكتب كل وزن في سطر: <b>الوزن=السعر</b> (مثال: <b dir="ltr">1.9=170</b>). ابدأ السطر بـ <b dir="ltr">-</b> لو الوزن مقفول النهاردة. بتتحدّث عند الزبائن في ثواني.</p>
-    <textarea class="input" id="td-text" rows="9" dir="ltr" style="font-weight:800" placeholder="1.900=170&#10;2.000=180&#10;-2.350=210"></textarea>
+    <p class="hint" style="margin-bottom:6px">اكتب <b>الوزن</b> و<b>عدد الفراخ الموجودة</b> منه. السعر <b>اختياري</b>: لو سبته فاضي بيتحسب لوحده (الوزن × سعر الكيلو). العدد فاضي = غير محدود. بينقص مع كل طلب ويرجع لو الطلب اتلغى.</p>
+    <div class="td-head"><span>الوزن (كجم)</span><span>العدد</span><span>السعر (اختياري)</span><span>متاح</span><span></span></div>
+    <div id="td-rows"></div>
+    <button class="btn dark" id="td-add" type="button" style="margin-top:6px">➕ إضافة وزن</button>
     <p class="hint" id="td-prev" style="min-height:2.4em"></p>
     <div class="two" style="margin-top:8px"><button class="btn dark" id="td-cancel" type="button">إلغاء</button><button class="btn primary" id="td-save" type="button">💾 حفظ الأوزان</button></div>
     <button class="btn dark" id="td-clear" type="button" style="margin-top:8px">🗑 مسح كل الأوزان (يرجع للكيلو/العدد)</button>
@@ -1095,6 +1192,7 @@ function restoreCust() {
 /* ===== المظهر ===== */
 function applyTheme(t) {
   document.documentElement.dataset.theme = t; $("theme-icon").textContent = t === "dark" ? "☀️" : "🌙"; lsSet("tahona_theme", t);
+  if ($("admin-theme")) $("admin-theme").textContent = t === "dark" ? "☀️" : "🌙";
 }
 const FONT_SIZES = [92, 100, 112, 125];   // الافتراضي 92% والزبون يكبّر من Aa
 const FONT_DEFAULT = 92;
@@ -1226,7 +1324,7 @@ const BASIS_NOTE = { "قائم": "السعر على وزن الفرخة وهي �
 const rangeStr = (a, b) => "من " + money(a) + " إلى " + money(b);
 const f3 = n => Number(n).toFixed(3);          // وزن الفرخة بتلات خانات عشان محدش يفهم 1.9 كيلو وتسعين جرام
 /* ===== أوزان متاحة بسعر نهائي لكل وزن (فراخ كاملة): المدير بيحدّثها، والزبون بيختار الوزن والعدد ===== */
-const activeTiers = m => (m.tiers || []).filter(t => t.on);
+const activeTiers = m => (m.tiers || []).filter(t => t.on && (t.s === null || t.s === undefined || t.s > 0));
 const tierOf = (m, w) => activeTiers(m).find(t => Math.abs(t.w - Number(w)) < 0.0005);
 const tierCountOf = c => Object.keys(c.tiers || {}).reduce((a, w) => a + c.tiers[w], 0);
 const tierKg = tiers => Math.round(Object.keys(tiers).reduce((a, w) => a + Number(w) * tiers[w], 0) * 1000) / 1000;
@@ -1234,7 +1332,9 @@ function setTierCount(id, w, n) {
   const m = findItem(id); if (!m || !tierOf(m, w)) return;
   const old = S.cart[id], tiers = Object.assign({}, old && old.tiers ? old.tiers : {});
   const key = String(Number(w));
-  if (n > 0) tiers[key] = Math.min(50, n); else delete tiers[key];
+  const tt = tierOf(m, w), cap = tt && tt.s !== null && tt.s !== undefined ? tt.s : 50;
+  if (n > cap) toast(`المتاح من الوزن ده ${cap} فرخة بس`, "warn");
+  if (n > 0) tiers[key] = Math.min(50, cap, n); else delete tiers[key];
   if (!Object.keys(tiers).length) { delete S.cart[id]; return commit(); }
   const p = prefOf(id, m);
   S.cart[id] = { qty: tierKg(tiers), prep: p.prep, note: p.note, tiers };
@@ -1247,39 +1347,40 @@ function sanitizeTiers(id, m) {                       // أوزان اتقفلت
   if (ch) { c.tiers = keep; c.qty = tierKg(keep); }
   return ch;
 }
-// أدوات المدير: قايمة الأوزان بسطر لكل وزن (1.9=170، وبـ - للمقفول)
+// أدوات المدير: الأوزان المتاحة = وزن + عدد الفراخ الموجودة + سعر اختياري (فاضي = الوزن × سعر الكيلو)
 const AR2 = c => ({ "٠": "0", "١": "1", "٢": "2", "٣": "3", "٤": "4", "٥": "5", "٦": "6", "٧": "7", "٨": "8", "٩": "9", "٫": ".", "،": "." }[c]);
-function parseTiers(text) {
-  const tiers = [], errors = [], seen = {};
-  String(text || "").split("\n").forEach((raw, i) => {
-    let t = raw.trim(); if (!t) return;
-    t = t.replace(/[٠-٩٫،]/g, AR2).replace(/(وزن|كجم|كيلو|جنيه|جم|ج\.م|ج)/g, " ").replace(/,/g, ".");
-    const m = /^(-)?\s*(\d+(?:\.\d+)?)\s*(?:=|:|ب|-)?\s*(\d+(?:\.\d+)?)\s*$/.exec(t.replace(/\s+/g, " ").replace(/ب(?=\d)/, "= "));
-    if (!m) return errors.push(`سطر ${i + 1}: مش مفهوم (اكتب مثلاً 1.9=170)`);
-    let w = Number(m[2]); const p = Number(m[3]);
-    if (w > 20 && w <= 20000) w = w / 1000;                // 1900 = 1.900 كجم
-    w = Math.round(w * 1000) / 1000;
-    if (!(w > 0 && w <= 20)) return errors.push(`سطر ${i + 1}: الوزن لازم بين 0.001 و20 كجم`);
-    if (!(p > 0 && p <= 100000)) return errors.push(`سطر ${i + 1}: السعر غير صحيح`);
-    if (seen[w]) return errors.push(`سطر ${i + 1}: الوزن ${f3(w)} متكرر`);
-    seen[w] = true; tiers.push({ w, p, on: !m[1] });
-  });
-  return { tiers, errors };
+const numIn = v => { const s = String(v == null ? "" : v).replace(/[٠-٩٫،]/g, AR2).replace(/,/g, ".").trim(); return s === "" ? "" : Number(s); };
+function tdRowHtml(t) {
+  return `<div class="td-row${t.s === 0 ? " sold" : ""}"><input type="number" inputmode="decimal" step="any" min="0" data-f="w" value="${t.w === "" || t.w === undefined ? "" : t.w}" aria-label="الوزن"><input type="number" inputmode="numeric" step="1" min="0" data-f="s" value="${t.s === null || t.s === undefined ? "" : t.s}" placeholder="∞" aria-label="عدد الفراخ"><input type="number" inputmode="decimal" step="any" min="0" data-f="p" value="${t.p > 0 ? t.p : ""}" placeholder="تلقائي" aria-label="السعر"><input type="checkbox" data-f="on" ${t.on !== false ? "checked" : ""} aria-label="متاح"><button type="button" class="del" data-f="del" aria-label="حذف">🗑</button></div>`;
 }
 function openTiers(id) {
   const m = findItem(id); if (!m) return;
   S.tdId = id; $("td-title").textContent = "⚖️ الأوزان المتاحة: " + m.name;
-  $("td-text").value = (m.tiers || []).map(t => (t.on ? "" : "-") + f3(t.w) + "=" + t.p).join("\n"); tdPreview();
-  $("tiers-dialog").classList.remove("hidden"); setTimeout(() => $("td-text").focus(), 50);
+  $("td-rows").innerHTML = (m.tiers || []).map(tdRowHtml).join(""); tdPreview();
+  $("tiers-dialog").classList.remove("hidden");
+}
+function tdCollect() {
+  const m = findItem(S.tdId) || { price: 0 }, tiers = [], errors = [], seen = {};
+  document.querySelectorAll("#td-rows .td-row").forEach((r, i) => {
+    const g = f => r.querySelector(`[data-f="${f}"]`), w = numIn(g("w").value), s = numIn(g("s").value), p = numIn(g("p").value);
+    if (w === "" && s === "" && p === "") return;                                    // سطر فاضي: بيتتجاهل
+    const wr = Math.round(Number(w) * 1000) / 1000;
+    if (!(wr > 0 && wr <= 20)) return errors.push(`سطر ${i + 1}: الوزن لازم بين 0.001 و20 كجم`);
+    if (s !== "" && !(Number.isInteger(s) && s >= 0 && s <= 100000)) return errors.push(`سطر ${i + 1}: عدد الفراخ لازم رقم صحيح`);
+    if (p !== "" && !(p > 0 && p <= 100000)) return errors.push(`سطر ${i + 1}: السعر غير صحيح`);
+    if (seen[wr]) return errors.push(`سطر ${i + 1}: الوزن ${f3(wr)} متكرر`);
+    seen[wr] = true; tiers.push({ w: wr, s: s === "" ? null : s, p: p === "" ? 0 : p, on: g("on").checked });
+  });
+  return { tiers, errors, price: Number(m.price) || 0 };
 }
 function tdPreview() {
-  const r = parseTiers($("td-text").value);
+  const r = tdCollect();
   $("td-prev").innerHTML = r.errors.length ? r.errors.map(e => "⚠️ " + esc(e)).join("<br>")
-    : (r.tiers.length ? `✅ ${r.tiers.length} وزن (${r.tiers.filter(t => t.on).length} متاح): ` + r.tiers.map(t => `${t.on ? "" : "🚫 "}${f3(t.w)} كجم = ${num(t.p)} ج (≈ ${num(Math.round(t.p / t.w * 10) / 10)}/كجم)`).join(" • ") : "مفيش أوزان: الصنف بيتباع بالكيلو/العدد.");
+    : (r.tiers.length ? `✅ ${r.tiers.length} وزن: ` + r.tiers.map(t => { const p = t.p > 0 ? t.p : Math.round(t.w * r.price * 100) / 100; return `${t.on ? "" : "🚫 "}${f3(t.w)} كجم × ${t.s === null ? "∞" : t.s} = ${num(p)} ج${t.p > 0 ? "" : " (تلقائي)"}`; }).join(" • ") : "مفيش أوزان: الصنف بيتباع بالكيلو/العدد.");
 }
 async function tdSave(clear) {
   const id = S.tdId; if (!id) return;
-  const r = clear ? { tiers: [], errors: [] } : parseTiers($("td-text").value);
+  const r = clear ? { tiers: [], errors: [] } : tdCollect();
   if (r.errors.length) return toast(r.errors[0], "err");
   try {
     const res = await post({ action: "save_tiers", pin: S.pin, id, tiers: r.tiers });
@@ -1518,7 +1619,7 @@ function cardHtml(m, idx) {
       <div class="offer-hint" data-cest>${esc(countText(m, cp))}</div>
     </div>`;
   const tierUi = !tiers.length ? "" : `<div class="tiers">${tiers.map(t => { const n = (c && c.tiers && c.tiers[String(t.w)]) || 0; return `
-    <div class="tier-row${n ? " on" : ""}" data-w="${t.w}"><div class="ti"><b>${f3(t.w)} كجم</b> <span class="bs" style="background:#e0f2fe;color:#075985">🔒 سعر نهائي</span><br><span class="tp">${money(t.p)} <small>≈ ${num(Math.round(t.p / t.w * 10) / 10)} ج/كجم</small></span></div>
+    <div class="tier-row${n ? " on" : ""}" data-w="${t.w}"><div class="ti"><b>${f3(t.w)} كجم</b> <span class="bs" style="background:#e0f2fe;color:#075985">🔒 سعر نهائي</span>${t.s !== null && t.s !== undefined && t.s <= 5 ? ` <span class="bs" style="background:#fee2e2;color:#991b1b">⏳ باقي ${t.s}</span>` : ""}<br><span class="tp">${money(t.p)} <small>≈ ${num(Math.round(t.p / t.w * 10) / 10)} ج/كجم</small></span></div>
       <div class="step sm"><button type="button" data-act="tdec" aria-label="تقليل">−</button><span>${n}</span><button type="button" class="plus" data-act="tinc" aria-label="زيادة">+</button></div></div>`; }).join("")}</div>`;
   const modes = [tiers.length ? ["tier", "🏷️ الأوزان المتاحة"] : null, m.count_mode ? ["count", "🐔 بالعدد"] : null, (tiers.length || m.count_mode) ? ["kg", "⚖️ بالكيلو"] : null].filter(Boolean);
   const toggle = modes.length < 2 ? "" : `<div class="mode">${modes.map(x => `<button type="button" class="${mode === x[0] ? "on" : ""}" data-act="mode" data-m="${x[0]}">${x[1]}</button>`).join("")}</div>`;
@@ -1657,9 +1758,9 @@ function renderTotals() {
 }
 function fillZones() {
   const zs = S.settings.deliveryZones || [];
-  const active = !!S.settings.deliveryActive && zs.length > 0;
+  const dst = deliveryState(), active = !!S.settings.deliveryActive && zs.length > 0 && dst.open;
   $("dt-delivery").disabled = !active;
-  $("dt-hint").textContent = active ? "" : "التوصيل مش متاح حالياً — الاستلام من الفرع.";
+  $("dt-hint").textContent = active ? "" : (S.settings.deliveryActive && zs.length > 0 && !dst.open ? "🕒 التوصيل بيبدأ " + (dst.next || "في موعد يحدده المحل") + " — دلوقتي الاستلام من الفرع." : "التوصيل مش متاح حالياً — الاستلام من الفرع.");
   if (!active) document.querySelector("input[name=dtype][value=pickup]").checked = true;
   $("c-zone").innerHTML = zs.map((z, i) => `<option value="${i}">${esc(z.name)} — ${Number(z.fee) > 0 && !S.settings.freeDelivery ? Number(z.fee) + " ج" : "مجاناً"}</option>`).join("");
   if (!S.custApplied) {                          // أول فتحة للسلة: نرجّع اختيار الزبون المحفوظ (منطقة + توصيل/استلام)
@@ -1744,7 +1845,7 @@ async function submitOrder() {
     const se = slotErr($("rv-date").value, $("rv-time").value); if (se) { toast(se, "err"); return; }
     rv = { reserve: true, reserveDate: $("rv-date").value, reserveTime: $("rv-time").value || "" }; S.lastResv = { d: rv.reserveDate, t: rv.reserveTime };
   }
-  saveCust({ name: c.name, phone: c.phone, address: c.address, dtype: c.deliveryType, zone: ((S.settings.deliveryZones || [])[Number(c.zoneIndex)] || {}).name || "", pay: c.payment });
+  saveCust({ name: c.name, phone: c.phone, address: c.address, dtype: c.deliveryType, zone: ((S.settings.deliveryZones || [])[Number(c.zoneIndex)] || {}).name || "", pay: c.payment }); setTimeout(pushSync, 1500);
   const btn = $("co-submit"); btn.disabled = true; btn.textContent = "⏳ جاري تسجيل الطلب...";
   try {
     const file = $("c-receipt").files[0];
@@ -1793,7 +1894,7 @@ function showDone(res, c, lines0, bls0 = []) {
   $("sheet-title").textContent = saved ? "✅ تم الطلب" : "⚠️ ابعت على واتساب";
   $("co-view").classList.add("hidden"); $("done-view").classList.remove("hidden");
   $("co-foot").classList.add("hidden"); $("done-foot").classList.remove("hidden");
-  if (saved) { S.cart = {}; S.pref = {}; S.pend = {}; S.bcart = {}; S.bpend = {}; saveCart(); saveBCart(); renderGrid(); updateBar(); startWaCountdown(); }
+  if (saved) { S.cart = {}; S.pref = {}; S.pend = {}; S.bcart = {}; S.bpend = {}; saveCart(); saveBCart(); renderGrid(); updateBar(); startWaCountdown(); setTimeout(askPushLater, 4000); }
 }
 
 /* ===== لوحة الإدارة ===== */
@@ -1812,7 +1913,7 @@ async function verifyPin() {
     const r = await post({ action: "verify_pin", pin });
     if (r.ok) {
       S.pin = pin; S.role = r.role || "admin"; S.userName = r.name || ""; S.perms = r.perms || {};
-      $("pin-dialog").classList.add("hidden"); openAdmin();
+      $("pin-dialog").classList.add("hidden"); openAdmin(); adminPushCheck();
     } else toast(r.error ? "الرقم السري: " + r.error : "الرقم السري غير صحيح", "err");
   } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
   finally { $("pin-ok").disabled = false; }
@@ -1839,7 +1940,7 @@ function openAdmin() {
 // الخروج بيمسح كلمة السر والدور من الذاكرة (الجهاز ممكن يتشارك بين الكاشيرات)
 function closeAdmin() {
   $("admin").classList.add("hidden"); document.body.classList.remove("lock");
-  $("order-screen").classList.add("hidden"); S.os = null;
+  $("order-screen").classList.add("hidden"); S.os = null; pushLogoutAdmin();
   if (APP_MODE === "admin") setTimeout(openPin, 50);
   S.pin = ""; S.role = ""; S.userName = ""; S.perms = {}; S.orders = []; S.users = []; S.rLast = null;
   S.bill = { items: {}, bundles: {} }; $("s-disc").value = ""; $("s-cname").value = ""; $("s-cphone").value = ""; $("s-note").value = "";
@@ -1850,12 +1951,13 @@ function showAdminTab(t) {
   if (need && need.need === "admin" && !isAdmin()) return;
   if (need && need.need === "orders" && !canOrders()) return;
   document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
-  ["sell", "orders", "reports", "campaign", "items", "form", "cats", "offers", "bundles", "delivery", "users", "shop"].forEach(x => $("tab-" + x).classList.toggle("hidden", x !== t));
+  ["sell", "orders", "reports", "campaign", "items", "form", "cats", "offers", "bundles", "delivery", "users", "push", "shop"].forEach(x => $("tab-" + x).classList.toggle("hidden", x !== t));
   if (t === "sell") renderSell();
   if (t === "reports") initReports();
   if (t === "campaign") campInit();
   if (t === "users") showUserList();
   if (t === "shop") fillShop();
+  if (t === "push") pnInit();
   if (t === "orders") { renderOrders(); loadOrders(true); }
   if (t === "bundles") showBundleList();
   if (t === "offers") renderAdminOffers();
@@ -1947,15 +2049,18 @@ async function stopAllOffers() {
   } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
 }
 /* ===== الطلبات في لوحة الإدارة (بدل ما تفتح الشيت) ===== */
-const ST_CLASS = { "جديد": "s-new", "تم الوزن": "s-prep", "تمت الموافقة": "s-prep", "تم الذبح": "s-prep", "تم التقطيع والتجهيز": "s-prep", "خرج للتوصيل": "s-out", "جاهز للاستلام": "s-out", "تم التسليم": "s-done", "ملغي": "s-cancel" };
-// مراحل الطلب. قبل «تم الذبح» ينفع الرجوع (إعادة الوزن)، وبعدها ما ينفعش
-const ALL_STAGES = ["جديد", "تم الوزن", "تمت الموافقة", "تم الذبح", "تم التقطيع والتجهيز", "خرج للتوصيل", "جاهز للاستلام", "تم التسليم", "ملغي"];
-const FLOW_DELIVERY = ["جديد", "تم الوزن", "تمت الموافقة", "تم الذبح", "تم التقطيع والتجهيز", "خرج للتوصيل", "تم التسليم"];
-const FLOW_PICKUP = ["جديد", "تم الوزن", "تمت الموافقة", "تم الذبح", "تم التقطيع والتجهيز", "جاهز للاستلام", "تم التسليم"];
-const SL_IDX = 3;                                            // «تم الذبح»
+const ST_CLASS = { "جديد": "s-new", "تم الوزن": "s-prep", "تمت الموافقة": "s-prep", "تم التجهيز": "s-prep", "خرج للتوصيل": "s-out", "جاهز للاستلام": "s-out", "تم التسليم": "s-done", "ملغي": "s-cancel" };
+// مراحل الطلب. قبل «تم التجهيز» ينفع الرجوع (إعادة الوزن)، وبعدها ما ينفعش
+const ALL_STAGES = ["جديد", "تم الوزن", "تمت الموافقة", "تم التجهيز", "خرج للتوصيل", "جاهز للاستلام", "تم التسليم", "ملغي"];
+const FLOW_DELIVERY = ["جديد", "تم الوزن", "تمت الموافقة", "تم التجهيز", "خرج للتوصيل", "تم التسليم"];
+const FLOW_PICKUP = ["جديد", "تم الوزن", "تمت الموافقة", "تم التجهيز", "جاهز للاستلام", "تم التسليم"];
+const SL_IDX = 3;                                            // «تم التجهيز»
+const LEGACY_ST = { "تم الذبح": "تم التجهيز", "تم التقطيع والتجهيز": "تم التجهيز", "جاهز": "تم التجهيز", "تم الوزن والذبح": "تم التجهيز" };     // أسماء قديمة محفوظة على الموبايل
 const flowFor = (t, appr) => (t === "pickup" ? FLOW_PICKUP : FLOW_DELIVERY).filter(s => !(appr === "na" && (s === "تم الوزن" || s === "تمت الموافقة")));
 const STAGE_NAMES = { "جديد": "تم استلام طلبك", "تم الوزن": "تم الوزن", "تمت الموافقة": "تمت الموافقة على الوزن والسعر" };
-const stageLabel = s => STAGE_NAMES[s] || s;
+// الطلب فيه فراخ بتتذبح؟ (أساس وزن أو عدد أو وزن متاح) — الزبون بيشوف «تم الذبح والتجهيز» بدل الاسم العام
+const needsSlaughter = o => !!o && (o.sl !== undefined ? !!o.sl : (o.lines || []).some(l => l && (l.w || l.c || l.tw)));
+const stageLabel = (s, o) => { s = LEGACY_ST[s] || s; return s === "تم التجهيز" && needsSlaughter(o) ? "تم الذبح والتجهيز" : (STAGE_NAMES[s] || s); };
 const stageIdx = s => ALL_STAGES.indexOf(s || "جديد");
 const apprOk = a => ["", "na", "approved", "auto"].includes(a || "");
 const isTerminal = s => s === "تم التسليم" || s === "ملغي";
@@ -1966,7 +2071,7 @@ const LATE_MIN = 15;                                         // مهلة موا�
 const isLate = o => o.approval === "pending" && o.approvalAt && (Date.now() - o.approvalAt) > LATE_MIN * 60000;
 const fmtTime = ms => (ms ? new Date(ms).toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" }) : "");
 function statusMsg(o) {
-  const L = [`مرحباً ${o.name} 👋`, `طلبك رقم ${o.id}: *${stageLabel(o.status || "جديد")}*`];
+  const L = [`مرحباً ${o.name} 👋`, `طلبك رقم ${o.id}: *${stageLabel(o.status || "جديد", o)}*`];
   if (o.final) L.push(`💰 المبلغ النهائي: ${moneyP(o.final)}`);
   else if (o.approval === "na") L.push(`💰 المبلغ: ${moneyP(o.total)} (سعر ثابت)`);
   else L.push(`💰 المبلغ التقديري: ${o.range ? rangeStr(o.range.lo, o.range.hi) : moneyP(o.total)} (بيتحدد بدقة بعد الوزن)`);
@@ -2008,7 +2113,7 @@ function ordMatch(o) {
   if (f === "today" && !String(o.time).startsWith(S.ordToday)) return false;
   if (f === "new" && o.status !== "جديد") return false;
   if (f === "wait" && o.approval !== "pending") return false;
-  if (f === "prep" && !["تم الوزن", "تمت الموافقة", "تم الذبح", "تم التقطيع والتجهيز"].includes(o.status)) return false;
+  if (f === "prep" && !["تم الوزن", "تمت الموافقة", "تم التجهيز"].includes(o.status)) return false;
   if (f === "out" && o.status !== "خرج للتوصيل" && o.status !== "جاهز للاستلام") return false;
   if (f === "done" && o.status !== "تم التسليم") return false;
   if (f === "cancel" && o.status !== "ملغي") return false;
@@ -2033,6 +2138,13 @@ function itemRowHtml(x) {
   const qty = dash < 0 ? mid : mid.slice(0, dash), rest = dash < 0 ? "" : mid.slice(dash + 3);
   return `<div class="oi"><div class="oi-top"><span class="oi-n"><bdi>${esc(name)}</bdi></span><span class="oi-p"><bdi>${esc(price)}</bdi></span></div><div class="oi-sub"><span class="oi-q"><bdi>${esc(qty)}</bdi></span>${rest ? `<span class="oi-r"><bdi>${esc(rest)}</bdi></span>` : ""}</div></div>`;
 }
+// سطر صنف موزون/مسعّر (من الوزن الفعلي): نفس شكل سطر الطلب في كل الشاشات (الاسم والسعر فوق، والكمية والتفاصيل تحت)
+function lineRowHtml(l) {
+  const qty = l.tw ? `${l.tc} فرخة × ${f3(l.tw)} كجم` : (l.f ? `${num(l.q)} ${esc(l.u)}` : `${f3(l.q)} كجم`);
+  const sub = (l.c && !l.tw ? `🐔 ${l.c} فرخة (من ${f3(l.a)} إلى ${f3(l.z)} كجم)` : "") + (l.p ? ` × ${num(l.p)} ج` : "");
+  return `<div class="oi"><div class="oi-top"><span class="oi-n"><bdi>${esc(l.n)}${l.w ? ` (وزن ${esc(l.w)})` : ""}</bdi></span><span class="oi-p"><bdi>${moneyP(l.t)}</bdi></span></div><div class="oi-sub"><span class="oi-q"><bdi>${qty}</bdi></span>${sub.trim() ? `<span class="oi-r"><bdi>${sub}</bdi></span>` : ""}</div></div>`;
+}
+const feeRowHtml = fee => fee > 0 ? `<div class="oi"><div class="oi-top"><span class="oi-n">🛵 التوصيل</span><span class="oi-p">${moneyP(fee)}</span></div></div>` : "";
 function orderCardHtml(o) {
   const waMsg = encodeURIComponent(statusMsg(o));
   const shop = o.source === "محل", hasPhone = /\d{6,}/.test(String(o.phone));
@@ -2051,6 +2163,7 @@ function orderCardHtml(o) {
       ${o.gps ? `<a class="btn-sm" href="${esc(o.gps)}" target="_blank" rel="noopener">🗺️ الموقع</a>` : ""}
       ${o.receipt ? `<a class="btn-sm" href="${esc(o.receipt)}" target="_blank" rel="noopener">🧾 الإيصال</a>` : ""}
       ${o.token ? `<button type="button" class="btn-sm" data-act="ocopy">🔗 رابط التتبّع</button>` : ""}
+      ${isAdmin() && !shop && hasPhone && o.status === "تم التسليم" ? `<button type="button" class="btn-sm${isTrusted(o.phone) ? " save" : ""}" data-act="otrust">${isTrusted(o.phone) ? "⭐ موثوق (إلغاء)" : "⭐ اعتبره موثوق"}</button>` : ""}
     </div></div>`;
 }
 function renderOrders() {
@@ -2063,10 +2176,26 @@ function renderOrders() {
   $("ord-more").classList.toggle("hidden", !S.ordMore);
   document.querySelectorAll("#ord-filters .chip").forEach(c => c.setAttribute("aria-pressed", String(c.dataset.f === S.ordF)));
 }
+// الزرار بيفتح صفحة التتبّع للعميل فعلاً (عشان المدير يشوف اللي العميل شايفه) وبينسخ الرابط كمان
 async function copyTrackLink(id) {
   const o = S.orders.find(x => x.id === id); if (!o || !o.token) return;
   const url = trackUrl(o.token);
-  try { await navigator.clipboard.writeText(url); toast("تم نسخ رابط التتبّع ✅"); } catch (e) { toast("انسخ الرابط: " + url, "warn"); }
+  try { window.open(url, "_blank", "noopener"); } catch (e) {}
+  try { await navigator.clipboard.writeText(url); toast("تم نسخ رابط التتبّع ✅ وفتحناه"); } catch (e) { toast("انسخ الرابط: " + url, "warn"); }
+}
+const normPh = v => { const s = String(v == null ? "" : v).replace(/\s+/g, ""); if (/^1[0125]\d{8}$/.test(s)) return "0" + s; const m = /^\+?20(1[0125]\d{8})$/.exec(s); return m ? "0" + m[1] : s; };
+const isTrusted = ph => (S.trusted || []).includes(normPh(ph));
+// العميل الموثوق من كارت الطلب المسلَّم (بدل كتابة الرقم يدوي): بيتحفظ مع قواعد الدورة
+async function toggleTrusted(id) {
+  const o = S.orders.find(x => x.id === id); if (!o || !isAdmin()) return;
+  const ph = normPh(o.phone), has = isTrusted(o.phone);
+  if (!confirm(has ? "نشيل " + o.name + " من العملاء الموثوقين؟" : o.name + " يبقى عميل موثوق؟ طلباته الجاية بتكمل من غير موافقته على فرق الوزن.")) return;
+  const fl = (S.settings && S.settings.flow) || {}, trusted = has ? (S.trusted || []).filter(x => x !== ph) : [...(S.trusted || []), ph];
+  try {
+    const r = await post({ action: "save_flow", pin: S.pin, tolPct: fl.tolPct || 0, tolEgp: fl.tolEgp || 0, display: fl.display || "exact", allowCancel: !!fl.allowCancel, trusted });
+    if (!r.ok) return toast(r.error || "تعذر الحفظ", "err");
+    S.trusted = trusted; renderOrders(); toast(has ? "اتشال من الموثوقين" : "⭐ بقى عميل موثوق");
+  } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
 }
 
 /* ===== شاشة الطلب عند المدير: الوزن ← الموافقة ← الحالة ← الإلغاء ===== */
@@ -2117,7 +2246,7 @@ function renderOrderScreen() {
     else weigh = `<div class="box"><h4>⚖️ الوزن الفعلي والفاتورة</h4>
       ${c.rows.map(r => `<div class="os-line">
         <div class="nm">${esc(r.l.n)}${r.l.w ? ` <span class="bs">وزن ${esc(r.l.w)}</span>` : ""}${r.fixed ? ' <span class="bs" style="background:#e0f2fe;color:#075985">🔒 سعر نهائي</span>' : ""}</div>
-        <div class="hint" style="margin:0">اتطلب: ${r.l.c ? r.l.c + " فرخة • " : ""}${num(r.l.q)} ${esc(r.l.u)} ≈ ${money(r.l.t)}</div>
+        <div class="oi-sub" style="margin:2px 0 6px"><span class="oi-q"><bdi>${r.l.c ? r.l.c + " فرخة • " : ""}${num(r.l.q)} ${esc(r.l.u)}</bdi></span><span class="oi-r"><bdi>اتطلب ≈ ${money(r.l.t)}</bdi></span></div>
         ${r.fixed || !pre ? `<div class="os-fixed">${r.fixed ? num(r.q) + " " + esc(r.l.u) : f3(r.q) + " كجم"} × ${num(r.p)} = <b>${money(r.t)}</b></div>`
           : `<div class="os-in"><input class="input" data-wq="${r.i}" inputmode="decimal" value="${esc(S.os.q[r.i])}" aria-label="الوزن الفعلي" placeholder="الوزن: 2.2 أو 850 جم"><span>كجم × ${num(r.p)} = <b data-lt="${r.i}">${r.err ? "—" : money(r.t)}</b></span></div>${r.err ? `<small class="err" data-le="${r.i}">${esc(r.err)}</small>` : `<small class="err" data-le="${r.i}"></small>`}`}
       </div>`).join("")}
@@ -2269,11 +2398,87 @@ async function sysNotify(title, body) {
     reg.showNotification(title, { body, icon: "icon-192.png", tag: "tahona-" + Date.now(), vibrate: [200, 100, 200] });
   } catch (e) {}
 }
+/* ===== إشعارات OneSignal (Web Push): بتوصل والشاشة مقفولة والتطبيق مقفول =====
+   المستلم بيتحدد بالـ external_id: المدير "adm"، الكاشير اللي معاه صلاحية الطلبات "csh"، الزبون "c-" + هاش آخر 10 أرقام من موبايله.
+   الـ SDK بيتحمّل بس على موقع GitHub Pages الحقيقي (مش في التجارب المحلية). الـ worker هو sw.js نفسه (فيه importScripts لـ OneSignal). */
+const OS_APP_ID = "71878b83-123a-4ba0-ab65-c69e01435ef8";
+let osReady = null;
+function osLoad() {
+  if (osReady) return osReady;
+  osReady = new Promise(res => {
+    if (location.hostname !== "tahona2026.github.io" || !("serviceWorker" in navigator) || !("PushManager" in window)) return res(null);
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async OneSignal => {
+      try { await OneSignal.init({ appId: OS_APP_ID, serviceWorkerPath: "menu/sw.js", serviceWorkerParam: { scope: "/menu/" } }); res(OneSignal); } catch (e) { res(null); }
+    });
+    const sc = document.createElement("script"); sc.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"; sc.defer = true; sc.onerror = () => res(null);
+    document.head.appendChild(sc);
+    setTimeout(() => res(null), 15000);
+  });
+  return osReady;
+}
+async function pushId() {
+  if (APP_MODE === "admin") return S.role === "admin" ? "adm" : (S.perms && S.perms.orders ? "csh" : "");
+  const ph = String(loadCust().phone || "").replace(/\D/g, "").slice(-10);
+  if (ph.length < 8 || !(window.crypto && crypto.subtle)) return "";
+  const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(ph));
+  return "c-" + Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, "0")).join("").slice(0, 24);
+}
+// بيربط الجهاز بصاحبه (مدير/كاشير/زبون). بيرجّع true لو الإشعارات شغّالة على الجهاز ده
+const pushOff = () => lsGet("tahona_push_off") === "1";          // الافتراضي: مفعّلة. الزبون/المدير بيقفلها من الإعدادات
+function syncPushToggles() { const on = "Notification" in window && Notification.permission === "granted" && !pushOff(); ["sn-push", "my-push"].forEach(i => { if ($(i)) $(i).checked = on; }); }
+async function pushSetEnabled(on) {
+  if (on) { lsSet("tahona_push_off", "0"); await enableNotif(); }
+  else {
+    lsSet("tahona_push_off", "1");
+    try { if (location.hostname === "tahona2026.github.io") { const OS = await osLoad(); if (OS) await OS.User.PushSubscription.optOut(); } } catch (e) {}
+    toast("الإشعارات اتقفلت. تقدر تفتحها تاني من نفس المكان", "warn");
+  }
+  syncPushToggles();
+}
+// الافتراضي «مفعّلة»: لو المتصفح لسه مسألش، بنعرض ورقة التفعيل (ضغطة الزرار هي اللي بتخلّي المتصفح يسمح). بتتكرر كل 3 أيام لو اتأجّلت
+function pushAutoAsk(kind) {
+  if (!("Notification" in window) || Notification.permission !== "default" || pushOff()) return;
+  if (Date.now() - Number(lsGet("tahona_push_ask") || 0) < 3 * 86400000) return;
+  if (document.querySelector(".dialog:not(.hidden)")) return setTimeout(() => pushAutoAsk(kind), 3000);
+  $("pa-text").textContent = kind === "admin" ? "عشان يوصلك كل طلب جديد وكل رد من العميل حتى والموبايل مقفول." : "عشان نبلّغك أول بأول لما طلبك يتوزن أو يخرج للتوصيل.";
+  $("push-ask").classList.remove("hidden"); lsSet("tahona_push_ask", String(Date.now()));
+}
+function askPushLater() {        // بعد ما الزبون يبعت طلبه (واتساب بيفتح بعد ثانيتين): نسأله لما يرجع للصفحة
+  if (!document.hidden) return pushAutoAsk("customer");
+  const f = () => { if (document.hidden) return; document.removeEventListener("visibilitychange", f); setTimeout(() => pushAutoAsk("customer"), 1500); };
+  document.addEventListener("visibilitychange", f);
+}
+async function pushSync() {
+  try {
+    if (!("Notification" in window) || Notification.permission !== "granted" || pushOff()) return false;
+    const OS = await osLoad(); if (!OS) return false;
+    try { if (!OS.User.PushSubscription.optedIn) await OS.User.PushSubscription.optIn(); } catch (e) {}
+    const id = await pushId(), cur = OS.User.externalId || "";
+    if (id && cur !== id && !(APP_MODE !== "admin" && /^(adm|csh)$/.test(cur))) { try { await OS.login(id); } catch (e) {} }
+    return !!OS.User.PushSubscription.optedIn;
+  } catch (e) { return false; }
+}
+async function pushLogoutAdmin() {          // خروج المدير/الكاشير: الجهاز ما يفضلش بيستلم طلبات
+  try { if (location.hostname !== "tahona2026.github.io") return; const OS = await osLoad(); if (OS && /^(adm|csh)$/.test(OS.User.externalId || "")) await OS.logout(); } catch (e) {}
+}
+async function adminPushCheck() {           // بعد دخول الإدارة: لو الإشعارات مش مفعّلة نظهر زرار التفعيل
+  const bar = $("push-bar"); if (!bar) return;
+  const on = await pushSync();
+  bar.classList.toggle("hidden", on || pushOff() || !("Notification" in window) || Notification.permission === "denied" || location.hostname !== "tahona2026.github.io");
+  if (!on) pushAutoAsk("admin");
+}
 async function enableNotif() {
   if (!("Notification" in window)) return toast("المتصفح ده مش بيدعم الإشعارات", "warn");
-  const p = await Notification.requestPermission();
-  toast(p === "granted" ? "تم تفعيل الإشعارات ✅" : "الإشعارات مقفولة، افتحها من إعدادات الموقع في المتصفح", p === "granted" ? "" : "warn");
+  lsSet("tahona_push_off", "0");
+  let p = Notification.permission;
+  if (p === "default") p = await Notification.requestPermission();
+  if (p !== "granted") return toast("الإشعارات مقفولة، افتحها من إعدادات الموقع في المتصفح", "warn");
+  const on = await pushSync();
+  toast(on ? "تم تفعيل الإشعارات ✅ بتوصلك حتى والتطبيق مقفول" : "تم تفعيل الإشعارات ✅", "");
   if ($("tr-notif")) $("tr-notif").classList.add("hidden");
+  if ($("push-bar")) $("push-bar").classList.add("hidden");
+  syncPushToggles();
 }
 // المدير: طلب جديد أو رد العميل على الموافقة ← صوت + اهتزاز + شريط + إشعار لو الصفحة في الخلفية
 function ownerAlert(msg) {
@@ -2309,13 +2514,14 @@ function fillSound() {
   $("sn-sel").value = c.sound; $("sn-state").textContent = "";
   idbGet("orderSound").then(b => { $("sn-state").textContent = b ? "✅ فيه صوت مرفوع على الجهاز ده (" + Math.round(b.size / 1024) + " ك.ب)" : ""; $("sn-clear").classList.toggle("hidden", !b); });
   $("sn-notif").classList.toggle("hidden", !("Notification" in window) || Notification.permission !== "default");
+  syncPushToggles();
 }
 function readSound() { return { on: $("sn-on").checked, sound: $("sn-sel").value, vol: Number($("sn-vol").value) / 100, wake: $("sn-wake").checked }; }
 function customerDetect(old, o) {                   // الزبون: تغيّرت حالة طلبه أو محتاجين موافقته
   if (!old) return;
   const approvalNew = o.approval === "pending" && old.approval !== "pending";
   if (!approvalNew && old.status === o.status && !(o.final && !old.final)) return;
-  const msg = approvalNew ? "⚖️ تم وزن طلبك — محتاجين موافقتك" : `طلبك ${o.id}: ${stageLabel(o.status)}${o.final && o.final !== old.final ? " • المبلغ النهائي " + moneyP(o.final) : ""}`;
+  const msg = approvalNew ? "⚖️ تم وزن طلبك — محتاجين موافقتك" : `طلبك ${o.id}: ${stageLabel(o.status, o)}${o.final && o.final !== old.final ? " • المبلغ النهائي " + moneyP(o.final) : ""}`;
   playSound(approvalNew ? "bell" : "soft", 0.7);
   try { navigator.vibrate && navigator.vibrate(approvalNew ? [300, 150, 300, 150, 300] : [200]); } catch (e) {}
   toast(msg, approvalNew ? "warn" : ""); sysNotify("دواجن الطاحونة", msg);
@@ -2336,7 +2542,7 @@ const hmMin = t => Number(String(t).slice(0, 2)) * 60 + Number(String(t).slice(3
 const t12 = t => new Date(2000, 0, 1, Number(t.slice(0, 2)), Number(t.slice(3, 5))).toLocaleTimeString("ar-EG", { hour: "numeric", minute: "2-digit" });
 function hoursCfg() {
   const h = (S.settings && S.settings.hours) || {};
-  return { mode: h.mode || "open", days: Array.isArray(h.days) && h.days.length === 7 ? h.days : DAY_AR.map(() => ({ on: true, from: "09:00", to: "23:00" })), resv: !!h.resv, maxDays: h.maxDays || 7 };
+  return { mode: h.mode || "open", days: Array.isArray(h.days) && h.days.length === 7 ? h.days : DAY_AR.map(() => ({ on: true, from: "09:00", to: "23:00" })), resv: !!h.resv, maxDays: h.maxDays || 7, delivery: h.delivery && h.delivery.mode === "auto" && Array.isArray(h.delivery.days) && h.delivery.days.length === 7 ? h.delivery : { mode: "open", days: [] } };
 }
 function cairoParts(ms) {
   const p = {};
@@ -2392,15 +2598,30 @@ function slotHint() {
   return "أيام وساعات الحجز: " + h.days.map((d, i) => d.on ? DAY_AR[i] + " " + t12(d.from) + "–" + t12(d.to) : "").filter(Boolean).join(" • ") + ". السعر والوزن بيتأكدوا يوم التنفيذ.";
 }
 const resvText = r => r ? "📅 حجز ليوم " + r.d + (r.t ? " الساعة " + t12(r.t) : "") : "";
-const HOURS_DEF = () => ({ mode: "open", resv: false, maxDays: 7, days: DAY_AR.map(() => ({ on: true, from: "09:00", to: "23:00" })) });
+const HOURS_DEF = () => ({ mode: "open", resv: false, maxDays: 7, days: DAY_AR.map(() => ({ on: true, from: "09:00", to: "23:00" })), delivery: { mode: "open", days: DAY_AR.map(() => ({ on: true, from: "12:00", to: "23:00" })) } });
+const daysRowsHtml = (days, f, t) => DAY_AR.map((n, i) => { const d = days[i] || {}; return `<div style="display:flex;gap:6px;align-items:center;margin:4px 0" data-d="${i}"><label class="chk" style="flex:1;margin:0"><input type="checkbox" data-k="on"${d.on === false ? "" : " checked"}> ${n}</label><input class="input" type="time" data-k="from" value="${esc(d.from || f)}" style="width:110px"><span>→</span><input class="input" type="time" data-k="to" value="${esc(d.to || t)}" style="width:110px"></div>`; }).join("");
+const readDaysRows = box => [...box.querySelectorAll("[data-d]")].map(r => ({ on: r.querySelector('[data-k="on"]').checked, from: r.querySelector('[data-k="from"]').value, to: r.querySelector('[data-k="to"]').value }));
 function fillHours() {
-  const h = Object.assign(HOURS_DEF(), (S.settings && S.settings.hours) || {});
+  const h = Object.assign(HOURS_DEF(), (S.settings && S.settings.hours) || {}), dl = h.delivery || HOURS_DEF().delivery;
   $("hr-mode").value = h.mode; $("hr-resv").checked = !!h.resv; $("hr-max").value = h.maxDays || 7;
-  $("hr-days").innerHTML = DAY_AR.map((n, i) => { const d = h.days[i] || {}; return `<div style="display:flex;gap:6px;align-items:center;margin:4px 0" data-d="${i}"><label class="chk" style="flex:1;margin:0"><input type="checkbox" data-k="on"${d.on === false ? "" : " checked"}> ${n}</label><input class="input" type="time" data-k="from" value="${esc(d.from || "09:00")}" style="width:110px"><span>→</span><input class="input" type="time" data-k="to" value="${esc(d.to || "23:00")}" style="width:110px"></div>`; }).join("");
+  $("hr-days").innerHTML = daysRowsHtml(h.days, "09:00", "23:00");
+  $("hr-dmode").value = dl.mode === "auto" ? "auto" : "open"; $("hr-ddays").innerHTML = daysRowsHtml(dl.days || [], "12:00", "23:00"); $("hr-ddays").classList.toggle("hidden", $("hr-dmode").value !== "auto");
 }
 function readHours() {
-  return { mode: $("hr-mode").value, resv: $("hr-resv").checked, maxDays: Number($("hr-max").value) || 0,
-    days: [...$("hr-days").querySelectorAll("[data-d]")].map(r => ({ on: r.querySelector('[data-k="on"]').checked, from: r.querySelector('[data-k="from"]').value, to: r.querySelector('[data-k="to"]').value })) };
+  return { mode: $("hr-mode").value, resv: $("hr-resv").checked, maxDays: Number($("hr-max").value) || 0, days: readDaysRows($("hr-days")),
+    delivery: { mode: $("hr-dmode").value, days: readDaysRows($("hr-ddays")) } };
+}
+// مواعيد التوصيل عند الزبون (نفس حساب السيرفر بتوقيت القاهرة)
+function deliveryState() {
+  const h = hoursCfg(), d = h.delivery; if (!d || d.mode !== "auto") return { open: true };
+  const c = cairoParts(nowMs()), td = d.days[c.wd], pv = d.days[(c.wd + 6) % 7];
+  let open = false;
+  if (td.on) { const f = hmMin(td.from), t = hmMin(td.to); open = f <= t ? (c.min >= f && c.min < t) : c.min >= f; }
+  if (!open && pv.on && hmMin(pv.from) > hmMin(pv.to) && c.min < hmMin(pv.to)) open = true;
+  if (open) return { open: true };
+  let next = "";
+  for (let k = 0; k < 8; k++) { const wd = (c.wd + k) % 7, x = d.days[wd]; if (!x.on) continue; if (k === 0 && c.min >= hmMin(x.from)) continue; next = (k === 0 ? "النهارده" : k === 1 ? "بكرة" : "يوم " + DAY_AR[wd]) + " الساعة " + t12(x.from); break; }
+  return { open: false, next };
 }
 setInterval(() => { try { renderClosed(); } catch (e) {} }, 60000);
 
@@ -2462,7 +2683,12 @@ function maybeInstallSheet(kind) {
   $("install-sheet").classList.remove("hidden"); lsSet("tahona_install_big", "1");
 }
 function initInstall() {
-  try { if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) navigator.serviceWorker.register("sw.js").catch(() => {}); } catch (e) {}
+  try {
+    if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+      if (location.hostname === "tahona2026.github.io") setTimeout(() => osLoad().then(OS => { if (!OS) navigator.serviceWorker.register("sw.js").catch(() => {}); }), 1500);   // OneSignal هو اللي بيسجّل نفس الـ worker، ولو ما اتحمّلش بنسجّله احنا
+      else navigator.serviceWorker.register("sw.js").catch(() => {});
+    }
+  } catch (e) {}
   const standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
   if (standalone || Number(lsGet("tahona_install_x")) > Date.now() - 2 * 864e5) return;   // ✕ بتخفي الشريط يومين بس (الإخفاء القديم "1" مش بيمنع)
   window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferredInstall = e; $("install-bar").classList.remove("hidden"); $("install-sheet").classList.add("hidden"); });   // التثبيت ظهر: الشريط بس. الورقة للحالات اللي ما ظهرش فيها
@@ -2484,6 +2710,152 @@ function initInstall() {
     deferredInstall = null; $("install-bar").classList.add("hidden");
   });
   $("install-x").addEventListener("click", () => { lsSet("tahona_install_x", String(Date.now())); $("install-bar").classList.add("hidden"); });
+}
+
+/* ===== إشعار جماعي للعملاء من لوحة الإدارة (صورة + ربط بعرض + إرسال فوري أو مجدول) ===== */
+function pnOffers() {
+  const items = (S.menu || []).filter(m => hasOffer(m) && offerActive(m)).map(m => ({ k: "i:" + m.id, label: "🔥 " + m.name, title: "🔥 عرض اليوم: " + m.name,
+    body: `اشتري ${num(m.offer_qty)} ${m.unit} بـ ${num(m.offer_total)} ج بدل ${num(Math.round(m.offer_qty * m.price * 100) / 100)} ج. وفّرت ${num(Math.round((m.offer_qty * m.price - m.offer_total) * 100) / 100)} ج!`, img: m.img }));
+  const bs = (S.bundles || []).filter(bundleActive).map(b => ({ k: "b:" + b.id, label: "🎁 " + b.name, title: "🎁 باقة " + b.name, body: `${num(b.price)} ج بدل ${num(bundleSumOf(b))} ج. وفّر ${num(bundleSaving(b))} ج!`, img: b.img }));
+  return [...items, ...bs];
+}
+function pnInit() {
+  const list = pnOffers(); S.pnList = list;
+  $("pn-offer").innerHTML = '<option value="">— بدون ربط بعرض —</option>' + list.map(o => `<option value="${esc(o.k)}">${esc(o.label)}</option>`).join("");
+  pnPreview();
+}
+function pnPreview() {
+  const t = $("pn-title").value.trim() || "العنوان", b = $("pn-body").value.trim() || "نص الإشعار", img = $("pn-img").value.trim();
+  $("pn-prev").innerHTML = `<div class="pn-h"><img src="icon-192.png" alt=""><div><div class="pn-t">${esc(t)}</div><div class="pn-b">${esc(b)}</div></div></div>${/^https:\/\//.test(img) ? `<img class="pn-i" src="${esc(safeImg(img))}" alt="" onerror="this.style.display='none'">` : ""}`;
+}
+async function pnSend() {
+  const title = $("pn-title").value.trim(), body = $("pn-body").value.trim(), image = $("pn-img").value.trim(), when = $("pn-when").value;
+  if (title.length < 2) return toast("اكتب عنوان الإشعار", "err");
+  if (body.length < 3) return toast("اكتب نص الإشعار", "err");
+  if (image && !/^https:\/\//.test(image)) return toast("رابط الصورة لازم يبدأ بـ https://", "err");
+  let sendAt = 0;
+  if (when === "later") { sendAt = new Date($("pn-at").value).getTime(); if (!(sendAt > Date.now() + 60000)) return toast("اختار موعد بعد دقيقة على الأقل", "err"); }
+  const url = $("pn-url").value.trim(); if (url && !url.startsWith(custBase())) return toast("الرابط لازم يكون من موقع المنيو", "err");
+  if (!confirm(sendAt ? "هيتبعت الإشعار ده في الموعد المحدد لكل المشتركين. متأكد؟" : "هيتبعت الإشعار ده دلوقتي لكل المشتركين. متأكد؟")) return;
+  $("pn-send").disabled = true;
+  try {
+    const r = await post({ action: "send_broadcast", pin: S.pin, title, body, image, url, sendAt });
+    if (!r.ok) return adminErr(r);
+    toast(r.scheduled ? "📅 اتجدول الإشعار ✅" : "📤 اتبعت الإشعار ✅"); $("pn-title").value = ""; $("pn-body").value = ""; $("pn-img").value = ""; $("pn-offer").value = ""; pnPreview();
+  } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
+  finally { $("pn-send").disabled = false; }
+}
+async function pnPickImage(e) {
+  const file = e.target.files[0]; e.target.value = ""; if (!file) return;
+  if (!/^image\//.test(file.type)) return toast("اختار صورة بس", "err");
+  const blob = await editImage(file, { ratio: 2, sizes: [1000, 800, 640], out: 1000, title: "✂️ صورة الإشعار" }); if (!blob) return;
+  const st = $("pn-up"); st.textContent = "⏳ جاري رفع الصورة...";
+  try {
+    const r = await post({ action: "upload_image", pin: S.pin, mime: "image/jpeg", imageBase64: await readB64(blob) });
+    if (!r.ok) { st.textContent = "❌ " + (r.error || "فشل رفع الصورة"); return adminErr(r); }
+    $("pn-img").value = r.url; st.textContent = "✅ تم رفع الصورة"; pnPreview();
+  } catch (err) { st.textContent = "❌ تعذر رفع الصورة"; }
+}
+/* ===== القايمة ☰ + الشريط السفلي + زرار الرجوع ===== */
+const isStandalone = () => window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+// زرار «تثبيت التطبيق» الدايم: بيشغّل نافذة التثبيت لو المتصفح بيدعمها، وإلا بيعرض خطوات يدوية حسب الجهاز
+async function installNow() {
+  if (deferredInstall) { deferredInstall.prompt(); try { await deferredInstall.userChoice; } catch (e) {} deferredInstall = null; $("install-bar").classList.add("hidden"); return; }
+  const ua = navigator.userAgent, kind = /FBAN|FBAV|Instagram|WhatsApp|Line\//i.test(ua) ? "inapp" : (/iPhone|iPad|iPod/i.test(ua) ? "ios" : "manual");
+  const steps = { ios: "اضغط زرار المشاركة ⬆️ في سفاري، ثم «إضافة إلى الشاشة الرئيسية».", inapp: "افتح الصفحة من متصفح موبايلك: اضغط ⋮ ثم «فتح في المتصفح»، وبعدها ثبّت التطبيق.", manual: "افتح قايمة المتصفح (⋮ أو ☰) واختار «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية». (في هواوي: قايمة متصفح هواوي ثم «إضافة إلى الشاشة الرئيسية»). ولو مش ظاهرة، جرّب متصفح تاني." }[kind];
+  $("is-steps").textContent = steps; $("is-steps").classList.remove("hidden"); $("is-install").classList.add("hidden");
+  $("install-sheet").classList.remove("hidden");
+}
+function smItems() {
+  const dark = document.documentElement.dataset.theme === "dark", pushOn = "Notification" in window && Notification.permission === "granted" && !pushOff();
+  const common = [
+    ["theme", dark ? "☀️ الوضع النهاري" : "🌙 الوضع الليلي"],
+    ...(isStandalone() ? [] : [["install", "📲 تثبيت التطبيق"]]),
+    ...("Notification" in window ? [["push", pushOn ? "🔕 قفل الإشعارات" : "🔔 تفعيل الإشعارات"]] : [])
+  ];
+  if (APP_MODE === "admin") {
+    const tabs = [...document.querySelectorAll("#admin .tabs button[data-tab]")].filter(b => !b.classList.contains("hidden") && !["sell", "orders", "items"].includes(b.dataset.tab)).map(b => ["tab:" + b.dataset.tab, b.textContent.trim()]);
+    return [...tabs, ...common, ["custview", "🛍️ شوف المنيو زي العميل"], ["logout", "🚪 خروج"]];
+  }
+  return [["refresh", "🔄 تحديث الأسعار"], ["font", "Aa حجم الخط"], ["track", "🔎 تتبّع طلب برقمه"], ...common];
+}
+function openSideMenu() {
+  $("sm-title").textContent = APP_MODE === "admin" ? "☰ باقي الأقسام والإعدادات" : "☰ المزيد";
+  $("sm-grid").innerHTML = smItems().map(([k, l]) => `<button type="button" data-k="${esc(k)}">${esc(l)}</button>`).join("");
+  $("side-menu").classList.remove("hidden");
+}
+function smAction(k) {
+  $("side-menu").classList.add("hidden");
+  if (k.startsWith("tab:")) return showAdminTab(k.slice(4));
+  if (k === "theme") return applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+  if (k === "install") return installNow();
+  if (k === "push") return pushSetEnabled(!( "Notification" in window && Notification.permission === "granted" && !pushOff()));
+  if (k === "refresh") return $("refresh-btn").click();
+  if (k === "font") return $("font-btn").click();
+  if (k === "track") { openMyOrders(); setTimeout(() => $("lk-code").focus(), 300); return; }
+  if (k === "custview") return void window.open(custBase(), "_blank", "noopener");
+  if (k === "logout") return closeAdmin();
+}
+function adminNavRender() {
+  const nav = $("admin-nav"); if (!nav) return;
+  const items = [["sell", "🧾", "كاشير", "sell"], ["orders", "📦", "الطلبات", "orders"], ["items", "📋", "الأصناف", "admin"]]
+    .filter(([, , , need]) => need === "admin" ? isAdmin() : need === "orders" ? canOrders() : true);
+  const on = (document.querySelector("#admin .tabs button.on") || {}).dataset;
+  const ob = document.querySelector('#admin .tabs button[data-tab="orders"]'), m = ob && /\((\d+)\)/.exec(ob.textContent);
+  nav.innerHTML = items.map(([t, i, l]) => `<button type="button" data-t="${t}" class="${on && on.tab === t ? "on" : ""}"><span class="bi">${i}</span>${l}${t === "orders" && m ? `<span class="bdg">${m[1]}</span>` : ""}</button>`).join("")
+    + '<button type="button" data-t="__more"><span class="bi">☰</span>المزيد</button>';
+}
+function bnavRender() {
+  const n = cartCount(), cb = $("bn-cart"); if (cb) { cb.textContent = n; cb.classList.toggle("hidden", !n); }
+  const act = loadMyOrders().filter(o => !isTerminal(o.status)).length, ob = $("bn-orders"); if (ob) { ob.textContent = act; ob.classList.toggle("hidden", !act); }
+}
+// زرار الرجوع: كل شاشة أو نافذة بتتفتح بتتسجّل خطوة في سجل المتصفح، فالرجوع بيقفل آخر واحدة بدل ما يطلع من التطبيق
+const OVL = {
+  "sheet": { vis: el => el.classList.contains("show"), close: () => $("sheet-close").click() },
+  "track": { vis: el => !el.classList.contains("hidden"), close: () => $("track-close").click() },
+  "myorders": { vis: el => !el.classList.contains("hidden"), close: () => $("my-close").click() },
+  "invoice": { vis: el => !el.classList.contains("hidden"), close: () => $("inv-close").click() },
+  "order-screen": { vis: el => !el.classList.contains("hidden"), close: () => $("os-close").click() },
+  "qty-dialog": { vis: el => !el.classList.contains("hidden"), close: () => $("qd-cancel").click() },
+  "tiers-dialog": { vis: el => !el.classList.contains("hidden"), close: () => $("td-cancel").click() },
+  "side-menu": { vis: el => !el.classList.contains("hidden"), close: () => $("side-menu").classList.add("hidden") },
+  "install-sheet": { vis: el => !el.classList.contains("hidden"), close: () => $("install-sheet").classList.add("hidden") },
+  "push-ask": { vis: el => !el.classList.contains("hidden"), close: () => $("push-ask").classList.add("hidden") }
+};
+const ovStack = []; let ovBack = 0;
+function initBackNav() {
+  Object.keys(OVL).forEach(id => {
+    const el = $(id); if (!el) return;
+    new MutationObserver(() => {
+      const shown = OVL[id].vis(el), at = ovStack.indexOf(id);
+      if (shown && at === -1) { ovStack.push(id); try { history.pushState({ ov: id }, ""); } catch (e) {} }
+      else if (!shown && at !== -1) { ovStack.splice(at, 1); if (history.state && history.state.ov === id) { ovBack++; try { history.back(); } catch (e) { ovBack--; } } }
+    }).observe(el, { attributes: true, attributeFilter: ["class"] });
+  });
+  window.addEventListener("popstate", () => {
+    if (ovBack > 0) { ovBack--; return; }
+    const id = ovStack.pop(); if (id) OVL[id].close();
+  });
+}
+function initNav() {
+  initBackNav();
+  $("sm-close").addEventListener("click", () => $("side-menu").classList.add("hidden"));
+  $("sm-grid").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (b) smAction(b.dataset.k); });
+  $("admin-theme").addEventListener("click", () => applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
+  $("bnav").addEventListener("click", e => {
+    const b = e.target.closest("[data-n]"); if (!b) return; const n = b.dataset.n;
+    if (n === "home") window.scrollTo({ top: 0, behavior: "smooth" });
+    else if (n === "cart") { if (cartCount() > 0) openSheet(); else toast("السلة فاضية، أضف أصناف الأول", "warn"); }
+    else if (n === "orders") openMyOrders();
+    else if (n === "wa") window.open("https://wa.me/" + WA, "_blank", "noopener");
+    else if (n === "more") openSideMenu();
+  });
+  $("admin-nav").addEventListener("click", e => {
+    const b = e.target.closest("[data-t]"); if (!b) return;
+    if (b.dataset.t === "__more") openSideMenu(); else showAdminTab(b.dataset.t);
+  });
+  new MutationObserver(adminNavRender).observe($("admin").querySelector(".tabs"), { attributes: true, subtree: true, attributeFilter: ["class"], childList: true, characterData: true });
+  setInterval(bnavRender, 2000); bnavRender();
 }
 
 /* ===== مصدر الطلب (من رابط الحملة ?src=...) ===== */
@@ -3124,37 +3496,51 @@ async function campCanvas() {
   c.fillStyle = "#6b7280"; c.font = F("400", 34); c.fillText(dstr, W / 2, y + 50); y += 76;
   // الصفوف
   const ch = campChosen(), rows = ch.items.length + ch.bundles.length, note = $("cp-note").value.trim();
-  const footH = (story ? 500 : 420) + (note ? 80 : 0), avail = H - footH - y, rowH = Math.max(52, Math.min(story ? 150 : 130, Math.floor(avail / Math.max(1, rows))));
+  const footH = (story ? 560 : 470) + (note ? 80 : 0), avail = H - footH - y, rowH = Math.max(58, Math.min(story ? 170 : 150, Math.floor(avail / Math.max(1, rows))));
+  const wrap = (txt, maxW) => { const words = String(txt).split(/\s+/), lines = []; let cur = ""; words.forEach(w => { const t = cur ? cur + " " + w : w; if (c.measureText(t).width <= maxW || !cur) cur = t; else { lines.push(cur); cur = w; } }); if (cur) lines.push(cur); return lines; };
+  // الاسم بياخد المساحة اللي فاضلة بعد السعر (مستحيل يركبوا على بعض)، وبينزل سطرين لو طويل
+  const rowText = (name, sub, price, priceCol, mid) => {
+    c.textAlign = "left"; const pp = fit(price, "700", rowH * .46, 380); c.font = F("700", pp); const pw = c.measureText(price).width;
+    c.fillStyle = priceCol; c.fillText(price, 80, mid + pp * .34);
+    const maxW = W - 160 - pw - 36; let np = Math.min(rowH * .5, 64), lines = [name]; c.font = F("700", np);
+    if (c.measureText(name).width > maxW) {            // طويل: سطرين بخط أكبر بدل سطر واحد صغير
+      np = Math.min(rowH * .36, 42); c.font = F("700", np); lines = wrap(name, maxW);
+      while (lines.length > 2 && np > 20) { np -= 2; c.font = F("700", np); lines = wrap(name, maxW); }
+      lines = lines.slice(0, 2);
+    }
+    const sp = sub ? Math.min(rowH * .26, 34) : 0, tot = lines.length * np * 1.15 + (sub ? sp * 1.25 : 0);
+    c.textAlign = "right"; c.fillStyle = "#111827"; c.font = F("700", np);
+    let ty = mid - tot / 2 + np * .9; lines.forEach(l => { c.fillText(l, W - 80, ty); ty += np * 1.15; });
+    if (sub) { c.fillStyle = sub.col; c.font = F("700", fit(sub.t, "700", sp, maxW)); c.fillText(sub.t, W - 80, ty - np * .9 + sp * .95); }
+  };
   let i = 0;
   const band = () => { if (i % 2 === 0) { c.fillStyle = "rgba(127,29,29,.06)"; rr(50, y + 2, W - 100, rowH - 6, 18); c.fill(); } };
   ch.items.forEach(m => {
     band(); const on = offerActive(m), mid = y + rowH / 2;
-    const nameP = fit(m.name, "700", rowH * .42, 600); c.fillStyle = "#111827"; c.textAlign = "right"; c.font = F("700", nameP); c.fillText(m.name, W - 80, on ? mid - rowH * .02 : mid + nameP * .34);
-    if (on) { c.fillStyle = "#dc2626"; c.font = F("700", rowH * .27); c.fillText("🔥 عرض: " + num(m.offer_qty) + " " + m.unit + " بـ " + money(m.offer_total), W - 80, mid + rowH * .3); }
-    const price = money(m.price) + " / " + m.unit; c.textAlign = "left"; c.fillStyle = "#7f1d1d"; c.font = F("700", fit(price, "700", rowH * .4, 340)); c.fillText(price, 80, mid + rowH * .13);
+    rowText(m.name, on ? { t: "🔥 عرض: " + num(m.offer_qty) + " " + m.unit + " بـ " + money(m.offer_total), col: "#dc2626" } : null, money(m.price) + " / " + m.unit, "#7f1d1d", mid);
     y += rowH; i++;
   });
   ch.bundles.forEach(b => {
     c.fillStyle = "rgba(220,38,38,.09)"; rr(50, y + 2, W - 100, rowH - 6, 18); c.fill(); c.strokeStyle = "#dc2626"; c.lineWidth = 3; rr(50, y + 2, W - 100, rowH - 6, 18); c.stroke();
-    const mid = y + rowH / 2, label = "🎁 " + bundleLabel(b.name), nameP = fit(label, "700", rowH * .4, 600);
-    c.fillStyle = "#111827"; c.textAlign = "right"; c.font = F("700", nameP); c.fillText(label, W - 80, b.desc ? mid - rowH * .02 : mid + nameP * .34);
-    if (b.desc) { c.fillStyle = "#6b7280"; c.font = F("400", fit(b.desc, "400", rowH * .26, 620)); c.fillText(b.desc, W - 80, mid + rowH * .3); }
-    const price = money(b.price); c.textAlign = "left"; c.fillStyle = "#dc2626"; c.font = F("700", fit(price, "700", rowH * .44, 300)); c.fillText(price, 80, mid + rowH * .15);
+    rowText("🎁 " + bundleLabel(b.name), b.desc ? { t: b.desc, col: "#6b7280" } : null, money(b.price), "#dc2626", y + rowH / 2);
     y += rowH; i++;
   });
   if (!rows) { c.textAlign = "center"; c.fillStyle = "#9ca3af"; c.font = F("400", 40); c.fillText("اختار أصناف من تحت", W / 2, y + 100); }
-  // الفوتر: السطر الإضافي + QR + الأرقام
-  const fy = H - (story ? 500 : 420);
+  // الفوتر: السطر الإضافي + QR + الأرقام (كل سطر بيتقاس عشان ما يطلعش برا مكانه ولا يركب على الـ QR)
+  const fy = H - (story ? 560 : 470);
   if (note) { c.fillStyle = "#fde68a"; rr(60, fy - 10, W - 120, 66, 20); c.fill(); c.textAlign = "center"; c.fillStyle = "#450a0a"; c.font = F("700", fit(note, "700", 40, W - 160)); c.fillText(note, W / 2, fy + 36); }
-  const base = fy + (note ? 80 : 0), qs = story ? 300 : 230;
+  const base = fy + (note ? 80 : 0), qs = story ? 320 : 250, tx = W - 70, tmax = tx - (60 + qs + 20) - 24;
   c.fillStyle = "#fff"; rr(60, base + 10, qs + 20, qs + 20, 20); c.fill(); c.strokeStyle = "#7f1d1d"; c.lineWidth = 6; rr(60, base + 10, qs + 20, qs + 20, 20); c.stroke();
   c.drawImage(qrCanvas(campLink(), 700, null), 70, base + 20, qs, qs);
-  c.textAlign = "right"; c.fillStyle = "#7f1d1d"; c.font = F("700", story ? 58 : 48); c.fillText("اطلب أونلاين الآن", W - 70, base + (story ? 90 : 76));
-  c.fillStyle = "#111827"; c.font = F("700", story ? 34 : 30); c.fillText("📱 امسح الكود أو افتح الرابط", W - 70, base + (story ? 140 : 120));
-  c.fillStyle = "#374151"; c.font = F("400", story ? 34 : 29);
-  phonesOf(sh).slice(0, 3).forEach((p, k) => c.fillText("📞 " + p, W - 70, base + (story ? 200 : 170) + k * (story ? 46 : 40)));
-  c.font = F("400", story ? 30 : 26); c.fillText(sh.address, W - 70, base + (story ? 200 : 170) + Math.min(3, phonesOf(sh).length) * (story ? 46 : 40) + 8);
-  c.fillStyle = "#7f1d1d"; c.fillRect(0, H - 22, W, 22); c.fillStyle = "#f59e0b"; c.fillRect(0, H - 30, W, 8);
+  c.textAlign = "right"; c.fillStyle = "#7f1d1d"; c.font = F("700", fit("اطلب أونلاين الآن", "700", story ? 66 : 54, tmax)); c.fillText("اطلب أونلاين الآن", tx, base + (story ? 92 : 76));
+  c.fillStyle = "#111827"; c.font = F("700", fit("📱 امسح الكود أو افتح الرابط", "700", story ? 38 : 32, tmax)); c.fillText("📱 امسح الكود أو افتح الرابط", tx, base + (story ? 152 : 128));
+  const ph = phonesOf(sh).slice(0, 3), py = base + (story ? 228 : 192), step = story ? 58 : 50;
+  c.fillStyle = "#374151"; ph.forEach((p, k) => { const t = "📞 " + p; c.font = F("700", fit(t, "700", story ? 44 : 36, tmax)); c.fillText(t, tx, py + k * step); });
+  c.font = F("400", fit(sh.address || " ", "400", story ? 34 : 30, tmax)); let ay = py + ph.length * step + 6;
+  const addrLines = wrap(sh.address || "", tmax).slice(0, 2); c.font = F("400", story ? 34 : 30);
+  addrLines.forEach((l, k) => c.fillText(l, tx, ay + k * (story ? 42 : 36)));
+  c.fillStyle = "#7f1d1d"; c.fillRect(0, H - 22, W, 22);
+c.fillStyle = "#7f1d1d"; c.fillRect(0, H - 22, W, 22); c.fillStyle = "#f59e0b"; c.fillRect(0, H - 30, W, 8);
   return cv;
 }
 function campCaption() {
@@ -3182,6 +3568,14 @@ async function campShare() {
     if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], text: campCaption() }); return; } catch (e) { if (e && e.name === "AbortError") return; } }
     await campDownload();
   } catch (e) { toast("تعذر المشاركة", "err"); }
+}
+// الصورة لوحدها من غير أي نص: بتتفتح في أي تطبيق (واتساب، فيسبوك، إنستجرام…) وكل البيانات جواها
+async function campShareImage() {
+  try {
+    const f = await campFile();
+    if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f] }); return; } catch (e) { if (e && e.name === "AbortError") return; } }
+    await campDownload();
+  } catch (e) { toast("تعذر مشاركة الصورة", "err"); }
 }
 async function campCopy() { try { await navigator.clipboard.writeText(campCaption()); toast("تم نسخ النص ✅"); } catch (e) { toast("تعذر النسخ، افتح واتساب بالنص من الزرار اللي جنبه", "warn"); } }
 
@@ -3227,7 +3621,7 @@ function updateMyBadge() {
 // أي رد من السيرفر عن طلب بيحدّث نسخة الجهاز (الحالة والمبلغ النهائي)
 function rememberTracked(o) {
   const a = loadMyOrders(), i = a.findIndex(x => x.token === o.token);
-  const patch = { token: o.token, id: o.id, time: o.time, total: o.total, final: o.final, status: o.status, type: o.type, approval: o.approval };
+  const patch = { token: o.token, id: o.id, time: o.time, total: o.total, final: o.final, status: o.status, type: o.type, approval: o.approval, sl: o.sl ? 1 : 0 };
   if (i >= 0) { customerDetect(a[i], o); a[i] = { ...a[i], ...patch }; } else a.unshift({ ...patch, lines: o.items.slice(0, 4), t: 0 });
   saveMyOrders(a); updateMyBadge();
 }
@@ -3275,16 +3669,16 @@ function renderTrack() {
   const steps = flow.map((s, i) => {
     const cls = cancelled ? "" : (o.status === "تم التسليم" || i < idx ? "done" : (i === idx ? "now" : ""));
     const mark = cls === "done" ? "✓" : (cls === "now" ? "●" : "");
-    return `<li class="${cls}"><span class="dot">${mark}</span><div><b>${esc(stageLabel(s))}</b>${cls === "now" && upd ? `<small>الحالة الحالية • آخر تحديث ${esc(upd)}</small>` : ""}</div></li>`;
+    return `<li class="${cls}"><span class="dot">${mark}</span><div><b>${esc(stageLabel(s, o))}</b>${cls === "now" && upd ? `<small>الحالة الحالية • آخر تحديث ${esc(upd)}</small>` : ""}</div></li>`;
   }).join("");
   const waText = encodeURIComponent(`بخصوص طلبي رقم ${o.id}`);
   const wl = o.weighed || [], hasW = wl.length > 0, fixedOnly = o.approval === "na";
   const diff = o.final ? Math.round((o.final - o.total) * 100) / 100 : 0;
-  const lineTxt = l => `${esc(l.n)}${l.w ? ` (وزن ${esc(l.w)})` : ""} — ${l.f ? num(l.q) + " " + esc(l.u) : f3(l.q) + " كجم"} × ${num(l.p)} = <b>${moneyP(l.t)}</b>`;
+  const lineTxt = lineRowHtml;
   const approveBox = (o.approval === "pending" && o.status === "تم الوزن") ? `
     <div class="box" style="border:2px solid #f59e0b">
       <h4>⚖️ تم وزن طلبك — محتاجين موافقتك</h4>
-      <div class="ord-items" style="white-space:normal;line-height:1.9">${wl.map(lineTxt).join("<br>")}${o.fee > 0 ? `<br>🛵 التوصيل: <b>${moneyP(o.fee)}</b>` : ""}</div>
+      <div class="ord-items oi-list">${wl.map(lineTxt).join("")}${feeRowHtml(o.fee)}</div>
       <div class="sum total" style="margin-top:8px"><span>الإجمالي النهائي</span><b>${moneyP(o.final || o.total)}</b></div>
       <p class="hint">التقديري كان ${moneyP(o.total)}${diff ? ` • الفرق <b style="color:${diff > 0 ? "#dc2626" : "#059669"}">${diff > 0 ? "+" : "−"}${moneyP(Math.abs(diff))}</b>` : ""}</p>
       <div class="two"><button class="btn primary" id="tr-ok" type="button">✅ موافق</button><button class="btn dark" id="tr-no" type="button">❌ مش موافق</button></div>
@@ -3299,14 +3693,14 @@ function renderTrack() {
   else totals = `<div class="sum"><span>المبلغ التقديري</span><b>${o.range ? rangeStr(o.range.lo, o.range.hi) : moneyP(o.total)}</b></div>
       <p class="hint">⚖️ المبلغ النهائي بيتحدد بدقة بعد الوزن، وبيظهر هنا أول ما يتجهّز.${toleranceText(o.flow) ? "<br>" + esc(toleranceText(o.flow)) : ""}</p>`;
   body.innerHTML = `
-    <div class="box"><div class="ord-head"><div><span class="ord-id">${esc(o.id)}</span><br><span class="ord-time">${esc(o.time)}</span></div><span class="st ${ST_CLASS[o.status] || ""}">${esc(stageLabel(o.status))}</span></div>
+    <div class="box"><div class="ord-head"><div><span class="ord-id">${esc(o.id)}</span><br><span class="ord-time">${esc(o.time)}</span></div><span class="st ${ST_CLASS[o.status] || ""}">${esc(stageLabel(o.status, o))}</span></div>
       <p class="hint" style="margin-top:6px">${o.type === "pickup" ? "🏬 استلام من الفرع" : "🛵 توصيل"}</p></div>
     ${cancelled ? `<div class="tr-cancel">⚠️ الطلب ده اتلغى.${o.cancelCharge > 0 ? ` محاسبة الطلب: ${moneyP(o.cancelCharge)}.` : ""} لو ده غلط كلّمنا على واتساب.</div>` : ""}
     ${o.resv ? `<div class="notice" style="background:#ede9fe;color:#4c1d95;border-color:#c4b5fd"><b>${esc(resvText(o.resv))}</b><br><small>الأسعار والوزن بيتأكدوا يوم التنفيذ، وهنتواصل معاك لتأكيد الحجز.</small></div>` : ""}
     ${approveBox}${apprNote}
     <div class="box"><h4>مراحل طلبك</h4><ol class="steps">${steps}</ol></div>
     <div class="box">${totals}</div>
-    <div class="box"><h4>📦 طلبك</h4><div class="ord-items">${hasW ? wl.map(lineTxt).join("<br>").replace(/<b>|<\/b>/g, "") : o.items.map(x => esc(x)).join("\n")}</div></div>
+    <div class="box"><h4>📦 طلبك</h4><div class="ord-items oi-list">${hasW ? wl.map(lineTxt).join("") + feeRowHtml(o.fee) : o.items.map(itemRowHtml).join("")}</div></div>
     ${("Notification" in window && Notification.permission === "default") ? '<button class="btn dark" id="tr-notif" type="button" style="margin-bottom:8px">🔔 فعّل إشعارات طلبك (تنبيه لما حالته تتغيّر)</button>' : ""}
     ${o.allowCancel ? '<button class="btn dark" id="tr-cancel" type="button" style="margin-bottom:8px;color:#b91c1c">❌ إلغاء الطلب</button>' : ""}
     <div class="two"><button class="btn dark" id="track-refresh" type="button">🔄 تحديث</button><a class="btn wa" href="https://wa.me/${WA}?text=${waText}" target="_blank" rel="noopener">💬 واتساب المحل</a></div>
@@ -3330,18 +3724,18 @@ async function trackCancel() {
     S.trackOrder = r.order; rememberTracked(r.order); renderTrack(); toast("تم إلغاء طلبك");
   } catch (e) { toast("تعذر الاتصال، حاول تاني", "err"); }
 }
-const stLabelEntry = s => stageLabel(s || "جديد");
+const stLabelEntry = (s, e) => stageLabel(s || "جديد", e || null);
 function renderMyOrders() {
   const a = loadMyOrders();
   $("my-list").innerHTML = a.length ? a.map(e => `
     <div class="row" data-tk="${esc(e.token)}">
-      <div class="ord-head"><div><span class="ord-id">${esc(e.id)}</span><br><span class="ord-time">${esc(e.t ? new Date(e.t).toLocaleString("ar-EG", { dateStyle: "medium", timeStyle: "short" }) : (e.time || ""))}</span></div><span class="st ${ST_CLASS[e.status] || ""}">${esc(stLabelEntry(e.status))}</span></div>
+      <div class="ord-head"><div><span class="ord-id">${esc(e.id)}</span><br><span class="ord-time">${esc(e.t ? new Date(e.t).toLocaleString("ar-EG", { dateStyle: "medium", timeStyle: "short" }) : (e.time || ""))}</span></div><span class="st ${ST_CLASS[e.status] || ""}">${esc(stLabelEntry(e.status, e))}</span></div>
       <div class="ord-meta">${(e.lines || []).slice(0, 3).map(x => esc(x)).join("<br>")}</div>
       <div class="ord-tot">${e.final ? `<span>✅ المبلغ النهائي: <b>${moneyP(e.final)}</b></span>` : `<span>المبلغ التقديري: <b>${moneyP(e.total || 0)}</b></span>`}</div>
       <div class="two" style="margin:0"><button class="btn dark" type="button" data-act="mytrack">🔎 تتبّع</button>${e.cart ? '<button class="btn primary" type="button" data-act="myreorder">🔁 اطلب تاني</button>' : "<span></span>"}</div>
     </div>`).join("") : '<div class="empty">ما فيش طلبات محفوظة على الجهاز ده لسه.</div>';
 }
-function openMyOrders() { renderMyOrders(); $("myorders").classList.remove("hidden"); document.body.classList.add("lock"); refreshMyStatuses(); }
+function openMyOrders() { syncPushToggles(); renderMyOrders(); $("myorders").classList.remove("hidden"); document.body.classList.add("lock"); refreshMyStatuses(); }
 function closeMyOrders() { $("myorders").classList.add("hidden"); if ($("track").classList.contains("hidden")) document.body.classList.remove("lock"); }
 async function refreshMyStatuses() {
   const act = loadMyOrders().filter(o => !isTerminal(o.status)).slice(0, 6);
@@ -3382,7 +3776,7 @@ async function lookupMine() {
     const r = await post({ action: "lookup_order", code, last4, all: true });
     if (!r.ok) return toast(r.error || "مفيش طلب بالبيانات دي", "err");
     (r.orders && r.orders.length ? r.orders : [r.order]).forEach(rememberTracked);       // كل طلبات نفس الرقم تظهر على الجهاز ده
-    if (r.profile && !loadCust().phone) { saveCust({ name: r.profile.name, phone: r.profile.phone, address: r.profile.address, dtype: r.profile.type, zone: r.profile.zone, pay: loadCust().pay || "" }); restoreCust(); }
+    if (r.profile && !loadCust().phone) { saveCust({ name: r.profile.name, phone: r.profile.phone, address: r.profile.address, dtype: r.profile.type, zone: r.profile.zone, pay: loadCust().pay || "" }); restoreCust(); setTimeout(pushSync, 1500); }
     $("lk-code").value = ""; $("lk-last4").value = ""; renderMyOrders(); toast("اتضافت طلباتك على الجهاز ده ✅"); openTrack(r.order.token);
   } catch (e) { toast("تعذر الاتصال بالسيرفر", "err"); }
   finally { btn.disabled = false; }
@@ -3511,6 +3905,13 @@ function updateOfferFormHint() {
   if (p > 0 && !(each < p)) { h.textContent = `⚠️ سعر العرض (${num(each)} ج/${u}) مش أقل من السعر العادي (${num(p)}).`; return; }
   h.textContent = `= ${num(each)} ج لكل ${u} بدل ${num(p)}${p > 0 ? ` (توفير ${money(q * p - t)} على ${num(q)} ${u})` : ""}`;
 }
+// إخفاء خيار تجهيز معيّن عن الزبون (من غير حذفه): بيفضل ظاهر هنا للمدير
+function prepLines() { return $("f-prep").value.split("\n").map(s => s.trim()).filter(Boolean); }
+function renderPrepHide() {
+  const list = prepLines(); S.prepHidden = new Set([...(S.prepHidden || [])].filter(x => list.includes(x)));
+  $("f-prep-hide").innerHTML = list.map((p, i) => `<button type="button" class="${S.prepHidden.has(p) ? "off" : ""}" data-i="${i}">${S.prepHidden.has(p) ? "🚫" : "👁"} ${esc(p)}</button>`).join("");
+  $("f-prep-hint").textContent = list.length ? (S.prepHidden.size ? "الخيارات اللي عليها 🚫 مش بتظهر للزبون. اضغط عليها تاني لإظهارها." : "اضغط على أي خيار عشان تخفيه عن الزبون من غير ما تحذفه.") : "";
+}
 function openForm(id) {
   const m = id ? findItem(id) : null;
   S.editingId = m ? m.id : "";
@@ -3519,6 +3920,7 @@ function openForm(id) {
   $("f-name").value = m ? m.name : "";
   $("f-price").value = m ? m.price : ""; $("f-unit").value = m ? m.unit : "كيلو";
   $("f-step").value = m ? m.step : 0.5; $("f-prep").value = m ? prepOpts(m).join("\n") : "";
+  S.prepHidden = new Set(m && Array.isArray(m.hidden_prep) ? m.hidden_prep : []); renderPrepHide();
   $("f-basis").value = m ? (m.weight_basis || "") : ""; $("f-count").checked = !!(m && m.count_mode);
   $("f-pmin").value = m && m.count_mode ? m.piece_min : ""; $("f-pmax").value = m && m.count_mode ? m.piece_max : ""; syncCountBox();
   $("f-img").value = m ? m.img : ""; $("f-desc").value = m ? m.desc : "";
@@ -3531,6 +3933,7 @@ function readForm() {
   return { id: S.editingId, name: $("f-name").value.trim(), cat: $("f-cat").value, price: Number($("f-price").value),
     unit: $("f-unit").value, step: Number($("f-step").value),
     prep_list: $("f-prep").value.split("\n").map(s => s.trim()).filter(Boolean),
+    hidden_prep: [...(S.prepHidden || [])],
     img: $("f-img").value.trim(), desc: $("f-desc").value.trim(),
     offer_qty: Number($("f-offer-qty").value) || 0, offer_total: Number($("f-offer-total").value) || 0,
     weight_basis: $("f-basis").value, count_mode: $("f-unit").value === "كيلو" && $("f-count").checked,
@@ -3852,6 +4255,7 @@ function init() {
     const card = b.closest("[data-oid]"), id = card.dataset.oid, act = b.dataset.act;
     if (act === "oopen") openOrderScreen(id);
     if (act === "ocopy") copyTrackLink(id);
+    if (act === "otrust") toggleTrusted(id);
   });
   $("os-close").addEventListener("click", closeOrderScreen);
   $("os-body").addEventListener("input", e => { const i = e.target.dataset.wq; if (i === undefined || !S.os) return; S.os.q[i] = e.target.value; osRecalc(); });
@@ -3971,7 +4375,17 @@ function init() {
   $("s-search").addEventListener("input", renderPick);
   $("s-chips").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (!b) return; S.sCat = b.dataset.c; renderSell(); });
   $("s-pick").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (b) addToBill(b.dataset.k, b.dataset.id); });
-  $("td-text").addEventListener("input", tdPreview);
+  $("pn-offer").addEventListener("change", () => { const o = (S.pnList || []).find(x => x.k === $("pn-offer").value); if (o) { $("pn-title").value = o.title; $("pn-body").value = o.body; $("pn-img").value = /^https:\/\//.test(o.img || "") ? o.img : ""; } pnPreview(); });
+  ["pn-title", "pn-body", "pn-img"].forEach(i => $(i).addEventListener("input", pnPreview));
+  $("pn-when").addEventListener("change", () => $("pn-at").classList.toggle("hidden", $("pn-when").value !== "later"));
+  $("pn-pick").addEventListener("click", () => $("pn-file").click()); $("pn-file").addEventListener("change", pnPickImage);
+  $("pn-noimg").addEventListener("click", () => { $("pn-img").value = ""; pnPreview(); });
+  $("pn-send").addEventListener("click", pnSend);
+  $("f-prep").addEventListener("input", renderPrepHide);
+  $("f-prep-hide").addEventListener("click", e => { const b = e.target.closest("[data-i]"); if (!b) return; const p = prepLines()[Number(b.dataset.i)]; if (!p) return; S.prepHidden = S.prepHidden || new Set(); S.prepHidden.has(p) ? S.prepHidden.delete(p) : S.prepHidden.add(p); renderPrepHide(); });
+  $("td-rows").addEventListener("input", tdPreview);
+  $("td-rows").addEventListener("click", e => { const b = e.target.closest('[data-f="del"]'); if (b) { b.closest(".td-row").remove(); tdPreview(); } });
+  $("td-add").addEventListener("click", () => { $("td-rows").insertAdjacentHTML("beforeend", tdRowHtml({ w: "", s: null, p: 0, on: true })); const w = $("td-rows").lastElementChild.querySelector("input"); w && w.focus(); });
   $("td-save").addEventListener("click", () => tdSave(false));
   $("td-clear").addEventListener("click", () => { if (confirm("مسح كل أوزان الصنف ده؟")) tdSave(true); });
   $("td-cancel").addEventListener("click", () => $("tiers-dialog").classList.add("hidden"));
@@ -4054,6 +4468,13 @@ function init() {
   });
   $("sn-clear").addEventListener("click", async () => { await idbDel("orderSound"); if ($("sn-sel").value === "custom") $("sn-sel").value = "bell"; sndSave(readSound()); fillSound(); toast("تم مسح الصوت"); });
   $("sn-notif").addEventListener("click", enableNotif);
+  $("push-bar").addEventListener("click", enableNotif);
+  $("install-sheet").addEventListener("click", e => { if (e.target === $("install-sheet")) $("install-sheet").classList.add("hidden"); });
+  $("sn-push").addEventListener("change", e => pushSetEnabled(e.target.checked));
+  $("my-push").addEventListener("change", e => pushSetEnabled(e.target.checked));
+  $("pa-on").addEventListener("click", () => { $("push-ask").classList.add("hidden"); enableNotif(); });
+  $("pa-later").addEventListener("click", () => $("push-ask").classList.add("hidden"));
+  $("hr-dmode").addEventListener("change", () => $("hr-ddays").classList.toggle("hidden", $("hr-dmode").value !== "auto"));
   $("hr-save").addEventListener("click", async () => {
     const btn = $("hr-save"); btn.disabled = true;
     try {
@@ -4085,14 +4506,17 @@ function init() {
   });
   $("cp-dl").addEventListener("click", campDownload);
   $("cp-share").addEventListener("click", campShare);
+  $("cp-share-img").addEventListener("click", campShareImage);
   $("cp-copy").addEventListener("click", campCopy);
   $("cp-wa").addEventListener("click", () => window.open("https://wa.me/?text=" + encodeURIComponent(campCaption()), "_blank", "noopener"));
   $("qr-url").addEventListener("input", () => { lsSet("tahona_qr_url", $("qr-url").value.trim()); drawQrPreview(); });
   $("qr-dl").addEventListener("click", downloadQr);
   $("qr-poster").addEventListener("click", downloadPoster);
 
+  initNav();
   captureSrc();
   applyShop();
+  if (APP_MODE !== "admin") setTimeout(pushSync, 4000);      // زبون مفعّل الإشعارات قبل كده: نربط جهازه بموبايله
   $("is-logo").src = LOGO_URI;
   initInstall();
   updateMyBadge();
