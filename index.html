@@ -793,6 +793,7 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
         <div class="field"><label>صوت من موبايلك (ملف mp3 أو m4a أو wav، حتى 1.5 ميجا)</label><input type="file" id="sn-file" accept="audio/*" class="hidden"><button class="btn soft" id="sn-pick" type="button">📁 اختيار صوت من الموبايل</button><p class="hint" id="sn-state"></p><button class="btn dark hidden" id="sn-clear" type="button">🗑 مسح الصوت المرفوع</button></div>
         <label class="chk"><input type="checkbox" id="sn-wake"> خلّي الشاشة صاحية (عشان الصوت يشتغل طول وقت الشغل)</label>
         <label class="chk"><input type="checkbox" id="sn-push"> 🔔 إشعارات الطلبات على الموبايل (بتوصل حتى والتطبيق مقفول)</label>
+        <p class="hint" id="sn-push-state"></p>
         <div class="two" style="margin:8px 0 0"><button class="btn dark" id="sn-test" type="button">▶️ تجربة الصوت</button><button class="btn dark hidden" id="sn-notif" type="button">🔔 إشعارات النظام</button></div>
         <p class="hint">الصوت بيشتغل والصفحة مفتوحة (حتى لو الشاشة في الخلفية). ولو الصفحة اتقفلت خالص محتاجين خدمة إشعارات إضافية.</p>
       </div>
@@ -948,6 +949,10 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
   <nav id="admin-nav" aria-label="اختصارات الإدارة"></nav>
 </div>
 
+<div id="menu-preview" class="screen hidden" role="dialog" aria-label="معاينة المنيو" style="z-index:66">
+  <div class="screen-head"><b id="mp-title">👁 المنيو زي ما العميل بيشوفه</b><button id="mp-close" type="button">رجوع للإدارة ✕</button></div>
+  <iframe id="mp-frame" title="معاينة" style="flex:1;border:0;width:100%;background:var(--bg)"></iframe>
+</div>
 <div id="side-menu" class="dialog hidden" role="dialog" aria-label="القايمة">
   <div class="dialog-box">
     <h3 id="sm-title" style="margin-bottom:0">☰ القايمة</h3>
@@ -966,7 +971,8 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
 <div id="myorders" class="screen hidden" role="dialog" aria-label="طلباتي">
   <div class="screen-head"><b>🧾 طلباتي</b><button id="my-close" type="button">رجوع للمنيو ✕</button></div>
   <div class="screen-body"><div class="wrap">
-    <label class="chk" style="margin-bottom:8px"><input type="checkbox" id="my-push"> 🔔 إشعارات طلباتي (لما حالة الطلب تتغيّر)</label>
+    <label class="chk" style="margin-bottom:2px"><input type="checkbox" id="my-push"> 🔔 إشعارات طلباتي (لما حالة الطلب تتغيّر)</label>
+    <p class="hint" id="my-push-state" style="margin:0 0 8px"></p>
     <div id="my-list"></div>
     <div class="box" style="margin-top:12px">
       <h4>🔎 طلبك مش ظاهر هنا؟ ابحث عنه</h4>
@@ -1127,6 +1133,8 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 /* ===== الإعدادات ===== */
 // نفس الملف بيتولّد منه صفحتين: index.html (الزبائن: APP_MODE=customer) و admin.html (الإدارة: APP_MODE=admin) بسكريبت make_admin
 const APP_MODE = "customer";
+// معاينة المنيو من الإدارة: بتتفتح جوه إطار (iframe) بـ ?preview=1 عشان المدير يشوف المنيو زي العميل من غير ما يتحوّل لتطبيق تاني
+const PREVIEW = /[?&]preview=1/.test(location.search);
 const WA = "201097022660";
 const PAY_NUMBER = "01097022660";
 const FALLBACK_IMG = "https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=500";
@@ -1838,6 +1846,7 @@ async function post(obj) {
   return r.json();
 }
 async function submitOrder() {
+  if (PREVIEW) return toast("ده عرض تجريبي للمنيو، الطلب مش بيتبعت", "warn");
   const lines = cartLines(), bls = bundleLines(); if (!lines.length && !bls.length) return toast("السلة فاضية", "warn");
   const c = readCustomer(), bad = checkCustomer(c);
   if (bad) { toast(bad[1], "err"); $(bad[0]).focus(); return; }
@@ -2164,7 +2173,7 @@ function orderCardHtml(o) {
       <button type="button" class="btn-sm save" data-act="oopen">📝 فتح الطلب</button>
       ${hasPhone ? `<a class="btn-sm" href="tel:${esc(String(o.phone).replace(/\D/g, ""))}">📞 اتصال</a>
       <a class="btn-sm" href="https://wa.me/${esc(phoneIntl(o.phone))}?text=${waMsg}" target="_blank" rel="noopener">💬 ${shop ? "الفاتورة" : "الحالة"}</a>` : ""}
-      ${o.token ? `<a class="btn-sm" href="${esc(invoiceUrl(o.token))}" target="_blank" rel="noopener">📄 الفاتورة</a>` : ""}
+      ${o.token ? `<button type="button" class="btn-sm" data-act="oinv">📄 الفاتورة</button>` : ""}
       ${o.gps ? `<a class="btn-sm" href="${esc(o.gps)}" target="_blank" rel="noopener">🗺️ الموقع</a>` : ""}
       ${o.receipt ? `<a class="btn-sm" href="${esc(o.receipt)}" target="_blank" rel="noopener">🧾 الإيصال</a>` : ""}
       ${o.token ? `<button type="button" class="btn-sm" data-act="ocopy">🔗 رابط التتبّع</button>` : ""}
@@ -2185,7 +2194,7 @@ function renderOrders() {
 async function copyTrackLink(id) {
   const o = S.orders.find(x => x.id === id); if (!o || !o.token) return;
   const url = trackUrl(o.token);
-  try { window.open(url, "_blank", "noopener"); } catch (e) {}
+  openMenuPreview(url, "🔎 صفحة التتبّع زي ما العميل بيشوفها");
   try { await navigator.clipboard.writeText(url); toast("تم نسخ رابط التتبّع ✅ وفتحناه"); } catch (e) { toast("انسخ الرابط: " + url, "warn"); }
 }
 const normPh = v => { const s = String(v == null ? "" : v).replace(/\s+/g, ""); if (/^1[0125]\d{8}$/.test(s)) return "0" + s; const m = /^\+?20(1[0125]\d{8})$/.exec(s); return m ? "0" + m[1] : s; };
@@ -2410,17 +2419,19 @@ const OS_APP_ID = "71878b83-123a-4ba0-ab65-c69e01435ef8";
 let osReady = null;
 function osLoad() {
   if (osReady) return osReady;
-  osReady = new Promise(res => {
-    if (location.hostname !== "tahona2026.github.io" || !("serviceWorker" in navigator) || !("PushManager" in window)) return res(null);
+  const p = new Promise(res => {
+    if (location.hostname !== "tahona2026.github.io") { S.osErr = "الإشعارات بتشتغل بس على الموقع الحقيقي"; return res(null); }
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) { S.osErr = "المتصفح ده مش بيدعم الإشعارات"; return res(null); }
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async OneSignal => {
-      try { await OneSignal.init({ appId: OS_APP_ID, serviceWorkerPath: "menu/sw.js", serviceWorkerParam: { scope: "/menu/" } }); res(OneSignal); } catch (e) { res(null); }
+      try { await OneSignal.init({ appId: OS_APP_ID, serviceWorkerPath: "menu/sw.js", serviceWorkerParam: { scope: "/menu/" } }); S.osErr = ""; res(OneSignal); } catch (e) { S.osErr = "تعذر تشغيل خدمة الإشعارات: " + String((e && e.message) || e).slice(0, 80); res(null); }
     });
-    const sc = document.createElement("script"); sc.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"; sc.defer = true; sc.onerror = () => res(null);
+    const sc = document.createElement("script"); sc.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"; sc.defer = true; sc.onerror = () => { S.osErr = "تعذر تحميل خدمة الإشعارات (النت أو حاجب)"; res(null); };
     document.head.appendChild(sc);
-    setTimeout(() => res(null), 15000);
+    setTimeout(() => { if (!S.osErr) S.osErr = "خدمة الإشعارات اتأخرت في التحميل"; res(null); }, 15000);
   });
-  return osReady;
+  osReady = p; p.then(v => { if (!v) osReady = null; });       // لو فشل نسيب المحاولة الجاية تتجرّب من الأول
+  return p;
 }
 async function pushId() {
   if (APP_MODE === "admin") return isAdmin() ? "adm" : (S.perms && S.perms.orders ? "csh" : "");
@@ -2431,18 +2442,48 @@ async function pushId() {
 }
 // بيربط الجهاز بصاحبه (مدير/كاشير/زبون). بيرجّع true لو الإشعارات شغّالة على الجهاز ده
 const pushOff = () => lsGet("tahona_push_off") === "1";          // الافتراضي: مفعّلة. الزبون/المدير بيقفلها من الإعدادات
-function syncPushToggles() { const on = "Notification" in window && Notification.permission === "granted" && !pushOff(); ["sn-push", "my-push"].forEach(i => { if ($(i)) $(i).checked = on; }); }
+// حالة الإشعارات بالنص (بتظهر تحت زرار التفعيل): مفعّلة / محجوبة / مش مسجّلة
+async function pushDiag() {
+  if (!("Notification" in window)) return "المتصفح ده مش بيدعم الإشعارات.";
+  const perm = Notification.permission;
+  if (perm === "denied") return "🚫 الإشعارات محجوبة من إعدادات المتصفح للموقع ده (افتحها من قفل 🔒 جنب العنوان ثم الإشعارات).";
+  if (perm === "default") return "غير مفعّلة. فعّلها عشان توصلك تنبيهات حتى والتطبيق مقفول.";
+  if (pushOff()) return "اتقفلت من عندك. اضغط عشان تفتحها تاني.";
+  const OS = await osLoad();
+  if (!OS) return "⚠️ الإذن موجود لكن " + (S.osErr || "خدمة الإشعارات مش شغّالة دلوقتي") + ".";
+  try {
+    const sub = OS.User.PushSubscription, ext = OS.User.externalId;
+    if (!sub.optedIn) return "⚠️ الإذن موجود لكن الاشتراك لسه ما اتسجلش. اقفل التطبيق وافتحه تاني.";
+    return "✅ مفعّلة وجهازك مسجّل" + (ext ? " ومربوط " + (APP_MODE === "admin" ? "بطلبات المحل." : "بطلباتك.") : (APP_MODE === "admin" ? "." : " (هيتربط برقمك لما تعمل أول طلب)."));
+  } catch (e) { return "⚠️ تعذر قراءة حالة الإشعارات."; }
+}
+function syncPushToggles() {
+  const on = "Notification" in window && Notification.permission === "granted" && !pushOff();
+  ["sn-push", "my-push"].forEach(i => { if ($(i)) $(i).checked = on; });
+  pushDiag().then(t => ["sn-push-state", "my-push-state"].forEach(i => { if ($(i)) $(i).textContent = t; })).catch(() => {});
+}
+// الضغط على زرار الإشعارات: تفعيل، أو إيقاف بعد تأكيد، أو شرح لو المتصفح حاجبها
+async function pushToggle(wantOn) {
+  if (wantOn) {
+    if ("Notification" in window && Notification.permission === "denied") { alert("الإشعارات محجوبة من المتصفح للموقع ده.\n\nعشان تفتحها: اضغط على القفل 🔒 (أو ⓘ) جنب عنوان الموقع، ثم «الإشعارات» أو «الأذونات»، واختار «سماح»، وبعدين ارجع هنا."); return syncPushToggles(); }
+    return pushSetEnabled(true);
+  }
+  const msg = APP_MODE === "admin" ? "متأكد إنك عايز توقف الإشعارات على الجهاز ده؟\n\nمش هتوصلك تنبيهات الطلبات الجديدة وردود العملاء، إلا لما تكون فاتح اللوحة." : "متأكد إنك عايز توقف الإشعارات؟\n\nمش هتوصلك تنبيهات بحالة طلباتك (الوزن، الموافقة، التجهيز، التوصيل، الإلغاء). تقدر تفتحها تاني في أي وقت.";
+  if (!confirm(msg)) return syncPushToggles();
+  return pushSetEnabled(false);
+}
 async function pushSetEnabled(on) {
   if (on) { lsSet("tahona_push_off", "0"); await enableNotif(); }
   else {
     lsSet("tahona_push_off", "1");
     try { if (location.hostname === "tahona2026.github.io") { const OS = await osLoad(); if (OS) await OS.User.PushSubscription.optOut(); } } catch (e) {}
-    toast("الإشعارات اتقفلت. تقدر تفتحها تاني من نفس المكان", "warn");
+    toast("🔕 الإشعارات اتقفلت. تقدر تفتحها تاني من نفس المكان", "warn");
   }
   syncPushToggles();
 }
 // الافتراضي «مفعّلة»: لو المتصفح لسه مسألش، بنعرض ورقة التفعيل (ضغطة الزرار هي اللي بتخلّي المتصفح يسمح). بتتكرر كل 3 أيام لو اتأجّلت
 function pushAutoAsk(kind) {
+  if (PREVIEW) return;
   if (!("Notification" in window) || Notification.permission !== "default" || pushOff()) return;
   if (Date.now() - Number(lsGet("tahona_push_ask") || 0) < 3 * 86400000) return;
   if (document.querySelector(".dialog:not(.hidden)")) return setTimeout(() => pushAutoAsk(kind), 3000);
@@ -2480,7 +2521,8 @@ async function enableNotif() {
   if (p === "default") p = await Notification.requestPermission();
   if (p !== "granted") return toast("الإشعارات مقفولة، افتحها من إعدادات الموقع في المتصفح", "warn");
   const on = await pushSync();
-  toast(on ? "تم تفعيل الإشعارات ✅ بتوصلك حتى والتطبيق مقفول" : "تم تفعيل الإشعارات ✅", "");
+  if (on) toast("✅ الإشعارات مفعّلة، بتوصلك حتى والتطبيق مقفول", "");
+  else toast("⚠️ الإذن اتمنح لكن الاشتراك لسه ما اتسجلش: " + (S.osErr || "جرّب تقفل التطبيق وتفتحه تاني") + ".", "warn");
   if ($("tr-notif")) $("tr-notif").classList.add("hidden");
   if ($("push-bar")) $("push-bar").classList.add("hidden");
   syncPushToggles();
@@ -2688,6 +2730,7 @@ function maybeInstallSheet(kind) {
   $("install-sheet").classList.remove("hidden"); lsSet("tahona_install_big", "1");
 }
 function initInstall() {
+  if (PREVIEW) return;
   try {
     if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
       if (location.hostname === "tahona2026.github.io") setTimeout(() => osLoad().then(OS => { if (!OS) navigator.serviceWorker.register("sw.js").catch(() => {}); }), 1500);   // OneSignal هو اللي بيسجّل نفس الـ worker، ولو ما اتحمّلش بنسجّله احنا
@@ -2782,7 +2825,7 @@ function smItems() {
   const common = [
     ["theme", dark ? "☀️ الوضع النهاري" : "🌙 الوضع الليلي"],
     ...(isStandalone() ? [] : [["install", "📲 تثبيت التطبيق"]]),
-    ...("Notification" in window ? [["push", pushOn ? "🔕 قفل الإشعارات" : "🔔 تفعيل الإشعارات"]] : [])
+    ...("Notification" in window ? [["push", pushOn ? "🔔 الإشعارات مفعّلة ✓ (اضغط لإيقافها)" : (Notification.permission === "denied" ? "🚫 الإشعارات محجوبة (اضغط للشرح)" : "🔔 تفعيل الإشعارات")]] : [])
   ];
   if (APP_MODE === "admin") {
     const tabs = [...document.querySelectorAll("#admin .tabs button[data-tab]")].filter(b => !b.classList.contains("hidden") && !["sell", "orders", "items"].includes(b.dataset.tab)).map(b => ["tab:" + b.dataset.tab, b.textContent.trim()]);
@@ -2800,13 +2843,20 @@ function smAction(k) {
   if (k.startsWith("tab:")) return showAdminTab(k.slice(4));
   if (k === "theme") return applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
   if (k === "install") return installNow();
-  if (k === "push") return pushSetEnabled(!( "Notification" in window && Notification.permission === "granted" && !pushOff()));
+  if (k === "push") return pushToggle(!("Notification" in window && Notification.permission === "granted" && !pushOff()));
   if (k === "refresh") return $("refresh-btn").click();
   if (k === "font") return $("font-btn").click();
   if (k === "track") { openMyOrders(); setTimeout(() => $("lk-code").focus(), 300); return; }
-  if (k === "custview") return void window.open(custBase(), "_blank", "noopener");
+  if (k === "custview") return openMenuPreview(custBase());
   if (k === "logout") return closeAdmin();
 }
+// معاينة صفحة العميل جوه الإدارة (المنيو أو صفحة تتبّع طلب) من غير الخروج منها
+function openMenuPreview(url, title) {
+  $("mp-title").textContent = title || "👁 المنيو زي ما العميل بيشوفه";
+  $("mp-frame").src = url + (url.includes("?") ? "&" : "?") + "preview=1";
+  $("menu-preview").classList.remove("hidden");
+}
+function closeMenuPreview() { $("menu-preview").classList.add("hidden"); $("mp-frame").src = "about:blank"; }
 function adminNavRender() {
   const nav = $("admin-nav"); if (!nav) return;
   const items = [["sell", "🧾", "كاشير", "sell"], ["orders", "📦", "الطلبات", "orders"], ["items", "📋", "الأصناف", "admin"]]
@@ -2829,6 +2879,7 @@ const OVL = {
   "order-screen": { vis: el => !el.classList.contains("hidden"), close: () => $("os-close").click() },
   "qty-dialog": { vis: el => !el.classList.contains("hidden"), close: () => $("qd-cancel").click() },
   "tiers-dialog": { vis: el => !el.classList.contains("hidden"), close: () => $("td-cancel").click() },
+  "menu-preview": { vis: el => !el.classList.contains("hidden"), close: () => $("mp-close").click() },
   "side-menu": { vis: el => !el.classList.contains("hidden"), close: () => $("side-menu").classList.add("hidden") },
   "install-sheet": { vis: el => !el.classList.contains("hidden"), close: () => $("install-sheet").classList.add("hidden") },
   "push-ask": { vis: el => !el.classList.contains("hidden"), close: () => $("push-ask").classList.add("hidden") }
@@ -2849,8 +2900,9 @@ function initBackNav() {
   });
 }
 function initNav() {
-  initBackNav();
+  if (!PREVIEW) initBackNav();          // جوه المعاينة ما نسجّلش خطوات في سجل المتصفح (بتتداخل مع زرار الرجوع بتاع الإدارة)
   $("sm-close").addEventListener("click", () => $("side-menu").classList.add("hidden"));
+  $("mp-close").addEventListener("click", closeMenuPreview);
   $("sm-grid").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (b) smAction(b.dataset.k); });
   $("admin-theme").addEventListener("click", () => applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
   $("bnav").addEventListener("click", e => {
@@ -4267,6 +4319,7 @@ function init() {
     if (act === "oopen") openOrderScreen(id);
     if (act === "ocopy") copyTrackLink(id);
     if (act === "otrust") toggleTrusted(id);
+    if (act === "oinv") { const oo = S.orders.find(x => x.id === id); if (oo && oo.token) openMenuPreview(invoiceUrl(oo.token), "🧾 الفاتورة زي ما العميل بيشوفها"); }
   });
   $("os-close").addEventListener("click", closeOrderScreen);
   $("os-body").addEventListener("input", e => { const i = e.target.dataset.wq; if (i === undefined || !S.os) return; S.os.q[i] = e.target.value; osRecalc(); });
@@ -4481,8 +4534,8 @@ function init() {
   $("sn-notif").addEventListener("click", enableNotif);
   $("push-bar").addEventListener("click", enableNotif);
   $("install-sheet").addEventListener("click", e => { if (e.target === $("install-sheet")) $("install-sheet").classList.add("hidden"); });
-  $("sn-push").addEventListener("change", e => pushSetEnabled(e.target.checked));
-  $("my-push").addEventListener("change", e => pushSetEnabled(e.target.checked));
+  $("sn-push").addEventListener("change", e => pushToggle(e.target.checked));
+  $("my-push").addEventListener("change", e => pushToggle(e.target.checked));
   $("pa-on").addEventListener("click", () => { $("push-ask").classList.add("hidden"); enableNotif(); });
   $("pa-later").addEventListener("click", () => $("push-ask").classList.add("hidden"));
   $("hr-dmode").addEventListener("change", () => $("hr-ddays").classList.toggle("hidden", $("hr-dmode").value !== "auto"));
@@ -4527,7 +4580,7 @@ function init() {
   initNav();
   captureSrc();
   applyShop();
-  if (APP_MODE !== "admin") setTimeout(pushSync, 4000);      // زبون مفعّل الإشعارات قبل كده: نربط جهازه بموبايله
+  if (APP_MODE !== "admin" && !PREVIEW) setTimeout(pushSync, 4000);      // زبون مفعّل الإشعارات قبل كده: نربط جهازه بموبايله
   $("is-logo").src = LOGO_URI;
   initInstall();
   updateMyBadge();
