@@ -634,6 +634,7 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
     <button data-tab="bundles" data-need="admin">🎁 الباقات</button>
     <button data-tab="delivery" data-need="admin">🛵 التوصيل</button>
     <button data-tab="users" data-need="admin">👥 المستخدمين</button>
+    <button data-tab="design" data-need="builder">🎨 المصمم</button>
     <button data-tab="push" data-need="admin">🔔 إشعار للعملاء</button>
     <button data-tab="shop" data-need="admin">🏪 المحل</button>
   </nav>
@@ -720,6 +721,7 @@ setTimeout(function(){ var s = document.getElementById("splash"); if (s) s.class
       </div>
     </div>
 
+    <div id="tab-design" class="hidden"><div id="dz-root"></div></div>
     <div id="tab-push" class="hidden">
       <div class="box">
         <h4>🔔 إشعار للعملاء</h4>
@@ -1140,7 +1142,8 @@ function applyShop() {
   try { renderClosed(); } catch (e) {}
   document.title = APP_MODE === "admin" ? "الإدارة — " + sh.name : sh.name + " - المنيو";
 }
-const isAdmin = () => S.role === "admin";
+const isAdmin = () => S.role === "admin" || S.role === "builder";          // المطوّر (BUILDER_PIN) معاه كل صلاحيات المدير
+const isBuilder = () => S.role === "builder";
 const canOrders = () => isAdmin() || !!(S.perms && S.perms.orders);
 // روابط الزبائن (تتبّع/فاتورة/منيو) دايماً على صفحة الزبائن، حتى لو اتولّدت من صفحة الإدارة
 const custBase = () => location.href.split("#")[0].split("?")[0].replace(/admin(\.html)?$/, "");
@@ -1546,7 +1549,7 @@ async function loadMenu(force) {
     S.settings = d.settings || { deliveryActive: false, deliveryZones: [] }; applyShop();
     S.bundles = Array.isArray(d.bundles) ? d.bundles : [];
     S.cats = Array.isArray(d.categories) && d.categories.length ? d.categories : DEFAULT_CATS.slice();
-    if (S.role === "admin") {                    // المدير بيشوف كل الأصناف والتصنيفات حتى المخفي
+    if (isAdmin()) {                    // المدير بيشوف كل الأصناف والتصنيفات حتى المخفي
       try { const ar = await post({ action: "admin_menu", pin: S.pin }); if (ar.ok) { S.menu = ar.menu; S.cats = ar.categories; S.trusted = ar.trusted || []; } } catch (er) {}
     }
     if (S.cat !== "all" && S.cat !== "__offers" && !S.cats.some(c => c.id === S.cat)) S.cat = "all";
@@ -1912,9 +1915,9 @@ async function verifyPin() {
 function applyRole() {
   document.querySelectorAll(".tabs button[data-need]").forEach(b => {
     const n = b.dataset.need;
-    b.classList.toggle("hidden", !(n === "admin" ? isAdmin() : n === "orders" ? canOrders() : true));
+    b.classList.toggle("hidden", !(n === "admin" ? isAdmin() : n === "builder" ? isBuilder() : n === "orders" ? canOrders() : true));
   });
-  $("admin-title").textContent = isAdmin() ? "⚙️ لوحة الإدارة" : "🧾 كاشير: " + (S.userName || "");
+  $("admin-title").textContent = isBuilder() ? "🛠️ المطوّر" : isAdmin() ? "⚙️ لوحة الإدارة" : "🧾 كاشير: " + (S.userName || "");
 }
 function openAdmin() {
   $("admin").classList.remove("hidden"); document.body.classList.add("lock");
@@ -1941,14 +1944,16 @@ function showAdminTab(t) {
   const need = (document.querySelector(`.tabs button[data-tab="${t}"]`) || {}).dataset;
   if (need && need.need === "admin" && !isAdmin()) return;
   if (need && need.need === "orders" && !canOrders()) return;
+  if (need && need.need === "builder" && !isBuilder()) return;
   document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
-  ["sell", "orders", "reports", "campaign", "items", "form", "cats", "offers", "bundles", "delivery", "users", "push", "shop"].forEach(x => $("tab-" + x).classList.toggle("hidden", x !== t));
+  ["sell", "orders", "reports", "campaign", "items", "form", "cats", "offers", "bundles", "delivery", "users", "push", "design", "shop"].forEach(x => $("tab-" + x).classList.toggle("hidden", x !== t));
   if (t === "sell") renderSell();
   if (t === "reports") initReports();
   if (t === "campaign") campInit();
   if (t === "users") showUserList();
   if (t === "shop") fillShop();
   if (t === "push") pnInit();
+  if (t === "design") loadDesigner();
   if (t === "orders") { renderOrders(); loadOrders(true); }
   if (t === "bundles") showBundleList();
   if (t === "offers") renderAdminOffers();
@@ -2409,7 +2414,7 @@ function osLoad() {
   return osReady;
 }
 async function pushId() {
-  if (APP_MODE === "admin") return S.role === "admin" ? "adm" : (S.perms && S.perms.orders ? "csh" : "");
+  if (APP_MODE === "admin") return isAdmin() ? "adm" : (S.perms && S.perms.orders ? "csh" : "");
   const ph = String(loadCust().phone || "").replace(/\D/g, "").slice(-10);
   if (ph.length < 8 || !(window.crypto && crypto.subtle)) return "";
   const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(ph));
@@ -2703,6 +2708,12 @@ function initInstall() {
   $("install-x").addEventListener("click", () => { lsSet("tahona_install_x", String(Date.now())); $("install-bar").classList.add("hidden"); });
 }
 
+// مصمم الحملة (للمطوّر بس): ملف designer.js بيتحمّل أول ما يفتح التبويب
+function loadDesigner() {
+  const go = () => { try { window.Designer.open($("dz-root")); } catch (e) { toast("تعذر فتح المصمم", "err"); } };
+  if (window.Designer) return go();
+  const sc = document.createElement("script"); sc.src = "designer.js?v=1"; sc.onload = go; sc.onerror = () => toast("تعذر تحميل المصمم", "err"); document.head.appendChild(sc);
+}
 /* ===== إشعار جماعي للعملاء من لوحة الإدارة (صورة + ربط بعرض + إرسال فوري أو مجدول) ===== */
 function pnOffers() {
   const items = (S.menu || []).filter(m => hasOffer(m) && offerActive(m)).map(m => ({ k: "i:" + m.id, label: "🔥 " + m.name, title: "🔥 عرض اليوم: " + m.name,
